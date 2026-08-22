@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F6F5F8">
+<title>eFootball Esports League</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#F6F5F8; --panel:#FFFFFF; --panel-2:#F3F1F6; --raise:#FFFFFF;
+    --line:rgba(24,16,32,.09); --line-2:rgba(24,16,32,.15);
+    --txt:#191320; --muted:#8B8598;
+    --mint:#E6007E; --mint-soft:rgba(230,0,126,.10); --cn:rgba(24,16,32,.18);
+    --amber:#E6007E; --rose:#D6006B; --rose-soft:rgba(214,0,107,.10); --gold:#E6007E;
+    --display:'Oswald',system-ui,sans-serif;
+    --body:'Plus Jakarta Sans',system-ui,sans-serif;
+    --mono:'JetBrains Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{font-family:var(--body);background:var(--ink);color:var(--txt);min-height:100vh;line-height:1.45;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+  body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+    background:radial-gradient(900px 380px at 50% -120px,rgba(230,0,126,.10),transparent 70%),
+      radial-gradient(700px 320px at 100% -60px,rgba(230,0,126,.06),transparent 70%)}
+  .wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:0 14px 90px}
+
+  .topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:14px;max-width:960px;margin:0 auto;
+    background:linear-gradient(180deg,rgba(246,245,248,.94),rgba(246,245,248,.60));backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .brand{display:flex;align-items:center;gap:11px;min-width:0}
+  .crest{width:40px;height:40px;border-radius:12px;flex:none;display:grid;place-items:center;font-size:20px;
+    background:linear-gradient(145deg,#fff,#f2ecf1);border:1px solid var(--line-2);
+    box-shadow:0 0 0 1px rgba(230,0,126,.20),0 8px 22px rgba(24,16,32,.10)}
+  .tname{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:.4px;line-height:1.05;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .tsub{font-size:11px;color:var(--muted);font-weight:600;letter-spacing:1.4px;text-transform:uppercase}
+  .admin-btn{font-family:var(--display);text-transform:uppercase;letter-spacing:1px;font-weight:600;font-size:12.5px;
+    color:var(--txt);background:var(--raise);border:1px solid var(--line-2);padding:9px 14px;border-radius:11px;cursor:pointer;white-space:nowrap;transition:.18s}
+  .admin-btn:hover{border-color:var(--mint);color:var(--mint)}
+  .admin-btn.live{background:var(--mint);color:#fff;border-color:var(--mint)}
+
+  .tabs{position:sticky;top:66px;z-index:25;display:flex;gap:6px;padding:8px;margin:0 auto 16px;
+    background:var(--panel-2);border:1px solid var(--line);border-radius:16px;max-width:960px}
+  .tabs button{flex:1;font-family:var(--display);text-transform:uppercase;letter-spacing:.6px;font-weight:600;font-size:12.5px;
+    color:var(--muted);background:transparent;border:0;padding:11px 4px;border-radius:11px;cursor:pointer;transition:.18s}
+  .tabs button.active{background:#fff;color:var(--mint);box-shadow:0 2px 8px rgba(24,16,32,.08),inset 0 0 0 1px var(--line-2)}
+
+  /* competition header */
+  .comp{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .pill{display:inline-flex;align-items:center;gap:7px;background:var(--panel);border:1px solid var(--line);
+    border-radius:11px;padding:9px 13px;font-size:12.5px;font-weight:600}
+  .pill b{font-family:var(--display);letter-spacing:.5px;text-transform:uppercase;font-size:12px}
+  .pill .k{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:700}
+  .pill.go{border-color:rgba(230,0,126,.35)}
+  .pill.go b{color:var(--mint)}
+
+  /* league table */
+  .gcard{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 3px rgba(24,16,32,.04),0 10px 26px rgba(24,16,32,.04)}
+  .ghead{display:flex;align-items:center;justify-content:space-between;padding:13px 16px 11px;border-bottom:1px solid var(--line)}
+  .ghead h3{font-family:var(--display);font-weight:600;font-size:14px;letter-spacing:1.2px;text-transform:uppercase}
+  .ghead .cols{display:flex;font-family:var(--mono);font-size:10px;color:var(--muted);font-weight:700}
+  .ghead .cols span{width:26px;text-align:center}
+  .ghead .cols .pts{color:var(--txt)}
+  .srow{display:flex;align-items:center;gap:10px;padding:10px 16px;border-left:3px solid transparent}
+  .srow + .srow{border-top:1px solid var(--line)}
+  .srow[data-z="q"]{border-left-color:var(--mint)}
+  .srow .pos{font-family:var(--mono);font-weight:800;font-size:13px;width:16px;text-align:center;color:var(--muted)}
+  .srow[data-z="q"] .pos{color:var(--mint)}
+  .srow .tn{flex:1;min-width:0;font-weight:600;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .srow .tn .sub2{color:var(--muted);font-family:var(--mono);font-weight:700;font-size:11px}
+  .srow .stt{display:flex;font-family:var(--mono);font-size:13px;font-weight:500}
+  .srow .stt span{width:26px;text-align:center;color:var(--muted)}
+  .srow .stt .gd{color:var(--txt)}
+  .srow .stt .pts{color:var(--txt);font-weight:800}
+  .srow[data-z="q"] .stt .pts{color:var(--mint)}
+
+  .bdg{width:28px;height:28px;border-radius:50%;flex:none;display:grid;place-items:center;
+    font-family:var(--mono);font-weight:800;font-size:9px;color:#fff;letter-spacing:.2px;
+    background:var(--c,#333);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.16)}
+  .bdg.img{background-size:cover;background-position:center;color:transparent;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.2)}
+  .flag{width:18px;height:13px;object-fit:cover;border-radius:2px;box-shadow:0 0 0 1px var(--line);vertical-align:middle;margin-right:6px}
+  .sub2 .flag{width:14px;height:10px;margin:0 4px 0 0}
+  .tlogo{display:inline-block;width:14px;height:14px;border-radius:50%;background-size:cover;background-position:center;vertical-align:middle;margin-right:4px;box-shadow:0 0 0 1px var(--line)}
+  .mini{display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--c,#555);background-size:cover;background-position:center;vertical-align:middle;box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)}
+  .mini.img{box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
+  .duel .dn{display:flex;align-items:center;gap:6px}
+  .duel .dn.a{justify-content:flex-end}
+  .prev{display:flex;align-items:center;gap:9px;margin:6px 0 12px}
+  .pl-row2{display:grid;grid-template-columns:22px 1fr 38px;gap:8px;align-items:start;padding:9px 0;border-bottom:1px solid var(--line)}
+  .pl-row2:last-child{border-bottom:0}
+  .pl-row2 .pn{font-family:var(--mono);color:var(--muted);font-size:12px;text-align:center;padding-top:11px}
+  .pl-row2 .stk{display:flex;flex-direction:column;gap:6px}
+  .pl-row2 input{padding:9px 11px}
+  .pl-row2 input[data-pp]{font-size:12px;color:var(--muted)}
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+  .chip{font-family:var(--display);text-transform:uppercase;letter-spacing:.6px;font-weight:600;font-size:12px;
+    color:var(--muted);background:var(--panel);border:1px solid var(--line);padding:8px 13px;border-radius:10px;cursor:pointer;transition:.16s}
+  .chip.active{background:#fff;color:var(--mint);border-color:rgba(230,0,126,.45);box-shadow:0 1px 5px rgba(24,16,32,.06)}
+  .empty{color:var(--muted);text-align:center;padding:36px 10px;font-size:14px}
+
+  /* fixtures */
+  .fix{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:10px;box-shadow:0 1px 3px rgba(24,16,32,.04),0 8px 20px rgba(24,16,32,.03)}
+  .fix-head{width:100%;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;
+    background:none;border:0;color:var(--txt);padding:14px;cursor:pointer;text-align:left}
+  .fix-head.static{cursor:default}
+  .fx-side{display:flex;align-items:center;gap:9px;min-width:0}
+  .fx-side.away{flex-direction:row-reverse;text-align:right}
+  .fx-side .nm{font-weight:600;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fx-mid{text-align:center;min-width:70px}
+  .fx-agg{font-family:var(--mono);font-weight:800;font-size:20px}
+  .fx-agg .v{color:var(--muted)}
+  .fx-vs{font-family:var(--mono);font-weight:700;font-size:15px;color:var(--muted)}
+  .fx-st{display:block;font-size:9px;text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-top:5px;color:var(--muted)}
+  .fx-st.ft{color:var(--mint)}
+  .fix-head.open{background:var(--panel-2)}
+  .fx-duels{border-top:1px solid var(--line);padding:6px 14px 10px;background:var(--panel-2)}
+  .duel{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px;padding:8px 2px}
+  .duel + .duel{border-top:1px solid var(--line)}
+  .duel .dn{font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .duel .dn.a{text-align:right}
+  .duel .dn.w{color:var(--txt);font-weight:700}
+  .duel .ds{font-family:var(--mono);font-weight:800;font-size:14px;min-width:54px;text-align:center}
+
+  /* admin */
+  .motm-strip{display:flex;align-items:center;gap:7px;padding:8px 14px;font-size:12.5px;color:var(--txt);background:var(--mint-soft);border-top:1px solid var(--line)}
+  .motm-strip span{font-family:var(--display);text-transform:uppercase;letter-spacing:1px;font-size:10px;color:var(--mint);font-weight:700}
+  .motm-n{font-family:var(--mono);font-weight:800;font-size:14px;color:var(--mint);white-space:nowrap;margin-left:auto}
+  .motm-pick{display:flex;flex-wrap:wrap;gap:7px}
+  .star-btn{font-family:var(--body);font-weight:600;font-size:12.5px;color:var(--muted);background:var(--panel);border:1px solid var(--line-2);border-radius:9px;padding:8px 11px;cursor:pointer;transition:.15s}
+  .star-btn.on{color:#fff;background:var(--mint);border-color:var(--mint)}
+  .kcol.kround.in .km.tp .kbox::before{display:none}
+  .kpen{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--mint);text-align:center;padding:3px 0 4px;border-top:1px dashed var(--line-2)}
+  .pen-lbl{font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted)}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 1px 3px rgba(24,16,32,.04),0 10px 26px rgba(24,16,32,.04)}
+  .panel h2{font-family:var(--display);text-transform:uppercase;letter-spacing:1px;font-size:15px;font-weight:600;margin-bottom:4px}
+  .panel p.hint{color:var(--muted);font-size:12.5px;margin-bottom:14px}
+  .field{margin-bottom:13px}
+  .field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700;margin-bottom:6px}
+  input[type=text],input[type=password],input[type=number],select{width:100%;font-family:var(--body);font-size:15px;color:var(--txt);
+    background:var(--panel-2);border:1px solid var(--line-2);border-radius:10px;padding:11px 12px;-webkit-appearance:none}
+  input:focus,select:focus{outline:none;border-color:var(--mint)}
+  .row2{display:grid;grid-template-columns:1fr 80px;gap:8px}
+  .row3{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .btn{font-family:var(--display);text-transform:uppercase;letter-spacing:1px;font-weight:600;font-size:13px;
+    background:var(--mint);color:#fff;border:0;border-radius:11px;padding:13px 18px;cursor:pointer;width:100%;transition:.16s}
+  .btn:hover{filter:brightness(1.07)}
+  .btn.ghost{background:var(--raise);color:var(--txt);box-shadow:inset 0 0 0 1px var(--line-2)}
+  .btn.danger{background:var(--rose-soft);color:var(--rose);box-shadow:inset 0 0 0 1px rgba(214,0,107,.35)}
+  .btn.sm{width:auto;padding:9px 14px;font-size:12px}
+  .btn-row{display:flex;gap:9px;flex-wrap:wrap}
+  .btn-row .btn{flex:1;min-width:120px}
+
+  .pl-row{display:grid;grid-template-columns:24px 1fr 38px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+  .pl-row:last-child{border-bottom:0}
+  .pl-row .pn{font-family:var(--mono);color:var(--muted);font-size:12px;text-align:center}
+  .pl-row input{padding:9px 11px}
+  .icon-btn{background:var(--rose-soft);color:var(--rose);border:0;border-radius:9px;height:38px;cursor:pointer;font-size:16px;font-weight:700}
+  input[type=color]{width:46px;height:44px;padding:2px;border:1px solid var(--line-2);background:var(--panel-2);border-radius:10px;cursor:pointer}
+
+  .fx-row{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--line)}
+  .fx-row:last-child{border-bottom:0}
+  .fx-row .lbl{flex:1;min-width:0;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fx-row .tag{font-size:9px;text-transform:uppercase;letter-spacing:.8px;font-weight:700;color:var(--muted);padding:3px 7px;border:1px solid var(--line);border-radius:6px}
+  .fx-row .tag.ft{color:var(--mint);border-color:rgba(230,0,126,.4)}
+
+  .duel-ed{display:grid;grid-template-columns:1fr auto 1fr;gap:7px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+  .duel-ed:last-child{border-bottom:0}
+  .duel-ed select{padding:8px 8px;font-size:12.5px}
+  .duel-ed .sc{display:flex;align-items:center;gap:5px}
+  .duel-ed .sc input{width:40px;text-align:center;padding:8px 2px;font-family:var(--mono);font-weight:800;font-size:15px}
+  .sc select.sc-sel{width:58px;text-align:center;text-align-last:center;font-family:var(--mono);font-weight:800;font-size:15px;
+    padding:10px 4px;background:var(--panel);border:1px solid var(--line-2);border-radius:9px;color:var(--txt);
+    -webkit-appearance:none;appearance:none;background-image:none}
+  .sc select.sc-sel:focus{border-color:var(--mint);outline:none}
+  .sc select.sc-sel:disabled{opacity:.45}
+  .duel-ed .sc span{color:var(--muted);font-weight:700}
+  .duel-ed .stk{display:flex;flex-direction:column;gap:5px}
+  .lock{max-width:340px;margin:30px auto;text-align:center}
+  .lock .crest{margin:0 auto 16px;width:54px;height:54px;font-size:26px}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    background:var(--mint);color:#fff;font-weight:700;font-size:13.5px;padding:12px 20px;border-radius:12px;z-index:80;opacity:0;pointer-events:none;
+    transition:.25s;box-shadow:0 10px 30px rgba(24,16,32,.22);font-family:var(--display);letter-spacing:.5px;text-transform:uppercase}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  .toast.err{background:var(--rose);color:#fff}
+
+  /* ---------- bracket ---------- */
+  .ko-nav{margin:2px 2px 16px}
+  .ko-labels{display:flex;margin-bottom:9px}
+  .ko-lbl{flex:1;background:none;border:0;cursor:pointer;font-family:var(--display);font-weight:600;font-size:18px;letter-spacing:1.2px;color:var(--muted);padding:2px 0;transition:color .2s}
+  .ko-lbl.on{color:var(--txt)}
+  .ko-seg{position:relative;display:flex;background:var(--panel-2);border:1px solid var(--line);border-radius:15px;height:52px;align-items:center;overflow:hidden;touch-action:none;cursor:grab;user-select:none;-webkit-user-select:none}
+  .ko-seg.grab{cursor:grabbing}
+  .ko-seg.grab .ko-win,.ko-seg.grab .ko-cv{transition:none}
+  .ko-win{position:absolute;top:5px;bottom:5px;left:0;width:60px;background:var(--mint);border-radius:11px;z-index:1;transition:left .28s cubic-bezier(.4,0,.2,1),width .28s cubic-bezier(.4,0,.2,1);box-shadow:0 3px 12px rgba(230,0,126,.30)}
+  .ko-track{position:relative;z-index:2;display:flex;flex:1;height:100%;align-items:center}
+  .ko-ic{flex:1;display:flex;align-items:center;justify-content:center;cursor:pointer;height:100%;font-size:17px}
+  .ko-ic:not(.tro)::before{content:"";width:22px;height:15px;border-radius:1px;opacity:.55;background:repeating-linear-gradient(var(--muted) 0 2px,transparent 2px 5px)}
+  .ko-ic:not(.tro).in::before{background:repeating-linear-gradient(#fff 0 2px,transparent 2px 5px);opacity:1}
+  .ko-ic.tro{filter:saturate(.7) brightness(.8)} .ko-ic.tro.in{filter:none}
+  .ko-cv{position:absolute;z-index:3;top:0;height:100%;width:24px;display:flex;align-items:center;justify-content:center;background:none;border:0;color:var(--muted);font-size:16px;font-weight:800;cursor:pointer;transition:left .28s cubic-bezier(.4,0,.2,1),opacity .2s}
+  .koflow{display:flex;overflow-x:auto;overflow-y:hidden;padding:4px 2px 22px;-webkit-overflow-scrolling:touch;scrollbar-width:thin;align-items:flex-start;scroll-behavior:smooth}
+  .koflow::-webkit-scrollbar{height:8px}
+  .koflow::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:8px}
+  .kcol{flex:0 0 auto;display:flex;flex-direction:column;justify-content:flex-start;width:var(--kcw,150px)}
+  .kcol.kround{margin-left:26px}
+  .kcol.kgroups{gap:9px}
+  .km{display:flex;flex-direction:column;justify-content:center;position:relative;margin-bottom:var(--kmg,14px)}
+  .kbox{position:relative;width:100%;background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden;box-shadow:0 4px 14px rgba(24,16,32,.07)}
+  .kteam{display:flex;align-items:center;gap:8px;padding:9px 10px;font-family:var(--mono);font-weight:700;font-size:12.5px;border-left:4px solid var(--c,transparent);color:var(--txt)}
+  .kteam + .kteam{border-top:1px solid var(--line)}
+  .kteam .kn{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:.4px}
+  .kteam .ks{font-weight:800;color:var(--muted);font-size:13px}
+  .kteam.tbd{color:var(--muted);border-left-color:transparent}
+  .kteam.tbd .kn{font-family:var(--body);font-weight:600;font-size:11.5px;letter-spacing:0}
+  .kteam.win .kn,.kteam.win .ks{color:var(--mint)}
+  .klabel{font-family:var(--display);text-transform:uppercase;letter-spacing:1.2px;font-size:12px;font-weight:600;color:var(--txt);margin-bottom:8px}
+  .gmini{background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden}
+  .gmini h4{font-family:var(--display);font-weight:600;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);padding:7px 10px 5px}
+  .gmini .gr{display:flex;align-items:center;gap:9px;padding:5px 10px;border-left:4px solid var(--c)}
+  .gmini .gr + .gr{border-top:1px solid var(--line)}
+  .gmini .gr.out{opacity:.5}
+  .gmini .gr .p{font-family:var(--mono);font-weight:800;font-size:11px;color:var(--muted);width:9px}
+  .gmini .gr .gc{flex:1;font-family:var(--mono);font-weight:700;font-size:12.5px;letter-spacing:.4px}
+  .gmini .gr .gp{font-family:var(--mono);font-weight:800;font-size:12px}
+  .kcol.kround.out .kbox::after{content:"";position:absolute;left:100%;top:calc(50% - 1px);width:13px;height:2px;background:var(--cn)}
+  .kcol.kround.in .kbox::before{content:"";position:absolute;right:100%;top:calc(50% - 1px);width:13px;height:2px;background:var(--cn)}
+  .km.tp .kbox::before{display:none}
+
+  @media(max-width:380px){
+    .ghead .cols span:nth-child(1),.srow .stt span:nth-child(1){display:none}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="crest">🎮</div>
+      <div style="min-width:0">
+        <div class="tname" id="brandName">eFootball League</div>
+        <div class="tsub" id="brandSub">Musim 1</div>
+      </div>
+    </div>
+    <button class="admin-btn" id="adminBtn">Admin</button>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button data-tab="teams" class="active">Pasukan</button>
+    <button data-tab="players">Pemain</button>
+    <button data-tab="motm">MOTM</button>
+    <button data-tab="fixtures">Perlawanan</button>
+    <button data-tab="bracket">Kalah Mati</button>
+  </nav>
+
+  <div class="wrap">
+    <section id="tab-teams"></section>
+    <section id="tab-players" hidden></section>
+    <section id="tab-motm" hidden></section>
+    <section id="tab-fixtures" hidden></section>
+    <section id="tab-bracket" hidden></section>
+    <section id="tab-admin" hidden></section>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+const KEY='efb_league_v4';
+let T=null, adminOK=false, PIDX={};
+let pFilter='all', fFilter='all', edTeam=null, edFix=null, adSec='fixtures', koA=0, koB=9;
+
+/* ---------- storage ---------- */
+const mem={};
+const Store={
+  async get(k){
+    try{ if(window.storage&&window.storage.get){ const r=await window.storage.get(k); return r?JSON.parse(r.value):null; } }catch(e){}
+    try{ const v=localStorage.getItem(k); if(v)return JSON.parse(v); }catch(e){}
+    return mem[k]??null;
+  },
+  async set(k,val){ const s=JSON.stringify(val); mem[k]=val; let ok=false;
+    try{ if(window.storage&&window.storage.set){ await window.storage.set(k,s); ok=true; } }catch(e){}
+    if(!ok){ try{ localStorage.setItem(k,s); }catch(e){} }
+  }
+};
+
+/* ---------- meta ---------- */
+const GAMES={efc:'eFootball · Console',efm:'eFootball · Mobile',fcc:'FC · Console',fcm:'FC · Mobile'};
+const PMODES=['1v1','2v2','3v3'];
+const pps=()=>parseInt(T.pmode)||1;
+
+/* ---------- seed ---------- */
+const PHON=['Alfa','Bravo','Charlie','Delta','Echo','Foxtrot','Golf','Hotel','India','Juliet','Kilo','Lima','Mike','November','Oscar','Papa','Quebec','Romeo','Sierra','Tango','Uniform','Victor','Whiskey','Xray','Yankee','Zulu','Apex','Blitz','Cobra','Drake','Eagle','Falcon'];
+function pPrefix(i){ return i<26?String.fromCharCode(65+i):PHON[i].slice(0,2).toUpperCase(); }
+function hsl2hex(h,s,l){s/=100;l/=100;const a=s*Math.min(l,1-l);const f=n=>{const k=(n+h/30)%12,c=l-a*Math.max(-1,Math.min(k-3,Math.min(9-k,1)));return Math.round(255*c).toString(16).padStart(2,'0');};return '#'+f(0)+f(8)+f(4);}
+
+function seed(){
+  const teams=PHON.map((nm,ti)=>{
+    const pre=pPrefix(ti), players=[];
+    for(let i=0;i<11;i++)players.push({id:'T'+ti+'_p'+i,name:pre+(i+1),photo:''});
+    return {id:'T'+ti,short:nm.slice(0,3).toUpperCase(),name:nm,color:hsl2hex(Math.round(ti*360/32),64,56),logo:'',flag:'',group:String.fromCharCode(65+Math.floor(ti/4)),players};
+  });
+  const t={name:'eFootball Esports League',sub:'Musim 1',pin:'1234',game:'efc',pmode:'1v1',teamSize:7,numGroups:8,koPerGroup:2,ko:[],teams,fixtures:[]};
+  let s=20260628; const rnd=()=>{s=(s*1103515245+12345)&0x7fffffff;return s/0x7fffffff;}; let fi=0;
+  [...new Set(teams.map(x=>x.group))].forEach(g=>{
+    const ids=teams.filter(x=>x.group===g).map(x=>x.id), pairs=[];
+    for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++)pairs.push([ids[i],ids[j]]);
+    pairs.forEach(([hid,aid])=>{
+      const H=teams.find(x=>x.id===hid), A=teams.find(x=>x.id===aid), duels=[];
+      for(let d=0;d<t.teamSize;d++)duels.push({h:[H.players[d]?H.players[d].id:null],a:[A.players[d]?A.players[d].id:null],hs:Math.floor(rnd()*4),as:Math.floor(rnd()*4)});
+      t.fixtures.push({id:'fx'+(fi++),home:hid,away:aid,status:'ft',date:'',duels});
+    });
+  });
+  return t;
+}
+function genGroupFixtures(){
+  const fx=[]; let fi=0, tvt=(T.mode||'twp')==='tvt';
+  groupList().forEach(g=>{
+    const ids=T.teams.filter(t=>t.group===g).map(t=>t.id);
+    for(let i=0;i<ids.length;i++)for(let j=i+1;j<ids.length;j++){
+      if(tvt){ fx.push({id:'fx'+(fi++)+'_'+Date.now().toString(36),home:ids[i],away:ids[j],status:'sched',date:'',hs:null,as:null,duels:[]}); continue; }
+      const H=team(ids[i]),A=team(ids[j]),duels=[];
+      for(let d=0;d<T.teamSize;d++)duels.push({h:[H.players[d]?H.players[d].id:null],a:[A.players[d]?A.players[d].id:null],hs:null,as:null});
+      fx.push({id:'fx'+(fi++)+'_'+Date.now().toString(36),home:ids[i],away:ids[j],status:'sched',date:'',duels});
+    }
+  });
+  T.fixtures=fx;
+}
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>(s+'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const team=id=>T.teams.find(t=>t.id===id);
+function refreshIdx(){ PIDX={}; T.teams.forEach(t=>t.players.forEach(p=>PIDX[p.id]={name:p.name,tid:t.id,photo:p.photo||''})); }
+const pName=pid=>PIDX[pid]?PIDX[pid].name:'—';
+const badge=(c,txt)=>`<span class="bdg" style="--c:${c}">${esc((txt||'').slice(0,3))}</span>`;
+function imgSrc(url){ if(!url)return ''; url=url.trim();
+  const m=url.match(/\/file\/d\/([-\w]{10,})/)||url.match(/[?&]id=([-\w]{10,})/)||url.match(/\/d\/([-\w]{10,})/);
+  return m?('https://drive.google.com/thumbnail?id='+m[1]+'&sz=w400'):url; }
+function tbadge(t){ return t&&t.logo?`<span class="bdg img" style="background-image:url('${imgSrc(t.logo)}')"></span>`:badge(t?t.color:'#444',t?t.short:'?'); }
+function flagImg(t){ return t&&t.flag?`<img class="flag" src="${imgSrc(t.flag)}" alt="" loading="lazy">`:''; }
+function pava(pid){ const i=PIDX[pid], tm=i?team(i.tid):null;
+  return i&&i.photo?`<span class="bdg img" style="background-image:url('${imgSrc(i.photo)}')"></span>`:badge(tm?tm.color:'#444',tm?tm.short:'?'); }
+function pmini(pid){ if(!pid)return ''; const i=PIDX[pid], tm=i?team(i.tid):null;
+  return i&&i.photo?`<span class="mini img" style="background-image:url('${imgSrc(i.photo)}')"></span>`:`<span class="mini" style="--c:${tm?tm.color:'#555'}"></span>`; }
+function toast(m,err){const e=$('#toast');e.textContent=m;e.className='toast show'+(err?' err':'');clearTimeout(e._t);e._t=setTimeout(()=>e.className='toast',1900);}
+
+/* ---------- standings ---------- */
+function teamStandings(){
+  const tb={}; T.teams.forEach(t=>tb[t.id]={t,P:0,W:0,D:0,L:0,DW:0,DL:0,Pts:0});
+  T.fixtures.filter(f=>f.status==='ft').forEach(f=>{
+    const H=tb[f.home],A=tb[f.away]; if(!H||!A)return;
+    let hw=0,aw=0;
+    f.duels.forEach(d=>{ if(d.hs==null||d.as==null)return; if(d.hs>d.as)hw++; else if(d.as>d.hs)aw++; });
+    H.P++;A.P++; H.DW+=hw;H.DL+=aw; A.DW+=aw;A.DL+=hw;
+    if(hw>aw){H.W++;H.Pts+=3;A.L++;} else if(aw>hw){A.W++;A.Pts+=3;H.L++;} else {H.D++;A.D++;H.Pts++;A.Pts++;}
+  });
+  return Object.values(tb).sort((x,y)=>y.Pts-x.Pts||(y.DW-y.DL)-(x.DW-x.DL)||y.DW-x.DW||x.t.name.localeCompare(y.t.name));
+}
+function groupList(){ return [...new Set(T.teams.map(t=>t.group).filter(Boolean))].sort(); }
+function groupStandings(g){
+  const mode=T.mode||'twp', goalMode=mode==='tvt'||(T.teamSize||1)===1;
+  const tb={}; T.teams.filter(t=>t.group===g).forEach(t=>tb[t.id]={t,P:0,W:0,D:0,L:0,DW:0,DL:0,GF:0,GA:0,Pts:0});
+  T.fixtures.filter(f=>f.status==='ft').forEach(f=>{ const H=tb[f.home],A=tb[f.away]; if(!H||!A)return;
+    if(mode==='tvt'){
+      const [hs,as]=fxGoals(f);
+      H.P++;A.P++;H.GF+=hs;H.GA+=as;A.GF+=as;A.GA+=hs;
+      if(hs>as){H.W++;H.Pts+=3;A.L++;}else if(as>hs){A.W++;A.Pts+=3;H.L++;}else{H.D++;A.D++;H.Pts++;A.Pts++;}
+    }else{
+      let hw=0,aw=0; f.duels.forEach(d=>{ if(d.hs==null||d.as==null)return; if(d.hs>d.as)hw++; else if(d.as>d.hs)aw++; H.GF+=d.hs;H.GA+=d.as;A.GF+=d.as;A.GA+=d.hs; });
+      H.P++;A.P++;H.DW+=hw;H.DL+=aw;A.DW+=aw;A.DL+=hw;
+      if(hw>aw){H.W++;H.Pts+=3;A.L++;}else if(aw>hw){A.W++;A.Pts+=3;H.L++;}else{H.D++;A.D++;H.Pts++;A.Pts++;}
+    }
+  });
+  return Object.values(tb).sort((x,y)=>y.Pts-x.Pts||
+    (goalMode?((y.GF-y.GA)-(x.GF-x.GA)):((y.DW-y.DL)-(x.DW-x.DL)))||
+    (goalMode?(y.GF-x.GF):(y.DW-x.DW))||x.t.name.localeCompare(y.t.name));
+}
+function teamPosMap(){ const m={}; groupList().forEach(g=>groupStandings(g).forEach((r,i)=>m[r.t.id]=i)); return m; }
+function playerStandings(){
+  const posMap=teamPosMap();
+  const tb={};
+  Object.keys(PIDX).forEach(pid=>tb[pid]={pid,name:PIDX[pid].name,tid:PIDX[pid].tid,P:0,W:0,D:0,L:0,GF:0,GA:0,Pts:0});
+  const cr=(pid,gf,ga)=>{const p=tb[pid];if(!p)return;p.P++;p.GF+=gf;p.GA+=ga;if(gf>ga){p.W++;p.Pts+=3;}else if(gf<ga){p.L++;}else{p.D++;p.Pts++;}};
+  T.fixtures.filter(f=>f.status==='ft').forEach(f=>f.duels.forEach(d=>{
+    if(d.hs==null||d.as==null)return;
+    (d.h||[]).forEach(pid=>cr(pid,d.hs,d.as)); (d.a||[]).forEach(pid=>cr(pid,d.as,d.hs));
+  }));
+  return Object.values(tb).filter(p=>p.P>0).sort((x,y)=>
+    y.Pts-x.Pts || y.GF-x.GF || x.GA-y.GA || (posMap[x.tid]??99)-(posMap[y.tid]??99) || x.name.localeCompare(y.name));
+}
+
+/* ---------- render ---------- */
+function compHeader(){
+  const tvt=(T.mode||'twp')==='tvt';
+  return `<div class="comp">
+    <span class="pill go"><span class="k">Game</span><b>${GAMES[T.game]||T.game}</b></span>
+    <span class="pill"><span class="k">Format</span><b>${tvt?'Pasukan lwn Pasukan':esc(T.pmode)}</b></span>
+    ${tvt?'':`<span class="pill"><span class="k">Pasukan</span><b>${T.teamSize} lwn ${T.teamSize}</b></span>`}
+  </div>`;
+}
+function renderTeams(){
+  let h=compHeader();
+  const per=T.koPerGroup||2, gl=groupList(), one=(T.mode==='tvt')||(T.teamSize||1)===1, dlab=one?'GD':'DD';
+  gl.forEach(g=>{
+    const rows=groupStandings(g);
+    h+=`<div class="gcard"><div class="ghead"><h3>Kumpulan ${g}</h3>
+      <div class="cols"><span>P</span><span>W</span><span>D</span><span>L</span><span>${dlab}</span><span class="pts">PTS</span></div></div>`;
+    rows.forEach((r,i)=>{ const dd=one?(r.GF-r.GA):(r.DW-r.DL), q=i<per;
+      h+=`<div class="srow" data-z="${q?'q':''}"><span class="pos">${i+1}</span>${tbadge(r.t)}
+        <span class="tn">${flagImg(r.t)}${esc(r.t.name)}</span>
+        <span class="stt"><span>${r.P}</span><span>${r.W}</span><span>${r.D}</span><span>${r.L}</span>
+        <span class="gd">${dd>0?'+':''}${dd}</span><span class="pts">${r.Pts}</span></span></div>`;
+    });
+    h+=`</div>`;
+  });
+  if(!T.fixtures.some(f=>f.status==='ft'))h+=`<div class="empty">Belum ada keputusan. Admin boleh masukkan skor duel di tab Perlawanan.</div>`;
+  h+=`<div style="font-size:11.5px;color:var(--muted);margin:4px 2px"><b style="color:var(--mint)">Hijau</b> = ${per} teratas layak kalah mati · <b style="color:var(--mint)">${dlab}</b> = ${one?'beza jaringan':'beza duel'} · mata: menang 3, seri 1</div>`;
+  $('#tab-teams').innerHTML=h;
+}
+function renderPlayers(){
+  let rows=playerStandings();
+  if(pFilter!=='all')rows=rows.filter(r=>r.tid===pFilter);
+  let h=`<div class="chips"><button class="chip${pFilter==='all'?' active':''}" data-pf="all">Semua</button>`+
+    T.teams.map(t=>`<button class="chip${pFilter===t.id?' active':''}" data-pf="${t.id}">${esc(t.short)}</button>`).join('')+`</div>`;
+  h+=`<div class="gcard"><div class="ghead"><h3>Liga · Pemain</h3>
+    <div class="cols"><span>P</span><span>W</span><span>D</span><span>L</span><span>GD</span><span class="pts">PTS</span></div></div>`;
+  rows.forEach((r,i)=>{ const gd=r.GF-r.GA, tm=team(r.tid);
+    h+=`<div class="srow"><span class="pos">${i+1}</span>${pava(r.pid)}
+      <span class="tn">${esc(r.name)}<span class="sub2"> · ${flagImg(tm)}${tm&&tm.logo?`<span class="tlogo" style="background-image:url('${imgSrc(tm.logo)}')"></span>`:''}${tm?esc(tm.short):''}</span></span>
+      <span class="stt"><span>${r.P}</span><span>${r.W}</span><span>${r.D}</span><span>${r.L}</span>
+      <span class="gd">${gd>0?'+':''}${gd}</span><span class="pts">${r.Pts}</span></span></div>`;
+  });
+  h+=`</div>`;
+  if(!rows.length)h+=`<div class="empty">Belum ada keputusan pemain.</div>`;
+  else h+=`<div style="font-size:11.5px;color:var(--muted);margin:4px 2px">Sama mata? Pemecah seri ikut: <b style="color:var(--mint)">jaringan</b> → <b style="color:var(--mint)">bolos (sikit)</b> → kedudukan pasukan.</div>`;
+  $('#tab-players').innerHTML=h;
+  $('#tab-players').querySelectorAll('[data-pf]').forEach(b=>b.onclick=()=>{pFilter=b.dataset.pf;renderPlayers();});
+}
+function motmBoard(){
+  const cnt={};
+  const add=pid=>{ if(!pid)return; cnt[pid]=(cnt[pid]||0)+1; };
+  T.fixtures.forEach(f=>add(f.motm));
+  (T.ko||[]).forEach(m=>add(m.motm));
+  return Object.keys(cnt).map(pid=>({pid,name:PIDX[pid]?PIDX[pid].name:pid,tid:PIDX[pid]?PIDX[pid].tid:null,n:cnt[pid]}))
+    .sort((a,b)=>b.n-a.n||a.name.localeCompare(b.name));
+}
+function renderMOTM(){
+  const rows=motmBoard();
+  let h=compHeader();
+  h+=`<div class="gcard"><div class="ghead"><h3>⭐ Pemain Terbaik · MOTM</h3>
+    <div class="cols"><span class="pts">⭐</span></div></div>`;
+  if(!rows.length)h+=`<div class="empty">Belum ada MOTM diberi. Admin boleh tekan ⭐ pada setiap perlawanan (tab Admin → Perlawanan).</div>`;
+  rows.forEach((r,i)=>{ const tm=team(r.tid);
+    h+=`<div class="srow"><span class="pos">${i+1}</span>${pava(r.pid)}
+      <span class="tn">${esc(r.name)}<span class="sub2"> · ${flagImg(tm)}${tm&&tm.logo?`<span class="tlogo" style="background-image:url('${imgSrc(tm.logo)}')"></span>`:''}${tm?esc(tm.short):''}</span></span>
+      <span class="motm-n">⭐ ${r.n}</span></div>`;
+  });
+  h+=`</div>`;
+  if(rows.length)h+=`<div style="font-size:11.5px;color:var(--muted);margin:4px 2px">Bilangan anugerah pemain terbaik perlawanan (Man of the Match).</div>`;
+  $('#tab-motm').innerHTML=h;
+}
+function renderFixtures(){
+  const f=[['all','Semua'],['ft','Selesai'],['sched','Akan Datang']];
+  let h=`<div class="chips">`+f.map(c=>`<button class="chip${fFilter===c[0]?' active':''}" data-ff="${c[0]}">${c[1]}</button>`).join('')+`</div>`;
+  const show=s=>fFilter==='all'||fFilter===s;
+  const list=T.fixtures.filter(x=>show(x.status));
+  if(!list.length)h+=`<div class="empty">Tiada perlawanan untuk penapis ini.</div>`;
+  list.forEach(fx=>h+=fixCard(fx));
+  $('#tab-fixtures').innerHTML=h;
+  $('#tab-fixtures').querySelectorAll('[data-ff]').forEach(b=>b.onclick=()=>{fFilter=b.dataset.ff;renderFixtures();});
+  $('#tab-fixtures').querySelectorAll('[data-fx]').forEach(b=>b.onclick=()=>{const el=$('#duels-'+b.dataset.fx);if(el){el.hidden=!el.hidden;b.classList.toggle('open');}});
+}
+function fxGoals(fx){
+  if(fx.hs!=null||fx.as!=null)return [fx.hs||0, fx.as||0];
+  let h=0,a=0; (fx.duels||[]).forEach(d=>{ if(d.hs!=null)h+=d.hs; if(d.as!=null)a+=d.as; }); return [h,a];
+}
+function scoreOpts(val){ let o='<option value="">–</option>'; for(let i=0;i<=99;i++)o+=`<option value="${i}"${val===i?' selected':''}>${i}</option>`; return o; }
+function fixAgg(fx){
+  const mode=T.mode||'twp';
+  if(mode==='tvt') return fxGoals(fx);
+  const one=(T.teamSize||1)===1;
+  if(one){ const d=fx.duels[0]; return (d&&d.hs!=null&&d.as!=null)?[d.hs,d.as]:[0,0]; }
+  let hw=0,aw=0; fx.duels.forEach(d=>{ if(d.hs==null||d.as==null)return; if(d.hs>d.as)hw++; else if(d.as>d.hs)aw++; }); return [hw,aw];
+}
+function fixCard(fx){
+  const H=team(fx.home),A=team(fx.away); if(!H||!A)return '';
+  const [hw,aw]=fixAgg(fx), done=fx.status==='ft', tvt=(T.mode||'twp')==='tvt';
+  const inner=`<div class="fx-side"><span class="nm">${esc(H.name)}</span>${tbadge(H)}</div>
+    <div class="fx-mid">${done?`<span class="fx-agg"><span class="${hw>aw?'':'v'}">${hw}</span> <span class="v">-</span> <span class="${aw>hw?'':'v'}">${aw}</span></span>`:`<span class="fx-vs">vs</span>`}
+      <span class="fx-st ${fx.status}">${done?'Selesai':'Akan Datang'}</span></div>
+    <div class="fx-side away">${tbadge(A)}<span class="nm">${esc(A.name)}</span></div>`;
+  const head=tvt?`<div class="fix-head static">${inner}</div>`:`<button class="fix-head" data-fx="${fx.id}">${inner}</button>`;
+  const motm=fx.motm?`<div class="motm-strip">⭐ <span>MOTM</span> ${pmini(fx.motm)}<b>${esc(pName(fx.motm))}</b></div>`:'';
+  let h=`<div class="fix">${head}${motm}`;
+  if(!tvt){
+    h+=`<div class="fx-duels" id="duels-${fx.id}" hidden>`;
+    fx.duels.forEach(d=>{
+      const hn=(d.h||[]).map(pName).join(' / ')||'—', an=(d.a||[]).map(pName).join(' / ')||'—';
+      const hwin=d.hs!=null&&d.hs>d.as, awin=d.as!=null&&d.as>d.hs;
+      h+=`<div class="duel"><span class="dn ${hwin?'w':''}">${pmini((d.h||[])[0])}${esc(hn)}</span>
+        <span class="ds">${d.hs!=null?`${d.hs} - ${d.as}`:'– : –'}</span>
+        <span class="dn a ${awin?'w':''}">${esc(an)}${pmini((d.a||[])[0])}</span></div>`;
+    });
+    h+=`</div>`;
+  }
+  return h+`</div>`;
+}
+
+/* ---------- knockout ---------- */
+const KORDER=['R32','R16','QF','SF','F'];
+const KOLABEL={R32:'R32',R16:'R16',QF:'Suku',SF:'Separuh',F:'Final'};
+const KFIRST={32:'R32',16:'R16',8:'QF',4:'SF',2:'F'};
+function seedOrder(n){ let r=[1,2]; while(r.length<n){ const sz=r.length*2,nx=[]; r.forEach(s=>{nx.push(s);nx.push(sz+1-s);}); r=nx; } return r; }
+function buildKO(size){
+  const start=KFIRST[size], rounds=KORDER.slice(KORDER.indexOf(start)), ko=[];
+  rounds.forEach((r,ri)=>{ const n=(size/2)/Math.pow(2,ri);
+    for(let i=0;i<n;i++){ const m={id:r+'_'+i,round:r,top:'TBD',bot:'TBD',ts:null,bs:null,status:'sched',next:null,slot:null};
+      if(ri<rounds.length-1){ m.next=rounds[ri+1]+'_'+Math.floor(i/2); m.slot=i%2?'bot':'top'; } ko.push(m); } });
+  return ko;
+}
+function generateKO(){
+  const groups=groupList(), per=T.koPerGroup||2, G=groups.length, size=G*per;
+  if(![2,4,8,16,32].includes(size)){ T.ko=[]; return; }
+  const winners=[],runners=[];
+  groups.forEach(g=>{ const s=groupStandings(g); winners.push(s[0]?s[0].t.id:'TBD'); runners.push(s[1]?s[1].t.id:'TBD'); });
+  const ko=buildKO(size), fr=KFIRST[size], frMatches=ko.filter(m=>m.round===fr);
+  if(per===2){
+    for(let i=0;i<G;i++){ const j=(i%2===0)?(i+1)%G:(i-1+G)%G; const m=frMatches[i]; if(m){ m.top=winners[i]; m.bot=runners[j]; } }
+  } else {
+    const ord=seedOrder(size);
+    frMatches.forEach((m,i)=>{ m.top=winners[ord[i*2]-1]||'TBD'; m.bot=winners[ord[i*2+1]-1]||'TBD'; });
+  }
+  T.ko=ko;
+  if(size>=4 && T.thirdMode && T.thirdMode!=='none')
+    ko.push({id:'TP_0',round:'TP',top:'TBD',bot:'TBD',ts:null,bs:null,status:'sched',next:null,slot:null,motm:null});
+  propagateKO();
+}
+function koWinner(m){
+  if(!m||m.status!=='ft'||m.ts==null||m.bs==null)return null;
+  if(m.ts>m.bs)return 'top'; if(m.bs>m.ts)return 'bot';
+  if(m.pts!=null&&m.pbs!=null&&m.pts!==m.pbs)return m.pts>m.pbs?'top':'bot';
+  return null;
+}
+function propagateKO(){
+  if(!T.ko)return; const by={}; T.ko.forEach(m=>by[m.id]=m);
+  const targets=new Set(T.ko.filter(m=>m.next).map(m=>m.next));
+  T.ko.forEach(m=>{ if(targets.has(m.id)){ m.top='TBD'; m.bot='TBD'; } });
+  T.ko.forEach(m=>{ const w=koWinner(m); if(w&&m.next){ const nm=by[m.next]; if(nm)nm[m.slot]=(w==='top'?m.top:m.bot); } });
+  if(T.thirdMode&&T.thirdMode!=='none'){
+    const tp=by['TP_0'], sfs=T.ko.filter(m=>m.round==='SF');
+    if(tp&&sfs.length===2){
+      sfs.forEach((m,i)=>{ const slot=i===0?'top':'bot', w=koWinner(m);
+        tp[slot]=w?(w==='top'?m.bot:m.top):'TBD'; });
+    }
+  }
+}
+function koRounds(){ const out=[]; KORDER.forEach(r=>{ if(T.ko&&T.ko.some(m=>m.round===r))out.push(r); }); return out; }
+
+function koTeam(code,sc,win){ const t=team(code);
+  return `<div class="kteam ${t?'':'tbd'} ${win?'win':''}" style="--c:${t?t.color:'transparent'}">
+    ${t&&t.logo?`<span class="tlogo" style="background-image:url('${imgSrc(t.logo)}')"></span>`:''}<span class="kn">${t?esc(t.short):esc(code==='TBD'?'TBD':code)}</span>${sc!=null?`<span class="ks">${sc}</span>`:''}</div>`;
+}
+function koBox(m){
+  const w=koWinner(m), tw=w==='top', bw=w==='bot';
+  const pen=(m.status==='ft'&&m.ts!=null&&m.ts===m.bs&&m.pts!=null&&m.pbs!=null)?`<div class="kpen">Penalti ${m.pts} - ${m.pbs}</div>`:'';
+  return `<div class="kbox">${koTeam(m.top,m.ts,tw)}${koTeam(m.bot,m.bs,bw)}${pen}</div>`;
+}
+function koCol(round,cls){
+  let h=`<div class="kcol kround ${cls}" data-col="${round}">`;
+  T.ko.filter(m=>m.round===round).forEach(m=>{
+    h+=`<div class="km">${round==='F'?`<div class="klabel">🏆 Final</div>`:''}${koBox(m)}</div>`;
+  });
+  if(round==='F'){ const tp=(T.ko||[]).find(m=>m.round==='TP');
+    if(tp)h+=`<div class="km tp"><div class="klabel">🥉 Tempat Ke-3${T.thirdMode==='joint'?' (Bersama)':''}</div>${koBox(tp)}</div>`; }
+  return h+`</div>`;
+}
+function renderBracket(){
+  const root=$('#tab-bracket');
+  if(!T.ko||!T.ko.length){ root.innerHTML=`<div class="empty">Bracket belum dijana.<br>Buka <b>Admin → Kalah Mati → Jana bracket</b>.</div>`; return; }
+  const rounds=koRounds(), cols=[['LG','Liga']].concat(rounds.map(r=>[r,KOLABEL[r]]));
+  const MAX=cols.length-1; koB=Math.min(koB,MAX); koA=Math.min(koA,koB);
+  let h=`<div class="ko-nav"><div class="ko-labels">`+cols.map((c,i)=>`<button class="ko-lbl" data-i="${i}">${c[0]}</button>`).join('')+`</div>
+    <div class="ko-seg" id="koSeg"><div class="ko-win" id="koWin"></div>
+      <div class="ko-track">`+cols.map((c,i)=>`<span class="ko-ic${i===cols.length-1?' tro':''}" data-i="${i}">${i===cols.length-1?'🏆':''}</span>`).join('')+`</div>
+      <button class="ko-cv" id="cvL">‹</button><button class="ko-cv" id="cvR">›</button></div></div>`;
+  h+=`<div class="koflow" id="koflow">`;
+  const per=T.koPerGroup||2;
+  h+=`<div class="kcol kgroups" data-col="LG">`;
+  groupList().forEach(g=>{ const st=groupStandings(g);
+    h+=`<div class="gmini"><h4>Kump. ${g}</h4>`;
+    st.forEach((r,i)=>{ h+=`<div class="gr ${i<per?'':'out'}" style="--c:${r.t.color}"><span class="p">${i+1}</span>${r.t.logo?`<span class="tlogo" style="background-image:url('${imgSrc(r.t.logo)}')"></span>`:''}<span class="gc">${esc(r.t.short)}</span><span class="gp">${r.Pts}</span></div>`; });
+    h+=`</div>`;
+  });
+  h+=`</div>`;
+  rounds.forEach((r,ri)=>{ const inC=ri>0, outC=ri<rounds.length-1; h+=koCol(r,(outC?'out ':'')+(inC?'in':'')); });
+  h+=`</div>`;
+  root.innerHTML=h;
+  const flow=$('#koflow'), seg=$('#koSeg');
+  function idxFromX(x){ const r=seg.getBoundingClientRect(), px=x-r.left, ics=seg.querySelectorAll('.ko-ic'); for(let i=0;i<ics.length;i++){ if(px<ics[i].offsetLeft+ics[i].offsetWidth)return i; } return ics.length-1; }
+  function positionWindow(){ const ics=seg.querySelectorAll('.ko-ic'),a=ics[koA],b=ics[koB],win=$('#koWin');
+    const left=a.offsetLeft,w=b.offsetLeft+b.offsetWidth-a.offsetLeft; win.style.left=left+'px'; win.style.width=w+'px';
+    $('#cvL').style.left=left+'px'; $('#cvR').style.left=(left+w-24)+'px';
+    $('#cvL').style.opacity=koA===0?'.3':'1'; $('#cvR').style.opacity=koB===MAX?'.3':'1';
+    ics.forEach((ic,i)=>ic.classList.toggle('in',i>=koA&&i<=koB));
+    root.querySelectorAll('.ko-lbl').forEach(x=>{const i=+x.dataset.i;x.classList.toggle('on',i>=koA&&i<=koB);}); }
+  function applyLayout(scroll){ const fitW=flow.clientWidth-4,n=koB-koA+1; let kcw=Math.max(92,(fitW-26*(n-1))/n);
+    flow.style.setProperty('--kcw',kcw+'px'); positionWindow();
+    // top-aligned bracket spacing: matches double their gap each round, offset relative to first visible round
+    const rEls=[...flow.querySelectorAll('.kcol.kround')];
+    const box=flow.querySelector('.kcol.kround .kbox');
+    const mh=box?box.getBoundingClientRect().height:46, U=mh+16, firstVis=Math.max(0,koA-1);
+    rEls.forEach((col,rri)=>{ const ri=Math.max(0,rri-firstVis), mult=Math.pow(2,ri), hasTP=!!col.querySelector('.km.tp');
+      col.style.setProperty('--kmg',(hasTP?22:(mult*U-mh))+'px');
+      const first=col.querySelector('.km'); if(first)first.style.marginTop=((mult-1)*U/2)+'px'; });
+    if(scroll)requestAnimationFrame(()=>{ const col=flow.querySelectorAll('.kcol')[koA]; if(col)flow.scrollTo({left:Math.max(0,col.offsetLeft-(koA===0?0:6)),behavior:'smooth'}); }); }
+  function setRange(a,b){ koA=Math.max(0,Math.min(MAX,a)); koB=Math.max(koA,Math.min(MAX,b)); applyLayout(true); }
+  root.querySelectorAll('.ko-lbl').forEach(b=>b.onclick=()=>setRange(+b.dataset.i,+b.dataset.i));
+  let drag=null;
+  seg.addEventListener('pointerdown',e=>{ const onL=e.target.closest('#cvL'),onR=e.target.closest('#cvR');
+    drag={mode:onL?'L':onR?'R':'move',a0:koA,b0:koB,i0:idxFromX(e.clientX),x0:e.clientX,moved:false}; seg.setPointerCapture(e.pointerId); seg.classList.add('grab'); });
+  seg.addEventListener('pointermove',e=>{ if(!drag)return; if(Math.abs(e.clientX-drag.x0)>4)drag.moved=true; const idx=idxFromX(e.clientX);
+    if(drag.mode==='move'){ const span=drag.b0-drag.a0,na=Math.max(0,Math.min(MAX-span,drag.a0+(idx-drag.i0))); koA=na; koB=na+span; }
+    else if(drag.mode==='L'){ koA=Math.min(koB,idx); } else { koB=Math.max(koA,idx); } positionWindow(); });
+  function endDrag(){ if(!drag)return; seg.classList.remove('grab');
+    if(!drag.moved){ if(drag.mode==='L')koA=Math.max(0,koA-1); else if(drag.mode==='R')koB=Math.min(MAX,koB+1); else koA=koB=drag.i0; }
+    drag=null; applyLayout(true); }
+  seg.addEventListener('pointerup',endDrag); seg.addEventListener('pointercancel',endDrag);
+  if(window._koResize)window.removeEventListener('resize',window._koResize);
+  window._koResize=()=>{ if($('#koflow'))applyLayout(false); }; window.addEventListener('resize',window._koResize);
+  requestAnimationFrame(()=>applyLayout(false));
+}
+
+/* ---------- admin ---------- */
+function renderAdmin(){
+  const c=$('#tab-admin');
+  if(!adminOK){
+    c.innerHTML=`<div class="lock"><div class="crest">🔒</div>
+      <div class="panel"><h2>Log masuk admin</h2><p class="hint">Masukkan PIN untuk urus liga.</p>
+      <div class="field"><label>PIN</label><input type="password" id="pinIn" inputmode="numeric" placeholder="••••"></div>
+      <button class="btn" id="pinGo">Buka kunci</button></div></div>`;
+    $('#pinGo').onclick=()=>{ if($('#pinIn').value===T.pin){adminOK=true;$('#adminBtn').classList.add('live');renderAdmin();toast('Selamat datang, admin');} else toast('PIN salah',1); };
+    $('#pinIn').onkeydown=e=>{if(e.key==='Enter')$('#pinGo').click();};
+    return;
+  }
+  const secs=[['fixtures','Perlawanan'],['teams','Pasukan'],['bracket','Kalah Mati'],['settings','Tetapan']];
+  let h=`<div class="chips">`+secs.map(s=>`<button class="chip${adSec===s[0]?' active':''}" data-as="${s[0]}">${s[1]}</button>`).join('')+`</div>`;
+  if(adSec==='fixtures')h+=admFixtures();
+  else if(adSec==='teams')h+=admTeams();
+  else if(adSec==='bracket')h+=admKO();
+  else h+=admSettings();
+  c.innerHTML=h;
+  c.querySelectorAll('[data-as]').forEach(b=>b.onclick=()=>{adSec=b.dataset.as;renderAdmin();});
+  if(adSec==='fixtures')bindFixtures();
+  else if(adSec==='teams')bindTeams();
+  else if(adSec==='bracket')bindKO();
+  else bindSettings();
+}
+
+/* --- admin: fixtures --- */
+function admFixtures(){
+  const opts=T.teams.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join('');
+  const tvt=(T.mode||'twp')==='tvt';
+  let h=`<div class="panel"><h2>Cipta perlawanan</h2><p class="hint">${tvt?'Mod Pasukan lwn Pasukan — masukkan skor pasukan sahaja (tiada skor pemain).':T.teamSize+' duel (1 pemain lwn 1) dijana automatik mengikut senarai pemain.'}</p>
+    <div class="field"><label>Tuan rumah</label><select id="fxH">${opts}</select></div>
+    <div class="field"><label>Tetamu</label><select id="fxA">${opts}</select></div>
+    <button class="btn" id="fxNew">Cipta perlawanan</button></div>`;
+  h+=`<div class="panel"><h2>Senarai perlawanan</h2>`;
+  if(!T.fixtures.length)h+=`<p class="hint">Belum ada perlawanan.</p>`;
+  T.fixtures.forEach(fx=>{
+    const H=team(fx.home),A=team(fx.away); if(!H||!A)return;
+    const [hw,aw]=fixAgg(fx), open=edFix===fx.id;
+    h+=`<div class="fx-row">
+      <span class="lbl">${esc(H.short)} ${fx.status==='ft'?hw+'–'+aw:'vs'} ${esc(A.short)}</span>
+      <span class="tag ${fx.status==='ft'?'ft':''}">${fx.status==='ft'?'Selesai':'Jadual'}</span>
+      <button class="btn ghost sm" data-edfx="${fx.id}">${open?'Tutup':'Edit'}</button>
+      <button class="icon-btn" data-delfx="${fx.id}" style="width:38px">✕</button></div>`;
+    if(open)h+=(tvt?admTeamScoreEditor(fx):admDuelEditor(fx));
+  });
+  h+=`</div>`;
+  return h;
+}
+function admTeamScoreEditor(fx){
+  const H=team(fx.home),A=team(fx.away), [hs,as]=[fx.hs,fx.as];
+  const roster=[...H.players.map(p=>[p,H]),...A.players.map(p=>[p,A])];
+  const motmOpts=`<option value="">⭐ MOTM —</option>`+roster.map(([p,tm])=>`<option value="${p.id}"${fx.motm===p.id?' selected':''}>${esc(p.name)} (${esc(tm.short)})</option>`).join('');
+  return `<div id="fxed-${fx.id}" style="background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:6px 0 12px">
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px">Skor pasukan</div>
+    <div class="duel-ed">
+      <div class="lbl" style="font-size:13px;font-weight:700">${esc(H.short)}</div>
+      <div class="sc"><select class="tvtH sc-sel">${scoreOpts(hs)}</select><span>-</span><select class="tvtA sc-sel">${scoreOpts(as)}</select></div>
+      <div class="lbl" style="font-size:13px;font-weight:700;text-align:right">${esc(A.short)}</div></div>
+    <div class="field" style="margin-top:12px"><label>⭐ MOTM (pilihan)</label><select class="tvtMotm">${motmOpts}</select></div>
+    <div class="field" style="margin-top:12px"><label>Status</label><select id="fxStatus">
+      <option value="sched"${fx.status==='sched'?' selected':''}>Akan Datang</option>
+      <option value="live"${fx.status==='live'?' selected':''}>Sedang</option>
+      <option value="ft"${fx.status==='ft'?' selected':''}>Selesai</option></select></div>
+    <button class="btn" data-savefx="${fx.id}">Simpan keputusan</button></div>`;
+}
+function admDuelEditor(fx){
+  const H=team(fx.home),A=team(fx.away);
+  const optFor=(tm,sel)=>`<option value="">—</option>`+tm.players.map(p=>`<option value="${p.id}"${sel===p.id?' selected':''}>${esc(p.name)}</option>`).join('');
+  let h=`<div id="fxed-${fx.id}" style="background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:6px 0 12px">
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:8px">${esc(H.short)} (kiri) · skor · ${esc(A.short)} (kanan)</div>`;
+  fx.duels.forEach((d,i)=>{
+    const np=Math.max(1,(d.h||[]).length, pps());
+    let hs=`<div class="stk">`,as_=`<div class="stk">`;
+    for(let k=0;k<np;k++){
+      hs+=`<select data-d="${i}" data-side="h" data-k="${k}">${optFor(H,(d.h||[])[k])}</select>`;
+      as_+=`<select data-d="${i}" data-side="a" data-k="${k}">${optFor(A,(d.a||[])[k])}</select>`;
+    }
+    hs+=`</div>`; as_+=`</div>`;
+    h+=`<div class="duel-ed">${hs}
+      <div class="sc"><select class="sc-sel" data-d="${i}" data-f="hs">${scoreOpts(d.hs)}</select><span>-</span><select class="sc-sel" data-d="${i}" data-f="as">${scoreOpts(d.as)}</select></div>
+      ${as_}</div>`;
+  });
+  const parts=[]; fx.duels.forEach(d=>{(d.h||[]).forEach(p=>p&&parts.push(p));(d.a||[]).forEach(p=>p&&parts.push(p));});
+  const uniq=[...new Set(parts)];
+  h+=`<div class="field" style="margin-top:12px"><label>⭐ MOTM — Pemain terbaik perlawanan</label>
+    <div class="motm-pick">`+uniq.map(pid=>`<button type="button" class="star-btn${fx.motm===pid?' on':''}" data-motm="${pid}">★ ${esc(pName(pid))}</button>`).join('')+
+    `<button type="button" class="star-btn${!fx.motm?' on':''}" data-motm="">✕ Tiada</button></div></div>`;
+  h+=`<div class="field" style="margin-top:12px"><label>Status</label><select id="fxStatus">
+      <option value="sched"${fx.status==='sched'?' selected':''}>Akan Datang</option>
+      <option value="live"${fx.status==='live'?' selected':''}>Sedang</option>
+      <option value="ft"${fx.status==='ft'?' selected':''}>Selesai</option></select></div>
+    <button class="btn" data-savefx="${fx.id}">Simpan keputusan</button></div>`;
+  return h;
+}
+function bindFixtures(){
+  const c=$('#tab-admin');
+  $('#fxNew').onclick=async()=>{
+    const hid=$('#fxH').value, aid=$('#fxA').value;
+    if(hid===aid){toast('Pilih 2 pasukan berbeza',1);return;}
+    let fx;
+    if((T.mode||'twp')==='tvt'){
+      fx={id:'fx'+Date.now(),home:hid,away:aid,status:'sched',date:'',hs:null,as:null,duels:[]};
+    }else{
+      const H=team(hid),A=team(aid),P=pps(),duels=[];
+      for(let d=0;d<T.teamSize;d++){
+        const hh=[],aa=[]; for(let k=0;k<P;k++){ const hp=H.players[d*P+k], ap=A.players[d*P+k]; hh.push(hp?hp.id:null); aa.push(ap?ap.id:null); }
+        duels.push({h:hh,a:aa,hs:null,as:null});
+      }
+      fx={id:'fx'+Date.now(),home:hid,away:aid,status:'sched',date:'',duels};
+    }
+    T.fixtures.push(fx); edFix=fx.id; await save(); renderAdmin(); toast('Perlawanan dicipta');
+  };
+  c.querySelectorAll('[data-edfx]').forEach(b=>b.onclick=()=>{edFix=edFix===b.dataset.edfx?null:b.dataset.edfx;renderAdmin();});
+  c.querySelectorAll('[data-delfx]').forEach(b=>b.onclick=async()=>{ if(!confirm('Padam perlawanan ini?'))return; T.fixtures=T.fixtures.filter(f=>f.id!==b.dataset.delfx); if(edFix===b.dataset.delfx)edFix=null; await save(); renderAdmin(); renderPublic(); toast('Dipadam'); });
+  c.querySelectorAll('.motm-pick .star-btn').forEach(b=>b.onclick=()=>{ b.parentElement.querySelectorAll('.star-btn').forEach(x=>x.classList.remove('on')); b.classList.add('on'); });
+  c.querySelectorAll('[data-savefx]').forEach(b=>b.onclick=async()=>{
+    const fx=T.fixtures.find(f=>f.id===b.dataset.savefx); if(!fx)return;
+    const ed=$('#fxed-'+fx.id);
+    if((T.mode||'twp')==='tvt'){
+      const hv=ed.querySelector('.tvtH').value, av=ed.querySelector('.tvtA').value;
+      fx.hs=hv===''?null:+hv; fx.as=av===''?null:+av;
+      const mo=ed.querySelector('.tvtMotm'); fx.motm=mo?(mo.value||null):null;
+    }else{
+      ed.querySelectorAll('.duel-ed select[data-side]').forEach(sel=>{ const di=+sel.dataset.d,k=+sel.dataset.k,side=sel.dataset.side; (fx.duels[di][side])[k]=sel.value||null; });
+      ed.querySelectorAll('.duel-ed select.sc-sel').forEach(sel=>{ const di=+sel.dataset.d,f=sel.dataset.f; fx.duels[di][f]=sel.value===''?null:+sel.value; });
+      const on=ed.querySelector('.motm-pick .star-btn.on'); fx.motm=on?(on.dataset.motm||null):null;
+    }
+    fx.status=$('#fxStatus').value;
+    await save(); renderPublic(); renderAdmin(); toast('Keputusan disimpan');
+  });
+}
+
+/* --- admin: teams --- */
+function admTeams(){
+  if(!edTeam&&T.teams[0])edTeam=T.teams[0].id;
+  let h=`<div class="panel"><h2>Pasukan</h2><p class="hint">Pilih pasukan untuk urus pemain & maklumat. Tukar nama pemain di sini.</p>
+    <div class="chips">`+T.teams.map(t=>`<button class="chip${edTeam===t.id?' active':''}" data-et="${t.id}">${esc(t.short)}</button>`).join('')
+    +`<button class="chip" data-et="__new">+ Baharu</button></div>`;
+  const t=team(edTeam);
+  if(t){
+    h+=`<div class="field"><label>Nama pasukan</label><input type="text" id="tName" value="${esc(t.name)}"></div>
+      <div class="row3"><div class="field"><label>Kod (list)</label><input type="text" id="tShort" value="${esc(t.short)}" maxlength="4"></div>
+      <div class="field"><label>Kumpulan</label><input type="text" id="tGroup" value="${esc(t.group||'')}" maxlength="2" placeholder="A"></div>
+      <div class="field"><label>Warna</label><input type="color" id="tColor" value="${/^#/.test(t.color)?t.color:'#27c2e0'}"></div></div>
+      <div class="field"><label>Logo pasukan (link)</label><input type="text" id="tLogo" value="${esc(t.logo||'')}" placeholder="Link Google Drive atau URL imej"></div>
+      <div class="field"><label>Bendera (link)</label><input type="text" id="tFlag" value="${esc(t.flag||'')}" placeholder="Link Google Drive atau URL imej"></div>
+      <div class="prev">${t.logo?`<span class="bdg img" style="background-image:url('${imgSrc(t.logo)}')"></span>`:'<span class="bdg" style="--c:'+(/^#/.test(t.color)?t.color:'#444')+'">'+esc(t.short)+'</span>'}
+        ${t.flag?`<img class="flag" style="width:34px;height:24px" src="${imgSrc(t.flag)}">`:''}
+        <span style="font-size:11px;color:var(--muted)">Pratonton · pastikan kongsi "Sesiapa yang ada link"</span></div>
+      <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin:8px 0 4px">Pemain (${t.players.length}) — nama + foto</div>
+      <div id="rosterBox">`;
+    t.players.forEach((p,i)=>{ h+=`<div class="pl-row2"><span class="pn">${i+1}</span>
+      <div class="stk"><input type="text" data-pn="${p.id}" value="${esc(p.name)}" placeholder="Nama pemain">
+      <input type="text" data-pp="${p.id}" value="${esc(p.photo||'')}" placeholder="Foto pemain (link)"></div>
+      <button class="icon-btn" data-delp="${p.id}">✕</button></div>`; });
+    h+=`</div>
+      <div class="row2" style="margin-top:10px"><input type="text" id="newPlayer" placeholder="Nama pemain baharu"><button class="btn sm" id="addPlayer">Tambah</button></div>
+      <div class="btn-row" style="margin-top:14px"><button class="btn" id="saveTeam">Simpan pasukan</button><button class="btn danger sm" id="delTeam" style="flex:0">Padam pasukan</button></div>`;
+  }
+  h+=`</div>`;
+  return h;
+}
+function bindTeams(){
+  const c=$('#tab-admin');
+  c.querySelectorAll('[data-et]').forEach(b=>b.onclick=async()=>{
+    if(b.dataset.et==='__new'){ const nm=prompt('Nama pasukan baharu:'); if(!nm)return;
+      const sh=nm.replace(/[^A-Za-z]/g,'').slice(0,3).toUpperCase()||'TM'+T.teams.length;
+      const id='T'+Date.now(); T.teams.push({id,short:sh,name:nm.trim(),color:'#27C2E0',logo:'',flag:'',group:(groupList()[0]||'A'),players:[]}); edTeam=id; refreshIdx(); await save(); renderAdmin(); renderPublic(); return; }
+    edTeam=b.dataset.et; renderAdmin();
+  });
+  const t=team(edTeam); if(!t)return;
+  $('#addPlayer').onclick=async()=>{ const nm=$('#newPlayer').value.trim(); if(!nm)return; t.players.push({id:t.id+'_p'+Date.now(),name:nm,photo:''}); refreshIdx(); await save(); renderAdmin(); };
+  c.querySelectorAll('[data-delp]').forEach(b=>b.onclick=async()=>{ t.players=t.players.filter(p=>p.id!==b.dataset.delp); refreshIdx(); await save(); renderAdmin(); renderPublic(); });
+  $('#saveTeam').onclick=async()=>{
+    t.name=$('#tName').value.trim()||t.name; t.short=($('#tShort').value.trim()||t.short).toUpperCase().slice(0,4); t.color=$('#tColor').value;
+    t.group=($('#tGroup').value.trim()||t.group||'A').toUpperCase().slice(0,2);
+    t.logo=$('#tLogo').value.trim(); t.flag=$('#tFlag').value.trim();
+    c.querySelectorAll('#rosterBox input[data-pn]').forEach(inp=>{ const p=t.players.find(x=>x.id===inp.dataset.pn); if(p)p.name=inp.value.trim()||p.name; });
+    c.querySelectorAll('#rosterBox input[data-pp]').forEach(inp=>{ const p=t.players.find(x=>x.id===inp.dataset.pp); if(p)p.photo=inp.value.trim(); });
+    refreshIdx(); await save(); renderPublic(); renderAdmin(); toast('Pasukan disimpan');
+  };
+  $('#delTeam').onclick=async()=>{ if(!confirm('Padam pasukan ini? Perlawanan berkaitan juga dipadam.'))return;
+    T.fixtures=T.fixtures.filter(f=>f.home!==t.id&&f.away!==t.id);
+    T.teams=T.teams.filter(x=>x.id!==t.id); edTeam=T.teams[0]?T.teams[0].id:null; refreshIdx(); await save(); renderAdmin(); renderPublic(); toast('Pasukan dipadam'); };
+}
+
+/* --- admin: knockout --- */
+function koMatchEd(m){
+  const playable=team(m.top)&&team(m.bot);
+  const tn1=team(m.top)?team(m.top).short:m.top, tn2=team(m.bot)?team(m.bot).short:m.bot;
+  let motmOpts=`<option value="">⭐ MOTM —</option>`;
+  if(playable)[team(m.top),team(m.bot)].forEach(tm=>tm.players.forEach(p=>{ motmOpts+=`<option value="${p.id}"${m.motm===p.id?' selected':''}>${esc(p.name)} (${esc(tm.short)})</option>`; }));
+  return `<div class="duel-ed" data-ko="${m.id}">
+    <div class="lbl" style="font-size:13px;font-weight:700">${esc(tn1)}</div>
+    <div class="sc"><select class="kts sc-sel" ${playable?'':'disabled'}>${scoreOpts(m.ts)}</select><span>-</span><select class="kbs sc-sel" ${playable?'':'disabled'}>${scoreOpts(m.bs)}</select></div>
+    <div class="lbl" style="font-size:13px;font-weight:700;text-align:right">${esc(tn2)}</div>
+    <div class="pen-lbl" style="grid-column:1/-1;margin-top:7px">Penalti (isi jika seri)</div>
+    <div class="sc" style="grid-column:1/-1"><select class="kpts sc-sel" ${playable?'':'disabled'}>${scoreOpts(m.pts)}</select><span>-</span><select class="kpbs sc-sel" ${playable?'':'disabled'}>${scoreOpts(m.pbs)}</select></div>
+    <select class="kst" style="grid-column:1/-1;margin-top:5px" ${playable?'':'disabled'}>
+      <option value="sched"${m.status==='sched'?' selected':''}>Akan Datang</option>
+      <option value="ft"${m.status==='ft'?' selected':''}>Selesai</option></select>
+    <select class="kmotm" style="grid-column:1/-1;margin-top:5px" ${playable?'':'disabled'}>${motmOpts}</select></div>`;
+}
+function admKO(){
+  const G=groupList().length, per=T.koPerGroup||2, size=G*per, ok=[2,4,8,16,32].includes(size), tm3=T.thirdMode||'none';
+  let h=`<div class="panel"><h2>Peringkat kalah mati</h2><p class="hint">Pasukan teratas setiap kumpulan layak. Jana bracket (silang juara lawan naib juara kumpulan lain), kemudian masukkan keputusan setiap pusingan. Pemenang naik automatik.</p>
+    <div class="field"><label>Layak setiap kumpulan</label><select id="koPerSel">
+      <option value="1"${per===1?' selected':''}>Juara sahaja (1)</option>
+      <option value="2"${per===2?' selected':''}>Juara + naib (2)</option></select></div>
+    <div class="field"><label>Tempat ke-3 & ke-4</label><select id="thirdSel">
+      <option value="none"${tm3==='none'?' selected':''}>Tiada</option>
+      <option value="match"${tm3==='match'?' selected':''}>Perlawanan tempat ke-3 & ke-4</option>
+      <option value="joint"${tm3==='joint'?' selected':''}>Tempat ke-3 bersama (2 pasukan kalah SF)</option></select></div>
+    <p class="hint">${G} kumpulan × ${per} = <b style="color:${ok?'var(--mint)':'#ff6b6b'}">${size} pasukan</b> dalam bracket${ok?'':' — perlu jumlah 2/4/8/16/32. Laraskan bilangan kumpulan di Tetapan.'}</p>
+    <button class="btn" id="koGen"${ok?'':' disabled'}>Jana bracket dari kumpulan</button>
+    ${T.ko&&T.ko.length?'<p class="hint" style="margin:10px 0 0">Jana semula akan tetapkan peserta ikut kedudukan kumpulan terkini & padam keputusan kalah mati.</p>':''}</div>`;
+  if(T.ko&&T.ko.length){
+    koRounds().forEach(r=>{
+      h+=`<div class="panel"><h2>${KOLABEL[r]}</h2>`;
+      T.ko.filter(m=>m.round===r).forEach(m=>{ h+=koMatchEd(m); });
+      h+=`</div>`;
+    });
+    const tp=T.ko.find(m=>m.round==='TP');
+    if(tp&&tm3==='match'){ h+=`<div class="panel"><h2>🥉 Tempat Ke-3 & Ke-4</h2>${koMatchEd(tp)}</div>`; }
+    else if(tp&&tm3==='joint'){ const a=team(tp.top),b=team(tp.bot); h+=`<div class="panel"><h2>🥉 Tempat Ke-3 (Bersama)</h2><p class="hint">Kedua-dua pasukan kalah separuh akhir berkongsi tempat ke-3: <b>${a?esc(a.short):'TBD'}</b> & <b>${b?esc(b.short):'TBD'}</b>.</p></div>`; }
+    h+=`<button class="btn" id="koSave" style="margin-bottom:14px">Simpan keputusan kalah mati</button>`;
+  }
+  return h;
+}
+function bindKO(){
+  const c=$('#tab-admin');
+  $('#koGen').onclick=async()=>{ T.koPerGroup=parseInt($('#koPerSel').value)||2; T.thirdMode=$('#thirdSel')?$('#thirdSel').value:'none'; generateKO();
+    if(!T.ko.length){toast('Jumlah pasukan mesti 2/4/8/16/32',1);return;}
+    await save(); renderBracket(); renderTeams(); renderAdmin(); toast('Bracket dijana'); };
+  if($('#koSave'))$('#koSave').onclick=async()=>{
+    c.querySelectorAll('.duel-ed[data-ko]').forEach(row=>{ const m=T.ko.find(x=>x.id===row.dataset.ko); if(!m)return;
+      const ts=row.querySelector('.kts').value, bs=row.querySelector('.kbs').value;
+      m.ts=ts===''?null:+ts; m.bs=bs===''?null:+bs; m.status=row.querySelector('.kst').value;
+      const pt=row.querySelector('.kpts'), pb=row.querySelector('.kpbs');
+      m.pts=(pt&&pt.value!=='')?+pt.value:null; m.pbs=(pb&&pb.value!=='')?+pb.value:null;
+      const mo=row.querySelector('.kmotm'); if(mo)m.motm=mo.value||null; });
+    propagateKO(); await save(); renderBracket(); renderMOTM(); renderAdmin(); toast('Keputusan disimpan');
+  };
+}
+
+/* --- admin: settings --- */
+function admSettings(){
+  return `<div class="panel"><h2>Tetapan liga</h2>
+    <div class="field"><label>Nama liga</label><input type="text" id="setName" value="${esc(T.name)}"></div>
+    <div class="field"><label>Sub-tajuk / musim</label><input type="text" id="setSub" value="${esc(T.sub||'')}"></div>
+    <div class="field"><label>Game</label><select id="setGame">`+Object.keys(GAMES).map(k=>`<option value="${k}"${T.game===k?' selected':''}>${GAMES[k]}</option>`).join('')+`</select></div>
+    <div class="field"><label>Format perlawanan</label><select id="setMode">
+      <option value="twp"${(T.mode||'twp')==='twp'?' selected':''}>Pasukan + Pemain (skor setiap pemain)</option>
+      <option value="tvt"${T.mode==='tvt'?' selected':''}>Pasukan lwn Pasukan (skor pasukan sahaja)</option></select></div>
+    <div class="row3"><div class="field"><label>Format pemain</label><select id="setPmode">`+PMODES.map(m=>`<option value="${m}"${T.pmode===m?' selected':''}>${m}</option>`).join('')+`</select></div>
+      <div class="field"><label>Saiz pasukan (1–64)</label><input type="number" id="setSize" min="1" max="64" value="${T.teamSize}"></div></div>
+    <div class="field"><label>PIN admin</label><input type="text" id="setPin" value="${esc(T.pin)}"></div>
+    <button class="btn" id="saveSet">Simpan tetapan</button>
+    <p class="hint" style="margin:12px 0 0">Tukar saiz pasukan / format hanya beri kesan pada perlawanan baharu.</p>
+    </div>
+    <div class="panel"><h2>Kumpulan</h2>
+    <p class="hint">${T.teams.length} pasukan · ${groupList().length} kumpulan sekarang. Auto-agih akan susun pasukan sama rata ke kumpulan A, B, C…</p>
+    <div class="row2"><div class="field"><label>Bilangan kumpulan</label><input type="number" id="setNG" min="1" max="26" value="${T.numGroups||groupList().length||1}"></div>
+      <button class="btn sm" id="autoGrp">Auto-agih pasukan</button></div>
+    <button class="btn ghost" id="genGrpFx">Jana semula jadual kumpulan (round-robin)</button>
+    <p class="hint" style="margin:8px 0 0">⚠️ Jana jadual akan padam semua perlawanan sedia ada & ganti dengan perlawanan dalam kumpulan.</p>
+    </div>
+    <div class="panel"><h2>Kongsi pautan</h2>
+    <p class="hint">Pautan penonton menyembunyikan butang Admin — kongsikan dengan peserta & penonton. Pautan admin (biasa) kekal untuk anda urus liga.</p>
+    <button class="btn" id="copyView">Salin pautan penonton</button>
+    <button class="btn ghost" id="copyAdmin" style="margin-top:8px">Salin pautan admin</button>
+    </div>
+    <div class="panel"><h2>Data</h2>
+    <div class="btn-row" style="margin-top:12px"><button class="btn ghost" id="expBtn">Muat turun data</button><button class="btn ghost" id="impBtn">Import data</button></div>
+    <input type="file" id="impFile" accept="application/json" hidden>
+    <button class="btn danger" id="resetBtn" style="margin-top:10px">Reset ke data contoh</button>
+    <button class="btn ghost" id="logoutBtn" style="margin-top:10px">Log keluar</button>
+  </div>`;
+}
+function bindSettings(){
+  $('#saveSet').onclick=async()=>{
+    T.name=$('#setName').value.trim()||T.name; T.sub=$('#setSub').value.trim(); T.game=$('#setGame').value; T.pmode=$('#setPmode').value;
+    T.teamSize=Math.max(1,Math.min(64,+$('#setSize').value||1)); T.pin=$('#setPin').value.trim()||T.pin;
+    T.mode=$('#setMode')?$('#setMode').value:(T.mode||'twp');
+    await save(); applyBrand(); updateTabs(); renderPublic(); toast('Tetapan disimpan');
+  };
+  $('#autoGrp').onclick=async()=>{ const ng=Math.max(1,Math.min(26,+$('#setNG').value||1)); T.numGroups=ng;
+    const per=Math.ceil(T.teams.length/ng);
+    T.teams.forEach((t,i)=>t.group=String.fromCharCode(65+Math.min(ng-1,Math.floor(i/per))));
+    refreshIdx(); await save(); renderAdmin(); renderPublic(); toast('Pasukan diagih ke '+ng+' kumpulan'); };
+  $('#genGrpFx').onclick=async()=>{ if(!confirm('Padam semua perlawanan & jana jadual round-robin dalam setiap kumpulan?'))return;
+    genGroupFixtures(); T.ko=[]; refreshIdx(); await save(); renderPublic(); renderAdmin(); toast('Jadual kumpulan dijana'); };
+  const base=location.origin+location.pathname;
+  const doCopy=(url,msg)=>{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(url).then(()=>toast(msg)).catch(()=>prompt('Salin pautan:',url)); } else prompt('Salin pautan:',url); };
+  if($('#copyView'))$('#copyView').onclick=()=>doCopy(base+'?view','Pautan penonton disalin');
+  if($('#copyAdmin'))$('#copyAdmin').onclick=()=>doCopy(base,'Pautan admin disalin');
+  $('#expBtn').onclick=()=>{const b=new Blob([JSON.stringify(T,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=(T.name||'liga').replace(/\s+/g,'-').toLowerCase()+'.json';a.click();};
+  $('#impBtn').onclick=()=>$('#impFile').click();
+  $('#impFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=async()=>{try{const d=JSON.parse(r.result);if(!d.teams||!d.fixtures)throw 0;T=d;refreshIdx();await save();applyBrand();renderPublic();renderAdmin();toast('Data diimport');}catch(_){toast('Fail tidak sah',1);}};r.readAsText(f);};
+  $('#resetBtn').onclick=async()=>{ if(confirm('Reset semua data ke contoh?')){T=seed();refreshIdx();await save();applyBrand();renderPublic();renderAdmin();toast('Telah direset');} };
+  $('#logoutBtn').onclick=()=>{adminOK=false;$('#adminBtn').classList.remove('live');switchTab('teams');};
+}
+
+/* ---------- shell ---------- */
+async function save(){ await Store.set(KEY,T); }
+function applyBrand(){ $('#brandName').textContent=T.name; $('#brandSub').textContent=T.sub||''; document.title=T.name; updateTabs(); }
+function updateTabs(){
+  const tvt=(T.mode||'twp')==='tvt';
+  const pb=document.querySelector('#tabs button[data-tab="players"]');
+  if(pb)pb.style.display=tvt?'none':'';
+  if(tvt&&!$('#tab-players').hidden)switchTab('teams');
+}
+function renderPublic(){ renderTeams(); renderPlayers(); renderMOTM(); renderFixtures(); renderBracket(); }
+function switchTab(name){
+  document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
+  ['teams','players','motm','fixtures','bracket','admin'].forEach(t=>$('#tab-'+t).hidden=(t!==name));
+  if(name==='bracket')renderBracket();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function isViewOnly(){ try{ return new URLSearchParams(location.search).has('view')||/(^|[#&])view\b/.test(location.hash); }catch(e){ return false; } }
+function init(){
+  document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+  const ab=$('#adminBtn');
+  if(isViewOnly()){ ab.style.display='none'; }
+  else ab.onclick=()=>{switchTab('admin');renderAdmin();};
+}
+(async function(){
+  T=await Store.get(KEY);
+  if(!T){ T=seed(); }
+  if(!T.teams||!T.fixtures){ T=seed(); }
+  if(!T.numGroups)T.numGroups=groupList().length||1;
+  if(!T.thirdMode)T.thirdMode='none';
+  if(!T.mode)T.mode='twp';
+  refreshIdx();
+  if(!T.ko||!T.ko.length){ generateKO(); }
+  await save();
+  applyBrand(); init(); renderPublic();
+})();
+</script>
+</body>
+</html>
