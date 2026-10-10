@@ -17,8 +17,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ms" suppressHydrationWarning>
-      <head><script dangerouslySetInnerHTML={{__html:`(()=>{let theme;try{theme=localStorage.getItem('battle-states-theme')}catch{}document.documentElement.dataset.theme=theme==='dark'||(theme!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light'})()`}}/></head>
+    <html lang="ms" data-theme="light">
+
       <body className="antialiased"><AppSplash />{children}</body>
     </html>
   );
