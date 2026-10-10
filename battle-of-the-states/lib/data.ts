@@ -1,6 +1,6 @@
 export const states=['Johor','Kedah','Kelantan','Melaka','Negeri Sembilan','Pahang','Perak','Perlis','Pulau Pinang','Sabah','Sarawak','Selangor','Terengganu','Kuala Lumpur','Putrajaya','Labuan'];
 export const codes=['JHR','KDH','KEL','MLK','NSN','PHG','PRK','PLS','PNG','SBH','SWK','SEL','TRG','KUL','PJY','LBN'];
-export type Team={id:number;name:string;code:string;manager:string;assistant:string;coach:string;logo?:string;players:{id:string;name:string;ign:string;image?:string}[]};
+export type Team={id:number;name:string;code:string;manager:string;assistant:string;coach:string;logo?:string;players:{id:string;name:string;ign:string;image?:string;clubLogo?:string}[]};
 export type PlayerGame={homePlayer:string;awayPlayer:string;hs:number;as:number;played:boolean;motm?:string};
 export type Match={id:number;week:number;home:number;away:number;date:string;played:boolean;hs:number;as:number;games?:PlayerGame[];gameCount?:number;cleanSheets?:string[];goals:{player:string;count:number}[]};
 export type Data={teams:Team[];matches:Match[];demo:boolean;demoScenario?:string};

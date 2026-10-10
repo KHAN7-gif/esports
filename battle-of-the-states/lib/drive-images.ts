@@ -6,3 +6,9 @@ const query=new URLSearchParams({id,sz:'w400'});const key=u.searchParams.get('re
 return {id,src:'https://drive.google.com/thumbnail?'+query.toString(),fallback:'https://lh3.googleusercontent.com/d/'+encodeURIComponent(id)+'=w400'};
 }catch{return null}}
 export function validDriveLink(link:unknown){return link===undefined||link===''||(typeof link==='string'&&!!driveImage(link));}
+
+export function clubLogoImage(link:string){
+const drive=driveImage(link);if(drive)return drive;
+try{if(link.length>1000)return null;const u=new URL(link.trim());if(u.protocol!=='https:'||u.username||u.password||u.port||u.hostname==='drive.google.com')return null;return {id:u.href,src:u.href,fallback:u.href};}catch{return null}
+}
+export function validClubLogoLink(link:unknown){return link===undefined||link===''||(typeof link==='string'&&!!clubLogoImage(link));}
