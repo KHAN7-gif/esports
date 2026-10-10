@@ -1,8 +1,8 @@
-export const states=['Johor','Kedah','Kelantan','Melaka','Negeri Sembilan','Pahang','Perak','Perlis','Pulau Pinang','Sabah','Sarawak','Selangor','Terengganu','Kuala Lumpur','Putrajaya','Labuan'];
+export const states=['Johor','Kedah','Kelantan','Melaka','Negeri Sembilan','Pahang','Perak','Perlis','Pulau Pinang','Sabah','Sarawak','Selangor','Terengganu','WP KUALA LUMPUR','WP PUTRAJAYA','WP LABUAN'];
 export const codes=['JHR','KDH','KEL','MLK','NSN','PHG','PRK','PLS','PNG','SBH','SWK','SEL','TRG','KUL','PJY','LBN'];
-export type Team={id:number;name:string;code:string;manager:string;assistant:string;coach:string;logo?:string;players:{id:string;name:string;ign:string;image?:string;clubLogo?:string}[]};
-export type PlayerGame={homePlayer:string;awayPlayer:string;hs:number;as:number;played:boolean;motm?:string};
-export type Match={id:number;week:number;home:number;away:number;date:string;played:boolean;hs:number;as:number;games?:PlayerGame[];gameCount?:number;cleanSheets?:string[];goals:{player:string;count:number}[]};
+export type Team={id:number;name:string;code:string;manager:string;managerImage?:string;assistant:string;coach:string;logo?:string;players:{id:string;name:string;ign:string;image?:string;clubLogo?:string;clubName?:string}[]};
+export type PlayerGame={homePlayer:string;awayPlayer:string;hs:number;as:number;played:boolean;live?:boolean;motm?:string};
+export type Match={id:number;week:number;home:number;away:number;date:string;played:boolean;live?:boolean;hs:number;as:number;games?:PlayerGame[];gameCount?:number;cleanSheets?:string[];goals:{player:string;count:number}[]};
 export type Data={teams:Team[];matches:Match[];demo:boolean;demoScenario?:string};
 export function seed():Data {
 const teams=states.map((name,id)=>({id,name,code:codes[id],manager:'Manager '+codes[id],assistant:'Penolong '+codes[id],coach:'Coach '+codes[id],players:Array.from({length:16},(_,p)=>({id:`${id}-${p}`,name:`Pemain ${String(p+1).padStart(2,'0')}`,ign:`${id===15?'LBU':codes[id]}${String(p+1).padStart(2,'0')}`}))}));
@@ -53,3 +53,13 @@ export function clubDefence(d:Data,id:number){
  }
  return {conceded,appearances};
 }
+
+// Keep federal-territory names consistent for existing and new records.
+export function federalTerritoryNames(data:Data):Data {
+ const names:Record<string,string>={'KUALA LUMPUR':'WP KUALA LUMPUR','LABUAN':'WP LABUAN','PUTRAJAYA':'WP PUTRAJAYA'};
+ return {...data,teams:data.teams.map(team=>{const name=names[team.name.trim().replace(/^WP\s+/i,'').toUpperCase()];return name?{...team,name}:team})};
+}
+
+// LIVE never counts an unfinished player game toward standings or player totals.
+export function isMatchLive(m:Match){return !seriesSummary(m).played&&(m.live===true||!!m.games?.some(g=>g.live||g.played));}
+export function selectMatchMotm(games:PlayerGame[],index:number,player:string){return games.map((g,i)=>({...g,motm:i===index?player:''}));}
