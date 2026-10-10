@@ -4,7 +4,7 @@ export const dynamic='force-dynamic';
 export async function POST(req:Request){
  if(req.headers.get('origin')!==new URL(req.url).origin)return Response.json({error:'Permintaan tidak sah.'},{status:403});
  try{
- const body=await req.json();if(typeof body.email!=='string'||typeof body.password!=='string'||body.email.length>254||body.password.length>256)return Response.json({error:'E-mel atau kata laluan tidak sah.'},{status:400});
+ const body=await req.json() as {email?:unknown;password?:unknown};if(typeof body.email!=='string'||typeof body.password!=='string'||body.email.length>254||body.password.length>256)return Response.json({error:'E-mel atau kata laluan tidak sah.'},{status:400});
  if(!env.DB)return Response.json({error:'Login belum tersedia.'},{status:503});
  await env.DB.prepare('CREATE TABLE IF NOT EXISTS admin_login_attempts (key TEXT PRIMARY KEY, attempts INTEGER NOT NULL, reset_at INTEGER NOT NULL)').run();
  const ip=req.headers.get('cf-connecting-ip')||req.headers.get('x-forwarded-for')?.split(',')[0]||'unknown';const now=Date.now();
