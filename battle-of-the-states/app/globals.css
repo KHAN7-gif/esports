@@ -288,3 +288,5 @@ html{color-scheme:light}.home-shortcuts{display:grid;grid-template-columns:repea
 }
 .home-shortcuts button>svg{transition:transform .18s}
 @media(prefers-reduced-motion:reduce){.section-tabs button,.standings-views button,.full-match-btn,.wide-link,.panel-title button,.section-title button,.admin-link,.home-shortcuts button>svg{transition:none;transform:none!important}}
+
+.home-scorer-identity{min-width:0;flex:1}.scorer-mini .home-scorer-state{display:flex;align-items:center;gap:8px;line-height:1.4}.home-scorer-state>span:last-child{overflow-wrap:anywhere}.home-scorer-state .state-flag{width:26px!important;height:18px!important;flex-shrink:0;border:0!important;border-radius:0!important;padding:0!important;background:transparent!important;box-shadow:none!important}.home-scorer-state .state-flag img{width:100%;height:100%;object-fit:contain;border-radius:0}@media(max-width:600px){.scorer-mini .home-scorer-state{gap:6px;font-size:11px}.home-scorer-state .state-flag{width:23px!important;height:16px!important}}
