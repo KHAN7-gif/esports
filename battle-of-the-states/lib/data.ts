@@ -14,8 +14,8 @@ export function standings(input:Data, options:{week?:number;venue?:string}={}){c
 
 // A team earns one series point per player-game victory. Drawn games earn none.
 export function seriesSummary(m:Match){if(!m.games)return {hs:m.hs,as:m.as,played:m.played,goals:m.goals,cleanSheets:m.cleanSheets||[]};const games=m.games.filter(g=>g.played);const goalMap=new Map<string,number>();const cleanSheets:string[]=[];for(const g of games){goalMap.set(g.homePlayer,(goalMap.get(g.homePlayer)||0)+g.hs);goalMap.set(g.awayPlayer,(goalMap.get(g.awayPlayer)||0)+g.as);if(g.as===0)cleanSheets.push(g.homePlayer);if(g.hs===0)cleanSheets.push(g.awayPlayer);}return {hs:games.filter(g=>g.hs>g.as).length,as:games.filter(g=>g.as>g.hs).length,played:m.games.length===(m.gameCount||16)&&m.games.every(g=>g.played),goals:Array.from(goalMap,([player,count])=>({player,count})).filter(g=>g.count>0),cleanSheets};}
-export function playerStats(d:Data){return d.teams.flatMap(t=>t.players.map(p=>({...p,team:t.name,code:t.code,teamId:t.id,goals:d.matches.reduce((n,m)=>n+(m.games?m.games.filter(g=>g.played).reduce((a,g)=>a+(g.homePlayer===p.id?g.hs:g.awayPlayer===p.id?g.as:0),0):m.played?m.goals.filter(g=>g.player===p.id).reduce((a,g)=>a+g.count,0):0),0),clean:d.matches.reduce((n,m)=>n+(m.games?m.games.filter(g=>g.played&&((g.homePlayer===p.id&&g.as===0)||(g.awayPlayer===p.id&&g.hs===0))).length:m.played&&m.cleanSheets?.includes(p.id)?1:0),0)})));}
-export function clubStats(d:Data){return d.teams.map(t=>({...t,goals:d.matches.reduce((n,m)=>n+(m.games?m.games.filter(g=>g.played).reduce((a,g)=>a+(m.home===t.id?g.hs:m.away===t.id?g.as:0),0):m.played?(m.home===t.id?m.hs:m.away===t.id?m.as:0):0),0),clean:d.matches.reduce((n,m)=>n+(m.games?m.games.filter(g=>g.played&&((m.home===t.id&&g.as===0)||(m.away===t.id&&g.hs===0))).length:m.played&&((m.home===t.id&&m.as===0)||(m.away===t.id&&m.hs===0))?1:0),0)}));}
+export function playerStats(d:Data){return d.teams.flatMap(t=>t.players.map(p=>({...p,team:t.name,code:t.code,teamId:t.id,...playerDefence(d,p.id),goals:d.matches.reduce((n,m)=>n+(m.games?m.games.filter(g=>g.played).reduce((a,g)=>a+(g.homePlayer===p.id?g.hs:g.awayPlayer===p.id?g.as:0),0):m.played?m.goals.filter(g=>g.player===p.id).reduce((a,g)=>a+g.count,0):0),0),clean:d.matches.reduce((n,m)=>n+(m.games?m.games.filter(g=>g.played&&((g.homePlayer===p.id&&g.as===0)||(g.awayPlayer===p.id&&g.hs===0))).length:m.played&&m.cleanSheets?.includes(p.id)?1:0),0)})));}
+export function clubStats(d:Data){return d.teams.map(t=>({...t,...clubDefence(d,t.id),goals:d.matches.reduce((n,m)=>n+(m.games?m.games.filter(g=>g.played).reduce((a,g)=>a+(m.home===t.id?g.hs:m.away===t.id?g.as:0),0):m.played?(m.home===t.id?m.hs:m.away===t.id?m.as:0):0),0),clean:d.matches.reduce((n,m)=>n+(m.games?m.games.filter(g=>g.played&&((m.home===t.id&&g.as===0)||(m.away===t.id&&g.hs===0))).length:m.played&&((m.home===t.id&&m.as===0)||(m.away===t.id&&m.hs===0))?1:0),0)}));}
 
 export function motmAwards(d:Data){return d.matches.flatMap(m=>(m.games||[]).flatMap((g,index)=>{if(!g.motm||![g.homePlayer,g.awayPlayer].includes(g.motm))return [];const team=d.teams.find(t=>[m.home,m.away].includes(t.id)&&t.players.some(p=>p.id===g.motm));const player=team?.players.find(p=>p.id===g.motm);return team&&player?[{match:m,game:index+1,team,player}]:[]}));}
 export function motmLeaders(d:Data){const awards=motmAwards(d);const goals=new Map(playerStats(d).map(p=>[p.id,p.goals]));const counts=new Map<string,number>();for(const a of awards)counts.set(a.player.id,(counts.get(a.player.id)||0)+1);return d.teams.flatMap(team=>team.players.filter(p=>counts.has(p.id)).map(player=>({team,player,count:counts.get(player.id)!,goals:goals.get(player.id)||0}))).sort((a,b)=>b.goals-a.goals||b.count-a.count||a.player.ign.localeCompare(b.player.ign));}
@@ -33,4 +33,23 @@ export function updateDummyResults(data:Data):Data {
   return {...updated,...seriesSummary(updated)};
  });
  return {...data,matches,demoScenario:'labuan-leader-v1'};
+}
+
+export function playerDefence(d:Data,id:string){
+ let conceded=0,appearances=0;
+ for(const m of d.matches)for(const g of m.games||[]){
+  if(!g.played)continue;
+  if(g.homePlayer===id){conceded+=g.as;appearances++;}
+  else if(g.awayPlayer===id){conceded+=g.hs;appearances++;}
+ }
+ return {conceded,appearances};
+}
+export function clubDefence(d:Data,id:number){
+ let conceded=0,appearances=0;
+ for(const m of d.matches){
+  if(m.home!==id&&m.away!==id)continue;
+  if(m.games){for(const g of m.games){if(g.played){conceded+=m.home===id?g.as:g.hs;appearances++;}}}
+  else if(m.played){conceded+=m.home===id?m.as:m.hs;appearances++;}
+ }
+ return {conceded,appearances};
 }
