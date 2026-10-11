@@ -338,3 +338,7 @@ html{color-scheme:light}.home-shortcuts{display:grid;grid-template-columns:repea
 /* Keep the full leading player portrait visible, including the head. */
 .ranking-leader-photo.player-portrait .photo-frame img{object-fit:contain;object-position:center bottom}
 .ranking-leader-photo.player-portrait .photo-frame{aspect-ratio:auto}
+
+/* Scale the featured portrait to the frame and keep its top visible. */
+.ranking-leader-art .ranking-leader-photo{width:70%;max-width:420px;height:100%;flex-shrink:0}
+.ranking-leader-photo.player-portrait .photo-frame img{object-fit:cover;object-position:center top}
