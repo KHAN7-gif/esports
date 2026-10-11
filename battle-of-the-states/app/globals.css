@@ -334,3 +334,7 @@ html{color-scheme:light}.home-shortcuts{display:grid;grid-template-columns:repea
 @media(max-width:370px){.tournament-header .competition-header-logo{width:110px}.tournament-header .competition-trigger{padding:10px 6px;gap:4px}.tournament-header .competition-trigger strong{font-size:11px}}
 
 .season-dialog{width:min(600px,calc(100% - 28px))}.season-row{min-height:96px}.season-management-actions{display:flex;gap:12px;flex-wrap:wrap}.season-url-field{grid-column:1/-1}.season-management-actions button{display:inline-flex;align-items:center;gap:8px}.season-row .competition-current{font-size:12px}.season-row .competition-soon{color:#d80075;font-weight:700;background:#fce6f3;border-radius:12px;padding:10px 14px}
+
+/* Keep the full leading player portrait visible, including the head. */
+.ranking-leader-photo.player-portrait .photo-frame img{object-fit:contain;object-position:center bottom}
+.ranking-leader-photo.player-portrait .photo-frame{aspect-ratio:auto}
