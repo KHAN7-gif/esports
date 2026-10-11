@@ -239,8 +239,8 @@ input:focus,select:focus{outline-color:var(--es-blue)}button:focus-visible,a:foc
 .player-metric-tabs button{flex-shrink:0;border:1px solid #d8d8e0;background:transparent;color:#777582;border-radius:7px;padding:14px 22px;font-size:18px;font-weight:750}
 .player-metric-tabs button[aria-selected=true]{border:2px solid #f25550;padding:13px 21px;color:#111126}
 .player-ranking-card{max-width:900px;margin:auto;background:white;border-radius:20px;overflow:hidden;box-shadow:0 8px 30px #10102506}
-.ranking-leader-art{height:310px;position:relative;background:linear-gradient(120deg,#123ac0,#153db6);display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
-.ranking-watermark{position:absolute;right:-12px;top:35px;transform:rotate(-15deg);font-weight:900;font-size:72px;line-height:1;color:#ffffff08;pointer-events:none}
+.ranking-leader-art{height:310px;position:relative;background:linear-gradient(#fff,#fff) padding-box,linear-gradient(120deg,#1763e8,#d80075,#f05454) border-box;border:2px solid transparent;border-radius:20px 20px 0 0;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}
+.ranking-watermark{position:absolute;right:-12px;top:35px;transform:rotate(-15deg);font-weight:900;font-size:72px;line-height:1;color:#10102504;pointer-events:none}
 .ranking-leader-photo{position:relative;width:220px;height:280px;z-index:1;display:block}
 .ranking-leader-photo .photo-frame{width:100%;height:100%;border-radius:0;background:transparent;border:0;display:block;overflow:hidden}
 .ranking-leader-photo img,.ranking-leader-photo .photo-fallback img{width:100%;height:100%;object-fit:contain;object-position:center bottom}
