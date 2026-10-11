@@ -66,3 +66,20 @@ export function federalTerritoryNames(data:Data):Data {
 // LIVE never counts an unfinished player game toward standings or player totals.
 export function isMatchLive(m:Match){return !seriesSummary(m).played&&(m.live===true||!!m.games?.some(g=>g.live||g.played));}
 export function selectMatchMotm(games:PlayerGame[],index:number,player:string){return games.map((g,i)=>({...g,motm:i===index?player:''}));}
+
+export type StatsMetric='goals'|'clean';
+export type StatsTieEntry={goals:number;conceded:number;teamPosition:number;teamConceded:number};
+// Compare sporting criteria only; names stabilize display without breaking a true tie.
+export function compareStats(a:StatsTieEntry,b:StatsTieEntry,metric:StatsMetric){
+const difference=(b.goals-b.conceded)-(a.goals-a.conceded);
+return metric==='goals'
+ ? b.goals-a.goals||a.conceded-b.conceded||difference||a.teamPosition-b.teamPosition
+ : a.conceded-b.conceded||difference||a.teamConceded-b.teamConceded;
+}
+export function statsRankings(d:Data){
+const table=standings(d),clubs=clubStats(d);
+const positions=new Map(table.map((t,i)=>[t.id,i+1]));
+const conceded=new Map(clubs.map(t=>[t.id,t.conceded]));
+const context=(teamId:number)=>({teamPosition:positions.get(teamId)??Infinity,teamConceded:conceded.get(teamId)??0});
+return {players:playerStats(d).map(p=>({...p,...context(p.teamId)})),clubs:clubs.map(t=>({...t,...context(t.id)}))};
+}
