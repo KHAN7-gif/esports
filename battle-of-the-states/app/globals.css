@@ -176,6 +176,11 @@ input:focus,select:focus{outline-color:var(--es-blue)}button:focus-visible,a:foc
 
 .photo-fallback:has(img){display:block;width:100%;height:100%}.photo-fallback img{object-fit:cover}
 
+/* Home Top Scorers: show the full portrait with headroom. */
+.scorer-mini .player-photo.player-portrait .photo-frame{padding:3px;aspect-ratio:auto;border-radius:8px}
+.scorer-mini .player-photo.player-portrait .photo-frame img{object-fit:contain;object-position:center bottom}
+.scorer-mini .player-photo.player-portrait .photo-fallback{display:flex;width:100%;height:100%;align-items:flex-end;justify-content:center}
+
 /* Square player portraits across roster, rankings and match details. */
 .player-portrait .photo-frame{border-radius:10px;aspect-ratio:1/1}
 .stat-photo.player-portrait .photo-frame{width:100%;height:100%}
