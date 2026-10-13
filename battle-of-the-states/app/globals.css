@@ -360,3 +360,4 @@ html{color-scheme:light}.home-shortcuts{display:grid;grid-template-columns:repea
 .matchday-share button>svg{width:20px;height:20px;flex-shrink:0}
 .matchday-share button>span{min-width:0;overflow-wrap:anywhere}
 @media(max-width:380px){.matchday-share button{font-size:11px;gap:6px;padding:12px 7px}.matchday-share button>svg{width:18px;height:18px}}
+.matchday-share .matchday-share-icon>svg{width:24px;height:24px}
