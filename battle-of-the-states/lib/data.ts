@@ -5,7 +5,7 @@ export type PlayerGame={homePlayer:string;awayPlayer:string;hs:number;as:number;
 export type Match={id:number;week:number;home:number;away:number;date:string;played:boolean;live?:boolean;hs:number;as:number;games?:PlayerGame[];gameCount?:number;cleanSheets?:string[];goals:{player:string;count:number}[]};
 export type Advertisement={id:string;title:string;image:string};
 export type Competition={id:string;name:string;season:string;format:string;status:"upcoming"|"ongoing"|"completed";logo:string;url:string};
-export type Season={id:string;name:string;status:"upcoming"|"ongoing"|"completed";url:string};
+export type Season={id:string;name:string;status:"upcoming"|"ongoing"|"completed";url:string;visible?:boolean};
 export type Data={seasons?:Season[];competitions?:Competition[];ads?:Advertisement[];teams:Team[];matches:Match[];demo:boolean;demoScenario?:string};
 export function seed():Data {
 const teams=states.map((name,id)=>({id,name,code:codes[id],manager:'Manager '+codes[id],assistant:'Penolong '+codes[id],coach:'Coach '+codes[id],players:Array.from({length:16},(_,p)=>({id:`${id}-${p}`,name:`Pemain ${String(p+1).padStart(2,'0')}`,ign:`${id===15?'LBU':codes[id]}${String(p+1).padStart(2,'0')}`}))}));
