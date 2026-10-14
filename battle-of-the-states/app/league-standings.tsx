@@ -2,7 +2,8 @@
 import {useState} from 'react';
 import {RotateCcw,ChevronUp,ChevronDown,Minus} from 'lucide-react';
 import {type Data,standings,codes,states,isMatchLive} from '../lib/data';
-export default function LeagueStandings({data,onTeam}:{data:Data;onTeam:(id:number)=>void}){
+export default function LeagueStandings({data,onTeam,seasonId='season-1'}:{data:Data;onTeam:(id:number)=>void;seasonId?:string}){
+ const seasonName=data.seasons?.find(s=>s.id===seasonId)?.name||(seasonId==='season-2'?'Season 2 / 2026':'Season 1 / 2026');
  const [view,setView]=useState('short'),[week,setWeek]=useState(0),[venue,setVenue]=useState('all'),[live,setLive]=useState(false);
  const active=data.matches.filter(m=>isMatchLive(m)&&(!week||m.week<=week)&&(venue==='all'||venue==='home'||venue==='away'));
  const official=standings(data,{week,venue});
@@ -11,7 +12,7 @@ export default function LeagueStandings({data,onTeam}:{data:Data;onTeam:(id:numb
  const previous=latest>1?standings({...data,matches:data.matches.filter(m=>m.week<latest)},{venue}):null;
  const cols=view==='short'?[['p','P','Played'],['w','W','Won'],['gd','GD','Player-game win difference'],['pts','Pts','Points']]:[['p','P','Played'],['w','W','Won'],['draw','D','Drawn'],['l','L','Lost'],['gf','GW','Player games won'],['ga','GL','Player games lost'],['gd','GD','Player-game win difference'],['pts','Pts','Points']];
  return <section className="standings-page">
- <div className="table-season"><div><span className="table-kicker">LEAGUE TABLE</span><h2>Season 1 / 2026</h2></div><label><span className="sr-only">Season</span><select value="1/2026" onChange={()=>{}}><option>1/2026</option></select></label></div>
+ <div className="table-season"><div><span className="table-kicker">LEAGUE TABLE</span><h2>{seasonName}</h2></div><label><span className="sr-only">Season aktif</span><select value={seasonId} onChange={()=>{}} aria-label="Standings season aktif"><option value={seasonId}>{seasonName}</option></select></label></div>
  <div className="standings-filters"><label><span className="sr-only">Matchweek table</span><select value={week} onChange={e=>setWeek(+e.target.value)}><option value={0}>All Matchweeks</option>{Array.from({length:15},(_,i)=><option value={i+1} key={i}>MW{i+1}</option>)}</select></label><label><span className="sr-only">Home or away</span><select value={venue} onChange={e=>setVenue(e.target.value)}><option value="all">Home & Away</option><option value="home">Home</option><option value="away">Away</option></select></label><button disabled={!week&&venue==='all'} onClick={()=>{setWeek(0);setVenue('all')}}><span>Reset</span><RotateCcw size={17}/></button></div>
  <div className="standings-views" role="tablist" aria-label="Paparan Table">{['short','full','form'].map(v=><button key={v} id={'table-tab-'+v} role="tab" aria-selected={view===v} aria-controls="standings-results" onClick={()=>setView(v)}>{v[0].toUpperCase()+v.slice(1)}</button>)}</div>
  <div className="live-table-control"><button type="button" role="switch" aria-checked={live} aria-label="Live Table" className={live?'live-table-switch enabled':'live-table-switch'} onClick={()=>setLive(!live)}><span/></button><span>Live Table</span>{live&&<i className="live-table-dot" aria-hidden="true"/>}<small role="status">{live?(active.length?`${active.length} perlawanan LIVE · Kedudukan sementara`:'Aktif · Tiada perlawanan LIVE'):'Keputusan penuh sahaja'}</small></div>
