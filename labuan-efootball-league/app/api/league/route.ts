@@ -2,13 +2,18 @@ import {env} from 'cloudflare:workers';
 import {getChatGPTUser} from '../../chatgpt-auth';
 import {registrationLeague,demoLeague,leagueSchema,validateLeague} from '../../../lib/league';
 export const dynamic='force-dynamic';
+function publicResponse(request:Request,body:unknown,status=200){
+ const headers:Record<string,string>={'Cache-Control':'no-store','Vary':'Origin'};
+ if(request.headers.get('Origin')==='https://khan7-gif.github.io')headers['Access-Control-Allow-Origin']='https://khan7-gif.github.io';
+ return Response.json(body,{status,headers});
+}
 export async function GET(request:Request){
- const category=new URL(request.url).searchParams.get('category');if(category!=='mobile'&&category!=='console')return Response.json({error:'Kategori tidak sah.'},{status:400});
- if(!env.DB)return Response.json({error:'Pangkalan data belum tersedia.'},{status:503});
+ const category=new URL(request.url).searchParams.get('category');if(category!=='mobile'&&category!=='console')return publicResponse(request,{error:'Kategori tidak sah.'},400);
+ if(!env.DB)return publicResponse(request,{error:'Pangkalan data belum tersedia.'},503);
  let row=await env.DB.prepare('SELECT data,version FROM lel_leagues WHERE category=?').bind(category).first<{data:string;version:number}>();
  if(!row){await env.DB.prepare('INSERT OR IGNORE INTO lel_leagues(category,data,version) VALUES(?,?,1)').bind(category,JSON.stringify(demoLeague(category))).run();row=await env.DB.prepare('SELECT data,version FROM lel_leagues WHERE category=?').bind(category).first<{data:string;version:number}>();}
- if(!row)return Response.json({error:'Data belum dapat disediakan.'},{status:503});
- return Response.json({data:registrationLeague(JSON.parse(row.data)),version:row.version},{headers:{'Cache-Control':'no-store'}});
+ if(!row)return publicResponse(request,{error:'Data belum dapat disediakan.'},503);
+ return publicResponse(request,{data:registrationLeague(JSON.parse(row.data)),version:row.version});
 }
 export async function PUT(request:Request){
  const user=await getChatGPTUser();if(!user||!env.ADMIN_EMAIL||user.email.toLowerCase()!==env.ADMIN_EMAIL.toLowerCase())return Response.json({error:'Akses admin diperlukan.'},{status:403});

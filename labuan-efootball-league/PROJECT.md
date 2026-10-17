@@ -1,5 +1,7 @@
 # Labuan eFootball League
 
+- GitHub Pages public frontend: `/esports/lel.html`. Build using `node scripts/export-github.mjs` after the Sites build. It renders the same public Dashboard directly, without an iframe or redirect. GET data uses the public backend with credentials omitted; only the exact GitHub Pages origin receives CORS permission. Admin remains on the authenticated backend.
+
 Independent application with its own source repository, Site and D1 database. No BOTS API or data dependencies.
 
 - / read view; /admin editing through ChatGPT sign-in and ADMIN_EMAIL allowlist.
