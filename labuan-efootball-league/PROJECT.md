@@ -1,5 +1,7 @@
 # Labuan eFootball League
 
+- Fixtures: per-group ALL ROUND / ROUND 1… filters beneath group heading. Rounds use circle scheduling derived from member order and map existing pairings, preserving IDs, scores and home/away. Even N: N−1 rounds; odd N: N rounds with one bye. Share/save follows selected group rounds and prints group/round labels.
+
 - GitHub Pages public frontend: `/esports/lel.html`. Build using `node scripts/export-github.mjs` after the Sites build. It renders the same public Dashboard directly, without an iframe or redirect. GET data uses the public backend with credentials omitted; only the exact GitHub Pages origin receives CORS permission. Admin remains on the authenticated backend.
 
 Independent application with its own source repository, Site and D1 database. No BOTS API or data dependencies.

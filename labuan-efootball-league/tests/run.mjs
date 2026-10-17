@@ -15,3 +15,4 @@ await import('./manual.test.mjs');
 await import('./setup.test.mjs');
 
 await import('./registration.test.mjs');
+await import('./rounds.test.mjs');

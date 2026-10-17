@@ -17,6 +17,23 @@ export type Category='mobile'|'console';
 export const categories={mobile:'eFootball Mobile',console:'eFootball Konsol'} as const;
 export const emptyLeague=():League=>({title:'Labuan eFootball League',season:'Season 1 / 2026',players:[],groups:[],rounds:[],settings:{groupCount:4,qualify:4,finalLegs:1}});
 export function game(id:string,home:string,away:string):Game{return {id,home,away,hs:null,as:null,status:'scheduled',date:'',motm:null,eh:null,ea:null,ph:null,pa:null}}
+// Circle scheduling partitions existing fixtures without changing IDs, scores or home/away.
+export function groupRounds(g:Group){
+ let ring:(string|null)[]=[...g.members];if(ring.length%2)ring.push(null);
+ const key=(a:string,b:string)=>JSON.stringify([a,b].sort());
+ const games=new Map(g.games.map(m=>[key(m.home,m.away),m]));
+ const rounds:{number:number;games:Game[];bye:string|null}[]=[];
+ for(let round=1;round<ring.length;round++){
+  const row:{number:number;games:Game[];bye:string|null}={number:round,games:[],bye:null};
+  for(let i=0;i<ring.length/2;i++){
+   const a=ring[i],b=ring[ring.length-1-i];
+   if(a===null||b===null){row.bye=a??b;continue}
+   const m=games.get(key(a,b));if(m)row.games.push(m);
+  }
+  rounds.push(row);ring=[ring[0],ring[ring.length-1],...ring.slice(1,-1)];
+ }
+ return rounds;
+}
 export function groupTable(g:Group,players:Player[]){
  const rows=g.members.map(id=>({id,ign:players.find(p=>p.id===id)?.ign||'—',rankingName:players.find(p=>p.id===id)?.rankingName||players.find(p=>p.id===id)?.ign||'—',p:0,w:0,d:0,l:0,gf:0,ga:0,gd:0,pts:0}));
  for(const m of g.games){if(m.status!=='completed'||m.hs===null||m.as===null)continue;const a=rows.find(x=>x.id===m.home)!,b=rows.find(x=>x.id===m.away)!;a.p++;b.p++;a.gf+=m.hs;b.gf+=m.as;a.ga+=m.as;b.ga+=m.hs;if(m.hs>m.as){a.w++;b.l++;a.pts+=3}else if(m.hs<m.as){b.w++;a.l++;b.pts+=3}else{a.d++;b.d++;a.pts++;b.pts++}}
