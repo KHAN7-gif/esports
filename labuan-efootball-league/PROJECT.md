@@ -1,5 +1,7 @@
 # Labuan eFootball League
 
+- Matches board follows supplied standings + Games reference: compact group tables on the left, magenta Games panel on the right, group/round controls, selected-round summary, existing score editor and share/save actions. Overall is a read-only comparison; qualification stays by group. On phones, Fixtures opens Games first and Groups opens standings first. Display-only: no data migration or tournament writes.
+
 - Admin match score fields open a popup with 0–10 buttons, + Manual (0–99 whole numbers), and Clear to restore null. Applies to normal-time, extra-time and penalty fields. Selecting a score updates the match draft; Apply changes and Save changes retain their existing behavior. Nested score popup Escape/backdrop closes only the score picker.
 
 - Fixtures: per-group ALL ROUND / ROUND 1… filters beneath group heading. Rounds use circle scheduling derived from member order and map existing pairings, preserving IDs, scores and home/away. Even N: N−1 rounds; odd N: N rounds with one bye. Share/save follows selected group rounds and prints group/round labels.
