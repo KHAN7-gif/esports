@@ -1,5 +1,7 @@
 # Labuan eFootball League
 
+- Admin match score fields open a popup with 0–10 buttons, + Manual (0–99 whole numbers), and Clear to restore null. Applies to normal-time, extra-time and penalty fields. Selecting a score updates the match draft; Apply changes and Save changes retain their existing behavior. Nested score popup Escape/backdrop closes only the score picker.
+
 - Fixtures: per-group ALL ROUND / ROUND 1… filters beneath group heading. Rounds use circle scheduling derived from member order and map existing pairings, preserving IDs, scores and home/away. Even N: N−1 rounds; odd N: N rounds with one bye. Share/save follows selected group rounds and prints group/round labels.
 
 - GitHub Pages public frontend: `/esports/lel.html`. Build using `node scripts/export-github.mjs` after the Sites build. It renders the same public Dashboard directly, without an iframe or redirect. GET data uses the public backend with credentials omitted; only the exact GitHub Pages origin receives CORS permission. Admin remains on the authenticated backend.
