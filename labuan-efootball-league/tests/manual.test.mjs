@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import {demoLeague,manualGroups,validateLeague,leagueSchema} from '../.sites-runtime/league.mjs';
+const d=demoLeague('mobile'),consoleData=demoLeague('console'),snapshot=JSON.stringify(d);
+const slots=d.groups.map(g=>[...g.members]);
+assert.equal(manualGroups(d,slots),d);
+[slots[0][0],slots[1][7]]=[slots[1][7],slots[0][0]];
+const changed=manualGroups(d,slots);
+assert.equal(changed.groups[0].members[0],slots[0][0]);
+assert.equal(changed.groups[1].members[7],slots[1][7]);
+assert.equal(changed.groups.flatMap(g=>g.games).length,112);
+assert.equal(changed.rounds.length,0);
+assert.ok(changed.groups.flatMap(g=>g.games).every(m=>m.status==='scheduled'&&m.hs===null&&m.motm===null));
+assert.deepEqual(changed.players,d.players);
+assert.equal(JSON.stringify(d),snapshot);
+assert.equal(consoleData.rounds.length,1);
+const duplicate=slots.map(g=>[...g]);duplicate[0][0]=duplicate[0][1];assert.throws(()=>manualGroups(d,duplicate));
+const missing=slots.map(g=>[...g]);missing[0][0]='';assert.throws(()=>manualGroups(d,missing));
+for(const showFlags of [true,false]){const parsed=leagueSchema.parse({...changed,players:changed.players.map((p,i)=>({...p,state:i?'':'LBN'})),settings:{...changed.settings,showFlags}});validateLeague(parsed);assert.equal(parsed.players[0].state,'LBN');assert.equal(parsed.settings.showFlags,showFlags)}
+assert.equal(leagueSchema.safeParse({...d,players:d.players.map(p=>({...p,state:'INVALID'}))}).success,false);
+console.log('PASS: manual slot assignments, duplicates, safe reset, unchanged categories, legacy saves and flag settings.');
