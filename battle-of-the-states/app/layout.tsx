@@ -1,6 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import AppSplash from "@/components/app-splash";
+
+export const viewport: Viewport = {width:"device-width",initialScale:1,viewportFit:"cover"};
 
 export const metadata: Metadata = {
   title: "Battle of the States | eFootball Mobile",
