@@ -1,0 +1,47 @@
+import assert from 'node:assert/strict';
+import {emptyLeague,demoLeague,leagueSchema,validateLeague,manualKnockout,assignKnockoutSlot,advanceKnockout,nextRound,syncThirdPlace,sharedThirdPlayers,winner,seriesScore,playerStats,allGames} from '../.sites-runtime/league.mjs';
+const original=demoLeague('mobile'),snapshot=JSON.stringify(original);
+assert.doesNotThrow(()=>validateLeague({...original,settings:{...original.settings,knockoutMode:'bo3'}}));
+assert.equal(JSON.stringify(original),snapshot);
+const players=original.players;
+const base={...emptyLeague(),players,settings:{...emptyLeague().settings,knockoutMode:'bo3',autoAdvance:true,thirdPlacePlayoff:true}};
+let d=manualKnockout(base,players.slice(0,16).map(p=>p.id));
+assert.equal(d.rounds[0].length,8);assert.equal(d.rounds[0][0].legs.length,3);
+assert.throws(()=>manualKnockout(base,[players[0].id,players[0].id]));
+const first=d.rounds[0][0],second=d.rounds[0][1],other=players[20].id;
+let swapped=assignKnockoutSlot(d,0,first.id,'a',second.b);
+assert.equal(swapped.rounds[0][0].a,second.b);assert.equal(swapped.rounds[0][1].b,first.a);
+assert.equal(new Set(swapped.rounds[0].flatMap(t=>[t.a,t.b])).size,16);
+assert.throws(()=>assignKnockoutSlot({...d,drawLocked:true},0,first.id,'a',other));
+const untouched=JSON.stringify(d);const replaced=assignKnockoutSlot(d,0,first.id,'a',other);
+assert.equal(replaced.rounds[0][0].a,other);assert.equal(replaced.rounds[0][0].legs[1].away,other);assert.equal(JSON.stringify(d),untouched);
+const winGame=(t,i,who=t.a)=>Object.assign(t.legs[i],{status:'completed',hs:t.legs[i].home===who?3:0,as:t.legs[i].away===who?3:0});
+winGame(first,0);assert.equal(winner(first),null);winGame(first,1);assert.equal(winner(first),first.a);assert.deepEqual(seriesScore(first),{a:2,b:0});
+assert.equal(playerStats(d).find(p=>p.id===first.a).played,2);assert.equal(first.legs[2].hs,null);
+assert.throws(()=>assignKnockoutSlot(d,0,first.id,'a',other));
+for(const t of d.rounds[0].slice(1)){winGame(t,0);winGame(t,1)}
+d=advanceKnockout(d);assert.equal(d.rounds.length,2);assert.equal(d.rounds[1].length,4);
+assert.throws(()=>assignKnockoutSlot(d,0,first.id,'a',other));
+for(const t of d.rounds[1]){winGame(t,0);winGame(t,1,t.b);assert.equal(winner(t),null);winGame(t,2,t.b);assert.equal(winner(t),t.b)}
+d=advanceKnockout(d);assert.equal(d.rounds[2].length,2);
+for(const t of d.rounds[2]){winGame(t,0);winGame(t,1)}
+d=advanceKnockout(d);assert.equal(d.rounds[3].length,1);assert.ok(d.thirdPlace);assert.equal(d.thirdPlace.mode,'bo3');assert.deepEqual(sharedThirdPlayers(d),[]);
+const losers=d.rounds[2].map(t=>t.b);assert.deepEqual([d.thirdPlace.a,d.thirdPlace.b],losers);
+let thirdSwap=assignKnockoutSlot(d,-1,d.thirdPlace.id,'a',d.thirdPlace.b);assert.equal(thirdSwap.thirdPlace.a,d.thirdPlace.b);assert.equal(thirdSwap.thirdPlace.b,d.thirdPlace.a);
+const thirdBefore=JSON.stringify(d.thirdPlace);const off=advanceKnockout({...d,settings:{...d.settings,thirdPlacePlayoff:false}});assert.deepEqual(sharedThirdPlayers(off),losers);assert.equal(JSON.stringify(off.thirdPlace),thirdBefore);
+for(const t of [d.rounds[3][0],d.thirdPlace]){winGame(t,0);winGame(t,1)}
+assert.ok(winner(d.rounds[3][0]));assert.ok(winner(d.thirdPlace));validateLeague(leagueSchema.parse(d));
+const bad=structuredClone(d);bad.rounds[0][0].legs[0].ph=3;bad.rounds[0][0].legs[0].pa=2;assert.throws(()=>validateLeague(bad));
+const unnecessary=structuredClone(d);winGame(unnecessary.rounds[0][0],2);assert.throws(()=>validateLeague(unnecessary));
+const draw=manualKnockout(base,players.slice(0,2).map(p=>p.id));Object.assign(draw.rounds[0][0].legs[0],{status:'completed',hs:0,as:0});assert.throws(()=>validateLeague(draw));
+const outOfOrder=manualKnockout(base,players.slice(0,2).map(p=>p.id));winGame(outOfOrder.rounds[0][0],1);assert.throws(()=>validateLeague(outOfOrder));
+let agg=manualKnockout({...base,settings:{...base.settings,knockoutMode:'aggregate',autoAdvance:false}},players.slice(0,2).map(p=>p.id)),t=agg.rounds[0][0];
+assert.equal(t.legs.length,2);t.legs.forEach(m=>Object.assign(m,{status:'completed',hs:1,as:0}));assert.equal(winner(t),null);validateLeague(agg);
+Object.assign(t.legs[1],{ph:4,pa:5});assert.equal(winner(t),t.a);validateLeague(agg);
+const beforePenalty=playerStats(agg).find(p=>p.id===t.a);assert.equal(beforePenalty.goals,1);assert.equal(beforePenalty.played,2);
+assert.throws(()=>validateLeague({...agg,rounds:[[{...t,penalties:false}]]}));
+const nonTie=structuredClone(agg);nonTie.rounds[0][0].legs[0].hs=4;assert.throws(()=>validateLeague(nonTie));
+const pending=manualKnockout({...base,settings:{...base.settings,autoAdvance:false}},players.slice(0,4).map(p=>p.id));pending.rounds[0].forEach(t=>{winGame(t,0);winGame(t,1)});assert.equal(advanceKnockout(pending).rounds.length,1);assert.equal(nextRound(pending).rounds.length,2);
+const legacy=demoLeague('console');const legacyGames=JSON.stringify(allGames(legacy));const migrated=advanceKnockout({...legacy,settings:{...legacy.settings,knockoutMode:'bo3',autoAdvance:true}});assert.equal(JSON.stringify(allGames(migrated)),legacyGames);
+assert.equal(leagueSchema.safeParse({...base,players:[{...players[0],clubNickname:'MD'}]}).success,false);assert.equal(leagueSchema.safeParse({...base,players:[{...players[0],clubNickname:'MDE'}]}).success,true);
+console.log('PASS: BO3 2–0/2–1, replay validation, Aggregate penalties, manual slots and swaps, Lock Draw, auto/manual advancement, third/fourth places, nicknames, completed-only stats and lossless legacy compatibility.');

@@ -18,3 +18,4 @@ await import('./setup.test.mjs');
 await import('./registration.test.mjs');
 await import('./rounds.test.mjs');
 await import('./stats-ranking.test.mjs');
+await import('./knockout.test.mjs');
