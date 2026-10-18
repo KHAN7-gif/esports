@@ -25,3 +25,4 @@
 .generate-league{border-top:1px solid #e0e6f0;padding-top:22px;margin-top:24px;display:grid;gap:14px}.generate-league-button{width:100%;min-height:54px;font-size:15px;border-radius:13px}.generate-league-button>svg:last-child{margin-left:auto}.generate-league-button>svg:first-child{margin-right:auto}
 
 .add-group-player{width:100%;margin-top:12px;border-style:dashed;color:#3d60bb}
+.stats-panel .ranking-row .avatar{width:56px;height:56px;aspect-ratio:1;border-radius:6px;background:#f6f8fc;border:1px solid #dfe6f0}.stats-panel .ranking-row .avatar>img:not(.state-flag){object-fit:contain;object-position:center;border-radius:5px}.round-statistics h3{display:flex;align-items:center;justify-content:center;gap:7px;min-height:30px;font-size:12px;font-weight:500}
