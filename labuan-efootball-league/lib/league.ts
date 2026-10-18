@@ -7,7 +7,7 @@ export const playerSchema=z.object({id,placeholder:z.boolean().optional(),rankin
 export const gameSchema=z.object({id,home:id,away:id,hs:score,as:score,status:z.enum(['scheduled','live','completed']),date:z.string().max(30),motm:id.nullable(),eh:score,ea:score,ph:score,pa:score});
 export const groupSchema=z.object({id,name:z.string().max(40),members:z.array(id).min(2).max(16),games:z.array(gameSchema).max(120)});
 export const tieSchema=z.object({id,a:id,b:id,mode:z.enum(["bo3","aggregate"]).optional(),penalties:z.boolean().optional(),legs:z.array(gameSchema).min(1).max(3)});
-export const leagueSchema=z.object({demo:z.boolean().optional(),title:z.string().trim().min(1).max(100),season:z.string().trim().min(1).max(60),players:z.array(playerSchema).max(128),groupSlots:z.array(z.array(id).max(16)).max(8).optional(),groups:z.array(groupSchema).max(16),manualKnockout:z.boolean().optional(),drawLocked:z.boolean().optional(),thirdPlace:tieSchema.optional(),rounds:z.array(z.array(tieSchema).min(1).max(16)).max(5),settings:z.object({knockoutMode:z.enum(["bo3","aggregate"]).optional(),knockoutPenalties:z.boolean().optional(),thirdPlacePlayoff:z.boolean().optional(),autoAdvance:z.boolean().optional(),showClubNickname:z.boolean().optional(),sharedThird:z.boolean().optional(),finalPenalties:z.enum(['extra-time','direct']).optional(),showFlags:z.boolean().optional(),groupCount:z.number().int().min(1).max(16),qualify:z.union([z.literal(1),z.literal(2),z.literal(4)]),finalLegs:z.union([z.literal(1),z.literal(2)])})});
+export const leagueSchema=z.object({referenceOnly:z.boolean().optional(),demo:z.boolean().optional(),title:z.string().trim().min(1).max(100),season:z.string().trim().min(1).max(60),players:z.array(playerSchema).max(128),groupSlots:z.array(z.array(id).max(16)).max(8).optional(),groups:z.array(groupSchema).max(16),manualKnockout:z.boolean().optional(),drawLocked:z.boolean().optional(),thirdPlace:tieSchema.optional(),rounds:z.array(z.array(tieSchema).min(1).max(16)).max(5),settings:z.object({knockoutMode:z.enum(["bo3","aggregate"]).optional(),knockoutPenalties:z.boolean().optional(),thirdPlacePlayoff:z.boolean().optional(),autoAdvance:z.boolean().optional(),showClubNickname:z.boolean().optional(),sharedThird:z.boolean().optional(),finalPenalties:z.enum(['extra-time','direct']).optional(),showFlags:z.boolean().optional(),groupCount:z.number().int().min(1).max(16),qualify:z.union([z.literal(1),z.literal(2),z.literal(4)]),finalLegs:z.union([z.literal(1),z.literal(2)])})});
 export type Player=z.infer<typeof playerSchema>;
 export type Game=z.infer<typeof gameSchema>;
 export type Group=z.infer<typeof groupSchema>;
@@ -103,6 +103,29 @@ export function demoLeague(category:Category):League{
  let seed=category==='mobile'?2026:2027;const rng=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296};d=drawGroups(d,rng);
  for(const g of d.groups){for(const m of g.games){m.hs=Math.floor(rng()*6);m.as=Math.floor(rng()*5);m.status='completed';m.motm=m.hs>=m.as?m.home:m.away;}}
  d=nextRound(d);return validateLeague(leagueSchema.parse(d));
+}
+
+// Admin-only reference data, independent of live league storage.
+export function referenceLeague(category:Category,mode:'bo3'|'aggregate'='aggregate'):League{
+ let d=demoLeague(category);d.rounds=[];d.referenceOnly=true;
+ d.title='LEL · Dummy 32 Pemain';d.season='Rujukan Admin · 2026';
+ d.settings={...d.settings,knockoutMode:mode,knockoutPenalties:true,finalLegs:2,showFlags:true,showClubNickname:true,thirdPlacePlayoff:true,sharedThird:false,autoAdvance:false};
+ d.players=d.players.map((p,i)=>({...p,name:'Pemain Dummy '+String(i+1).padStart(2,'0'),state:states[i%states.length][0],clubNickname:['ALP','BRV','CHR','DLT'][i%4]}));
+ let clock=0;
+ const stamp=(m:Game)=>{const day=String(1+Math.floor(clock/12)).padStart(2,'0'),hour=String(10+clock%12).padStart(2,'0');m.date='2026-10-'+day+'T'+hour+':00';clock++;m.motm=m.hs!>=m.as!?m.home:m.away;};
+ d.groups.forEach(g=>g.games.forEach(stamp));
+ function complete(t:Tie,index:number){
+  if(t.mode==='bo3'){
+   const target=index%2?t.b:t.a,decider=index%3===0;
+   t.legs.slice(0,decider?3:2).forEach((m,i)=>{const w=decider&&i===1?(target===t.a?t.b:t.a):target;m.status='completed';m.hs=m.home===w?3:1;m.as=m.away===w?3:1;stamp(m)});
+  }else{
+   t.legs.forEach((m,i)=>{m.status='completed';m.hs=i===0?2:index%3===0?2:0;m.as=1;stamp(m)});
+   if(!winner(t)){const m=t.legs.at(-1)!;m.ph=index%2?5:4;m.pa=index%2?4:5;}
+  }
+ }
+ do{d=nextRound(d);d.rounds.at(-1)!.forEach((t,i)=>complete(t,i+d.rounds.length));d=syncThirdPlace(d);}while(d.rounds.at(-1)!.length>1);
+ if(d.thirdPlace)complete(d.thirdPlace,0);
+ return validateLeague(leagueSchema.parse(d));
 }
 
 // Members are ordered draw slots (A1, A2, ...), independently of standings rank.

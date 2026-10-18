@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {emptyLeague} from '../.sites-runtime/league.mjs';
+import {emptyLeague,referenceLeague} from '../.sites-runtime/league.mjs';
 const rows=new Map();
 globalThis.__lelUser=null;
 class DB {
@@ -48,6 +48,10 @@ assert.equal(other.headers.get('Access-Control-Allow-Origin'),null);
 assert.equal((await PUT(req('mobile',changed,'https://khan7-gif.github.io'))).status,403);
 assert.equal((await GET(new Request('https://lel.example/api/league?category=bad'))).status,400);
 assert.equal((await PUT(req('mobile',{version:2,data:{...emptyLeague(),players:[{}]}}))).status,400);
+const liveSnapshot=structuredClone([...rows]);
+assert.equal((await PUT(req('mobile',{data:referenceLeague('mobile'),version:2}))).status,400);
+assert.deepEqual([...rows],liveSnapshot);
+console.log('PASS: reference dummy data cannot overwrite either live category through the save API.');
 console.log('PASS: admin authorization, origin protection, validation, independent category storage, optimistic conflicts and uncached reads.');
 rows.clear();
 for(const category of ['mobile','console']){

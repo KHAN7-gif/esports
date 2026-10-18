@@ -20,7 +20,7 @@ export async function PUT(request:Request){
  if(request.headers.get('Origin')!==new URL(request.url).origin)return Response.json({error:'Origin tidak sah.'},{status:403});
  const category=new URL(request.url).searchParams.get('category');if(category!=='mobile'&&category!=='console')return Response.json({error:'Kategori tidak sah.'},{status:400});
  if(!env.DB)return Response.json({error:'Pangkalan data belum tersedia.'},{status:503});
- try{const raw=await request.text();if(raw.length>500000)return Response.json({error:'Data terlalu besar.'},{status:413});const b=JSON.parse(raw);if(!Number.isInteger(b.version)||b.version<0)throw Error('Versi tidak sah.');const data=validateLeague(leagueSchema.parse(b.data));
+ try{const raw=await request.text();if(raw.length>500000)return Response.json({error:'Data terlalu besar.'},{status:413});const b=JSON.parse(raw);if(b.data?.referenceOnly)throw Error('Data dummy rujukan tidak boleh disimpan ke liga sebenar.');if(!Number.isInteger(b.version)||b.version<0)throw Error('Versi tidak sah.');const data=validateLeague(leagueSchema.parse(b.data));
   const text=JSON.stringify(data),next=b.version+1;
   const result=b.version===0?await env.DB.prepare('INSERT OR IGNORE INTO lel_leagues(category,data,version) VALUES(?,?,1)').bind(category,text).run():await env.DB.prepare('UPDATE lel_leagues SET data=?,version=? WHERE category=? AND version=?').bind(text,next,category,b.version).run();
   if(!result.meta.changes)return Response.json({error:'Data telah dikemas kini di tempat lain. Muat semula dahulu; perubahan tempatan masih ada.'},{status:409});
