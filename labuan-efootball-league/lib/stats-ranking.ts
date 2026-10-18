@@ -10,7 +10,7 @@ export function compareStats(a:RankedStatsInput,b:RankedStatsInput,metric:StatsM
 }
 
 export function rankStatsRows(rows:RankedStatsInput[],metric:StatsMetric){
- const sorted=rows.filter(p=>p.played>0).sort((a,b)=>compareStats(a,b,metric));
+ const sorted=rows.filter(p=>p.played>0&&(metric!=='goals'||p.goals>0)).sort((a,b)=>compareStats(a,b,metric));
  let rank=0;
  return sorted.map((p,index)=>{
   if(index===0||compareStats(sorted[index-1],p,metric)!==0)rank=index+1;

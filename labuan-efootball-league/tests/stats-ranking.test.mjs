@@ -4,6 +4,8 @@ import {emptyLeague,game} from '../.sites-runtime/league.mjs';
 
 const row=(id,values={})=>({id,ign:id,name:'',photo:'',logo:'',club:'',played:1,goals:3,conceded:1,gd:2,clean:0,motm:0,leaguePosition:2,teamConceded:3,...values});
 const ids=(rows,metric)=>rankStatsRows(rows,metric).map(p=>p.id);
+assert.deepEqual(ids([row('zero',{goals:0}),row('scorer',{goals:1})],'goals'),['scorer']);
+assert.deepEqual(ids([row('zero',{goals:0})],'goals'),[]);
 assert.deepEqual(ids([row('less',{goals:2}),row('most',{goals:5,conceded:8})],'goals'),['most','less']);
 assert.deepEqual(ids([row('more',{conceded:2}),row('fewer')],'goals'),['fewer','more']);
 assert.deepEqual(ids([row('low',{gd:1}),row('high')],'goals'),['high','low']);
