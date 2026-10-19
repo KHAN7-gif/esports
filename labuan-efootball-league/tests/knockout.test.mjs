@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import {emptyLeague,demoLeague,leagueSchema,validateLeague,manualKnockout,assignKnockoutSlot,advanceKnockout,nextRound,syncThirdPlace,sharedThirdPlayers,winner,seriesScore,playerStats,allGames} from '../.sites-runtime/league.mjs';
+import {emptyLeague,demoLeague,leagueSchema,validateLeague,manualKnockout,assignKnockoutSlot,advanceKnockout,nextRound,syncThirdPlace,sharedThirdPlayers,knockoutSlots,winner,seriesScore,playerStats,allGames} from '../.sites-runtime/league.mjs';
 const original=demoLeague('mobile'),snapshot=JSON.stringify(original);
 assert.doesNotThrow(()=>validateLeague({...original,settings:{...original.settings,knockoutMode:'bo3'}}));
 assert.equal(JSON.stringify(original),snapshot);
@@ -16,11 +16,16 @@ assert.throws(()=>assignKnockoutSlot({...d,drawLocked:true},0,first.id,'a',other
 const untouched=JSON.stringify(d);const replaced=assignKnockoutSlot(d,0,first.id,'a',other);
 assert.equal(replaced.rounds[0][0].a,other);assert.equal(replaced.rounds[0][0].legs[1].away,other);assert.equal(JSON.stringify(d),untouched);
 const winGame=(t,i,who=t.a)=>Object.assign(t.legs[i],{status:'completed',hs:t.legs[i].home===who?3:0,as:t.legs[i].away===who?3:0});
+assert.deepEqual(knockoutSlots(d,1),Array(8).fill(null));
 winGame(first,0);assert.equal(winner(first),null);winGame(first,1);assert.equal(winner(first),first.a);assert.deepEqual(seriesScore(first),{a:2,b:0});
+assert.equal(knockoutSlots(d,1)[0],first.a);assert.equal(knockoutSlots(d,1)[1],null);assert.equal(d.rounds.length,1);
+assert.equal(knockoutSlots(d,2).every(x=>x===null),true);
 assert.equal(playerStats(d).find(p=>p.id===first.a).played,2);assert.equal(first.legs[2].hs,null);
 assert.throws(()=>assignKnockoutSlot(d,0,first.id,'a',other));
 for(const t of d.rounds[0].slice(1)){winGame(t,0);winGame(t,1)}
 d=advanceKnockout(d);assert.equal(d.rounds.length,2);assert.equal(d.rounds[1].length,4);
+assert.throws(()=>assignKnockoutSlot(d,1,d.rounds[1][0].id,'a',first.a));
+assert.equal(JSON.stringify(advanceKnockout(d)),JSON.stringify(d));
 assert.throws(()=>assignKnockoutSlot(d,0,first.id,'a',other));
 for(const t of d.rounds[1]){winGame(t,0);winGame(t,1,t.b);assert.equal(winner(t),null);winGame(t,2,t.b);assert.equal(winner(t),t.b)}
 d=advanceKnockout(d);assert.equal(d.rounds[2].length,2);
@@ -41,7 +46,13 @@ Object.assign(t.legs[1],{ph:4,pa:5});assert.equal(winner(t),t.a);validateLeague(
 const beforePenalty=playerStats(agg).find(p=>p.id===t.a);assert.equal(beforePenalty.goals,1);assert.equal(beforePenalty.played,2);
 assert.throws(()=>validateLeague({...agg,rounds:[[{...t,penalties:false}]]}));
 const nonTie=structuredClone(agg);nonTie.rounds[0][0].legs[0].hs=4;assert.throws(()=>validateLeague(nonTie));
-const pending=manualKnockout({...base,settings:{...base.settings,autoAdvance:false}},players.slice(0,4).map(p=>p.id));pending.rounds[0].forEach(t=>{winGame(t,0);winGame(t,1)});assert.equal(advanceKnockout(pending).rounds.length,1);assert.equal(nextRound(pending).rounds.length,2);
+const pending=manualKnockout({...base,settings:{...base.settings,autoAdvance:false}},players.slice(0,4).map(p=>p.id));pending.rounds[0].forEach(t=>{winGame(t,0);winGame(t,1)});assert.equal(advanceKnockout(pending).rounds.length,2);assert.equal(nextRound(pending).rounds.length,2);
 const legacy=demoLeague('console');const legacyGames=JSON.stringify(allGames(legacy));const migrated=advanceKnockout({...legacy,settings:{...legacy.settings,knockoutMode:'bo3',autoAdvance:true}});assert.equal(JSON.stringify(allGames(migrated)),legacyGames);
 assert.equal(leagueSchema.safeParse({...base,players:[{...players[0],clubNickname:'MD'}]}).success,false);assert.equal(leagueSchema.safeParse({...base,players:[{...players[0],clubNickname:'MDE'}]}).success,true);
 console.log('PASS: BO3 2–0/2–1, replay validation, Aggregate penalties, manual slots and swaps, Lock Draw, auto/manual advancement, third/fourth places, nicknames, completed-only stats and lossless legacy compatibility.');
+
+// Later rounds inherit the opening format, not a stale future-round setting.
+const inherited=advanceKnockout({...pending,settings:{...pending.settings,knockoutMode:'aggregate'}});
+assert.equal(inherited.rounds[1][0].mode,'bo3');
+assert.deepEqual(inherited.rounds[0],pending.rounds[0]);
+console.log('PASS: immediate winner slot projection, automatic progression despite old OFF flag, opening format inheritance and idempotent lossless advancement.');

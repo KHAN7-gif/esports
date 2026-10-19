@@ -184,6 +184,7 @@ export function manualKnockout(d:League,seeds:string[]):League{
  return validateLeague({...base,manualKnockout:true,rounds:[Array.from({length:seeds.length/2},(_,i)=>tie(seeds[i*2],seeds[i*2+1],i,0,seeds.length/2,base))]});
 }
 export function assignKnockoutSlot(d:League,ri:number,tid:string,side:'a'|'b',pid:string):League{
+ if(ri>0)throw Error('Peserta pusingan seterusnya ditentukan oleh pemenang secara automatik.');
  if(d.drawLocked)throw Error('Lock Draw aktif. Buka kunci untuk menukar slot.');
  const third=ri===-1,t=third?d.thirdPlace:d.rounds[ri]?.find(t=>t.id===tid);if(!t)throw Error('Slot tidak dijumpai.');
  const scored=(x:Tie)=>x.legs.some(m=>m.status!=='scheduled'||m.hs!==null||m.as!==null);
@@ -198,13 +199,27 @@ export function assignKnockoutSlot(d:League,ri:number,tid:string,side:'a'|'b',pi
 export function syncThirdPlace(d:League):League{
  if(!d.settings.thirdPlacePlayoff||d.thirdPlace)return d;
  const semis=d.rounds.find(r=>r.length===2);if(!semis||semis.some(t=>!winner(t)))return d;
- const losers=semis.map(t=>winner(t)===t.a?t.b:t.a),base={...d,settings:{...d.settings,knockoutMode:d.settings.knockoutMode||'aggregate' as const}},t=tie(losers[0],losers[1],0,0,1,base);
+ const losers=semis.map(t=>winner(t)===t.a?t.b:t.a),base={...d,settings:{...d.settings,knockoutMode:semis[0].mode||'aggregate' as const,knockoutPenalties:semis[0].penalties??d.settings.knockoutPenalties}},t=tie(losers[0],losers[1],0,0,1,base);
  t.id='third-place';t.legs=t.legs.map((m,i)=>({...m,id:'third-place-l'+i}));return {...d,thirdPlace:t};
 }
 export function advanceKnockout(d:League):League{
  let result=syncThirdPlace(d);
- while(result.settings.autoAdvance&&result.rounds.length&&result.rounds.at(-1)!.length>1&&result.rounds.at(-1)!.every(t=>winner(t)))result=syncThirdPlace(nextRound(result));
+ // The opening draw defines the path and rules once. Never regenerate existing ties.
+ const opening=result.rounds[0]?.[0];
+ while(result.rounds.length&&result.rounds.at(-1)!.length>1&&result.rounds.at(-1)!.every(t=>winner(t))){
+  const settings={...result.settings,knockoutMode:opening?.mode,knockoutPenalties:opening?.penalties??result.settings.knockoutPenalties};
+  const next=nextRound({...result,settings});
+  result=syncThirdPlace({...next,settings:result.settings});
+ }
  return validateLeague(result);
+}
+
+// Project each resolved winner into the next fixed slot immediately, without
+// inventing participants, fixtures, scores or writing incomplete ties to storage.
+export function knockoutSlots(d:League,ri:number):(string|null)[]{
+ if(ri===0)return d.rounds[0]?.flatMap(t=>[t.a,t.b])||[];
+ const count=(d.rounds[0]?.length||8)/2**ri;
+ return Array.from({length:count*2},(_,i)=>d.rounds[ri-1]?.[i]?winner(d.rounds[ri-1][i]):null);
 }
 
 // Registration slots exist independently of fixtures, so profiles can be entered first.
