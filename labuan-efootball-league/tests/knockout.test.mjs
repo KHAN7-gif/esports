@@ -56,3 +56,12 @@ const inherited=advanceKnockout({...pending,settings:{...pending.settings,knocko
 assert.equal(inherited.rounds[1][0].mode,'bo3');
 assert.deepEqual(inherited.rounds[0],pending.rounds[0]);
 console.log('PASS: immediate winner slot projection, automatic progression despite old OFF flag, opening format inheritance and idempotent lossless advancement.');
+const {tieGameScore}=await import('../.sites-runtime/league.mjs');
+const displayTie={a:'A',b:'B'};
+const displayGames=[{home:'A',hs:1,as:2,eh:null,ea:null,ph:null,pa:null},{home:'B',hs:1,as:2,eh:null,ea:null,ph:null,pa:null},{home:'A',hs:1,as:2,eh:null,ea:null,ph:null,pa:null}];
+const displayBefore=JSON.stringify(displayGames);
+assert.deepEqual(displayGames.map(m=>{const s=tieGameScore(displayTie,m);return [s.a,s.b]}),[[1,2],[2,1],[1,2]]);
+assert.deepEqual(tieGameScore(displayTie,{...displayGames[1],eh:1,ea:2,ph:4,pa:5}),{a:4,b:2,pa:5,pb:4});
+assert.deepEqual(tieGameScore(displayTie,{...displayGames[1],hs:null,as:null}),{a:null,b:null,pa:null,pb:null});
+assert.equal(JSON.stringify(displayGames),displayBefore);
+console.log('PASS: fixed participant score columns for alternating home/away, extra time, penalties and pending games without changing stored scores.');

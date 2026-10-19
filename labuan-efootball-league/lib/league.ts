@@ -51,6 +51,10 @@ export function drawGroups(d:League,random:()=>number=Math.random):League{
  return {...d,groups,groupSlots:groups.map(g=>[...g.members])};
 }
 export function totals(t:Tie){let a=0,b=0;for(const m of t.legs){if(m.hs===null||m.as===null)continue;if(m.home===t.a){a+=m.hs+(m.eh||0);b+=m.as+(m.ea||0)}else{a+=m.as+(m.ea||0);b+=m.hs+(m.eh||0)}}return {a,b}}
+export function tieGameScore(t:Tie,m:Game){
+ const home=m.home===t.a,hs=m.hs===null?null:m.hs+(m.eh??0),as=m.as===null?null:m.as+(m.ea??0);
+ return {a:home?hs:as,b:home?as:hs,pa:home?m.ph:m.pa,pb:home?m.pa:m.ph};
+}
 export function seriesScore(t:Tie){let a=0,b=0;for(const m of t.legs){if(m.status!=="completed"||m.hs===null||m.as===null||m.hs===m.as)continue;const w=m.hs>m.as?m.home:m.away;w===t.a?a++:b++}return {a,b}}
 export function winner(t:Tie):string|null{
  if(t.mode==="bo3"){const s=seriesScore(t);return s.a>=2?t.a:s.b>=2?t.b:null;}

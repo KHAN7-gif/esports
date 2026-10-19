@@ -1,0 +1,17 @@
+.ko-entry .ko-player-portrait{width:52px;height:66px;flex:0 0 52px;border-radius:8px;background:#edf2fa}
+.ko-entry .ko-player-portrait img{object-fit:contain;object-position:center bottom;background:transparent}
+.ko-card>.ko-result{display:block;font-size:10px;line-height:1.6}
+.ko-score-heading{display:grid;grid-template-columns:minmax(0,1fr) 76px minmax(0,1fr);align-items:center;gap:8px;padding:13px 16px;background:#f5f8fd;border-top:1px solid #e7edf5;text-align:center;font-size:11px}
+.ko-score-heading strong{min-width:0;overflow-wrap:anywhere;color:#233c60;line-height:1.4}
+.ko-score-heading>span{font-size:9px;color:#8092ad}
+.ko-card .ko-fixed-scores>button{display:grid;grid-template-columns:minmax(0,1fr) 76px minmax(0,1fr);gap:6px 8px;padding:14px 16px;text-align:center;align-items:center}
+.ko-card .ko-fixed-scores>button>strong{font-size:24px;font-weight:800;line-height:1.2;color:#213d68}
+.ko-game-caption{font-size:12px;font-weight:650}
+.ko-card .ko-fixed-scores .ko-game-caption small{font-size:9px;color:#8191a9;margin-top:5px}
+.ko-fixed-scores .ko-game-note{grid-column:1/-1;font-size:9px;color:#8191a9;line-height:1.6;margin-top:4px;overflow-wrap:anywhere}
+.ko-rounds.bracket .ko-player-portrait{width:26px;height:33px;flex-basis:26px;border-radius:5px}
+.ko-rounds.bracket .ko-score-heading,.ko-rounds.bracket .ko-fixed-scores>button{grid-template-columns:minmax(0,1fr) 42px minmax(0,1fr);gap:5px;padding:9px 6px}
+.ko-rounds.bracket .ko-score-heading{font-size:8px}
+.ko-rounds.bracket .ko-fixed-scores>button>strong{font-size:17px}
+.ko-rounds.bracket .ko-fixed-scores .ko-game-caption{font-size:9px}
+.ko-rounds.bracket .ko-fixed-scores .ko-game-note{font-size:8px}
