@@ -1,0 +1,36 @@
+'use client';
+import {useState,type ReactNode} from 'react';
+import {ArrowRight,Trophy} from 'lucide-react';
+import {groupRounds,groupTable,roundName,sharedThirdPlayers,winner,type Game,type League,type Player} from '../lib/league';
+import {rankedPlayerStats} from '../lib/stats-ranking';
+type Entry={game:Game;label:string};
+type Props={data:League;avatar:(p?:Player)=>ReactNode;identity:(p?:Player)=>ReactNode;onOpen:(game:Game)=>void;onMatches:(view:'fixtures'|'knockout')=>void;onStats:()=>void;onTable:(groupId:string)=>void};
+
+function selectMatches(entries:Entry[],limit:number){
+ const live=entries.filter(e=>e.game.status==='live'),pending=entries.filter(e=>e.game.status==='scheduled').sort((a,b)=>(a.game.date||'9999').localeCompare(b.game.date||'9999'));
+ const results=entries.filter(e=>e.game.status==='completed').sort((a,b)=>b.game.date.localeCompare(a.game.date));
+ const chosen=live.slice(0,limit),scheduled=pending.slice(0,Math.min(2,limit-chosen.length));
+ chosen.push(...results.slice(0,limit-chosen.length-scheduled.length),...scheduled);
+ chosen.push(...pending.slice(scheduled.length,scheduled.length+limit-chosen.length));
+ return chosen;
+}
+function matchDate(value:string){if(!value)return {day:'DATE TBA',time:''};const date=new Date(value+'+08:00');if(Number.isNaN(date.getTime()))return {day:'DATE TBA',time:''};return {day:date.toLocaleDateString('en-MY',{weekday:'short',day:'2-digit',month:'short',timeZone:'Asia/Kuching'}).toUpperCase(),time:date.toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Kuching'})};}
+
+export default function HomeOverview({data,avatar,identity,onOpen,onMatches,onStats,onTable}:Props){
+ const [groupId,setGroupId]=useState(data.groups[0]?.id||'');
+ const group=data.groups.find(g=>g.id===groupId)||data.groups[0],table=group?groupTable(group,data.players).slice(0,4):[],scorers=rankedPlayerStats(data,'goals').slice(0,3);
+ const player=(id:string)=>data.players.find(p=>p.id===id);
+ const groupGames=data.groups.flatMap(g=>groupRounds(g).flatMap(r=>r.games.map(game=>({game,label:g.name+' · ROUND '+r.number}))));
+ const knockoutGames=data.rounds.flatMap(r=>r.flatMap(t=>t.legs.filter(m=>!(t.mode==='bo3'&&winner(t)&&m.status==='scheduled')).map((game,i)=>({game,label:roundName(r.length)+' · '+(t.mode==='bo3'?'GAME ':t.legs.length===1?'MATCH ':'LEG ')+(i+1)}))));
+ if(data.settings.thirdPlacePlayoff&&data.thirdPlace){const t=data.thirdPlace;knockoutGames.push(...t.legs.filter(m=>!(t.mode==='bo3'&&winner(t)&&m.status==='scheduled')).map((game,i)=>({game,label:'Tempat 3 / 4 · '+(t.mode==='bo3'?'GAME ':'LEG ')+(i+1)})));}
+ const sections=[{title:'GROUP STAGE',view:'fixtures' as const,entries:selectMatches(groupGames,6)},{title:'KNOCKOUT STAGE',view:'knockout' as const,entries:selectMatches(knockoutGames,4)}];
+ const final=data.rounds.at(-1),champion=final?.length===1?winner(final[0]):null,third=sharedThirdPlayers(data);
+ function matchRow({game:m,label}:Entry){const a=player(m.home),b=player(m.away),hs=m.hs===null?null:m.hs+(m.eh||0),as=m.as===null?null:m.as+(m.ea||0),date=matchDate(m.date),scheduled=m.status==='scheduled';return <button className={'home-match-row '+m.status} key={m.id} onClick={()=>onOpen(m)} aria-label={`${label}: ${a?.ign||'—'} ${scheduled?'versus':(hs??'—')+' : '+(as??'—')} ${b?.ign||'—'}, ${m.status}`}><span className="home-match-person home-side">{avatar(a)}<strong>{a?.ign||'—'}</strong></span>{!scheduled&&<b className={'home-match-score '+(m.status==='completed'&&hs!==null&&as!==null&&hs<as?'muted':'')}>{hs??'—'}</b>}<span className="home-match-center">{scheduled?<><strong>{date.day}</strong><b>{date.time||'Time TBA'}</b></>:<><strong className={m.status==='live'?'is-live':''}>{m.status==='completed'?'Full time':'● LIVE'}</strong>{m.ph!==null&&<small>Pen {m.ph} : {m.pa}</small>}</>}<small>{label}</small></span>{!scheduled&&<b className={'home-match-score '+(m.status==='completed'&&hs!==null&&as!==null&&as<hs?'muted':'')}>{as??'—'}</b>}<span className="home-match-person away-side"><strong>{b?.ign||'—'}</strong>{avatar(b)}</span></button>}
+ return <div className="lel-home-overview">
+  <section className="home-matches" aria-labelledby="home-matches-title"><div className="home-section-heading"><h2 id="home-matches-title">Matches</h2><button onClick={()=>onMatches('fixtures')}>View all <ArrowRight size={16}/></button></div>{sections.filter(s=>s.entries.length).map(s=><section className="home-competition" key={s.view}><button className={'home-competition-title '+s.view} onClick={()=>onMatches(s.view)}>{s.title}<ArrowRight size={15}/></button><div className="home-match-list">{s.entries.map(matchRow)}</div></section>)}{!groupGames.length&&!knockoutGames.length&&<div className="home-empty"><Trophy size={26}/><p>Jadual akan dipaparkan selepas liga dijana.</p></div>}</section>
+  {champion&&<section className="home-champion"><Trophy size={25}/><div><small>LEL CHAMPION</small>{identity(player(champion))}</div></section>}
+  <div className="home-feature-grid"><section className="home-scorers" aria-labelledby="home-scorers-title"><div className="home-section-heading"><h2 id="home-scorers-title">Season Goalscorers</h2></div><span className="home-season">{data.season}</span><div className="home-scorer-list">{scorers.map(p=><div className="home-scorer" key={p.id}><div className="home-scorer-identity">{identity(p)}</div><div className="home-goals"><strong>{p.goals}</strong><span>GOALS</span></div></div>)}</div>{!scorers.length&&<p className="home-empty-message">Belum ada jaringan dalam perlawanan yang selesai.</p>}<button className="home-view-all" onClick={onStats}>View all <ArrowRight size={18}/></button></section>
+  <section className="home-standings" aria-labelledby="home-standings-title"><div className="home-section-heading"><h2 id="home-standings-title">Current Standings</h2></div>{!!data.groups.length&&<label className="home-group-choice"><span>Kumpulan</span><select aria-label="Kumpulan untuk kedudukan semasa" value={group?.id||''} onChange={e=>setGroupId(e.target.value)}>{data.groups.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></label>}{table.length?<><div className="home-standings-table"><table><thead><tr><th scope="col">POS.</th><th scope="col">PLAYER</th><th scope="col">W</th><th scope="col">D</th><th scope="col">L</th><th scope="col">PTS</th></tr></thead><tbody>{table.map((row,i)=><tr key={row.id} className={i<data.settings.qualify?'qualifier':''}><td>{i+1}</td><th scope="row"><span className="home-standing-person">{avatar(player(row.id))}<strong>{row.ign}</strong></span></th><td>{row.w}</td><td>{row.d}</td><td>{row.l}</td><td>{row.pts}</td></tr>)}</tbody></table></div><p className="home-table-caption">{group.name} · Top {table.length} daripada {group.members.length} pemain · Top {data.settings.qualify} layak</p></>:<p className="home-empty-message">Kedudukan akan dipaparkan selepas kumpulan dijana.</p>}<button className="home-view-all" onClick={()=>onTable(group?.id||'all')}>Tables <ArrowRight size={18}/></button></section></div>
+  {!!third.length&&<section className="home-shared-third"><h2>Tempat ketiga bersama</h2>{third.map(id=><div key={id}>{identity(player(id))}<span>3rd</span></div>)}</section>}
+ </div>;
+}
