@@ -1,0 +1,8 @@
+.home-match-center>.match-status,.board-score>.match-status,.ko-card .ko-fixed-scores .ko-game-caption>.match-status,.match-readonly>.match-status{font-weight:800;text-transform:uppercase;letter-spacing:.25px;background:none;border:0;border-radius:0}
+.home-match-center>.match-status.scheduled,.board-score>.match-status.scheduled,.ko-card .ko-fixed-scores .ko-game-caption>.match-status.scheduled,.match-readonly>.match-status.scheduled{color:#215ed8}
+.home-match-center>.match-status.live,.board-score>.match-status.live,.ko-card .ko-fixed-scores .ko-game-caption>.match-status.live,.match-readonly>.match-status.live{color:#ed2544}
+.home-match-center>.match-status.completed,.board-score>.match-status.completed,.ko-card .ko-fixed-scores .ko-game-caption>.match-status.completed,.match-readonly>.match-status.completed{color:#111111}
+.home-match-center>.home-kickoff-time{color:#111111;font-variant-numeric:tabular-nums}
+.home-match-center>.match-status.scheduled{font-size:16px;line-height:1.4}
+.ko-card .ko-fixed-scores .ko-game-caption>.match-status{display:block;line-height:1.4;overflow-wrap:normal}
+@media(max-width:600px){.home-match-center>.match-status.scheduled{font-size:13px}.home-match-center>.match-status.completed,.home-match-center>.match-status.live{font-size:9px}}
