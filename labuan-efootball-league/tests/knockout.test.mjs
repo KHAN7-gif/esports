@@ -65,3 +65,12 @@ assert.deepEqual(tieGameScore(displayTie,{...displayGames[1],eh:1,ea:2,ph:4,pa:5
 assert.deepEqual(tieGameScore(displayTie,{...displayGames[1],hs:null,as:null}),{a:null,b:null,pa:null,pb:null});
 assert.equal(JSON.stringify(displayGames),displayBefore);
 console.log('PASS: fixed participant score columns for alternating home/away, extra time, penalties and pending games without changing stored scores.');
+const colored=leagueSchema.parse({...original,players:original.players.map((p,i)=>({...p,teamColor:i===0?'#e63746':i===1?'#215ed8':''}))});
+validateLeague(colored);
+assert.equal(colored.players[0].teamColor,'#e63746');
+assert.equal(colored.players[1].teamColor,'#215ed8');
+assert.deepEqual(colored.groups,original.groups);assert.deepEqual(colored.rounds,original.rounds);
+assert.equal(leagueSchema.safeParse({...original,players:[{...original.players[0],teamColor:'red;display:none'}]}).success,false);
+assert.equal(leagueSchema.safeParse({...original,players:[{...original.players[0],teamColor:'#fff'}]}).success,false);
+assert.equal(leagueSchema.parse(original).players[0].teamColor,undefined);
+console.log('PASS: optional per-player team colors preserve legacy profiles, fixtures and results; only full HEX values are accepted.');

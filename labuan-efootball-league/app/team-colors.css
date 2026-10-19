@@ -1,0 +1,14 @@
+.ko-card .ko-contender.ko-team-color{border-left-color:var(--team-color);background:var(--team-tint)}
+.ko-score-heading>.ko-team-color,.ko-card .ko-fixed-scores>button>strong.ko-team-color{border-bottom:3px solid var(--team-color);background:var(--team-tint);border-radius:5px;padding:7px 4px;color:#172542}
+.team-color-field{display:grid;gap:13px;grid-column:1/-1;padding:18px;border:1px solid #dde5f0;border-radius:12px;background:#f8faff}
+.team-color-input{display:flex;align-items:center;gap:10px;margin-top:8px}
+.team-color-input input[type=color]{width:58px;min-width:58px;height:46px;padding:4px;cursor:pointer;background:#fff}
+.team-color-input input:not([type=color]){flex:1;min-width:0;text-transform:uppercase}
+.team-color-palette{display:flex;flex-wrap:wrap;gap:10px}
+.team-color-palette>button{display:flex;align-items:center;justify-content:center;width:36px;height:36px;min-width:36px;border:1px solid #b9c5d6;border-radius:50%;box-shadow:0 2px 4px #17254212}
+.team-color-palette>button[aria-pressed=true]{outline:3px solid #215ed8;outline-offset:3px}
+.team-color-palette svg{color:white;filter:drop-shadow(0 0 2px #000);stroke-width:3}
+.team-color-preview{padding:14px 16px;border-left:5px solid;display:grid;gap:6px;background:#fff;border-radius:6px;color:#172542}
+.team-color-preview span{font-size:11px;color:#6e7d96}
+.team-color-field>.outline{justify-self:start;font-size:11px}
+.team-color-field .help{margin:0}
