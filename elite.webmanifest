@@ -11,15 +11,21 @@
   "theme_color": "#061331",
   "icons": [
     {
-      "src": "./elite-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "./elite-icon-192.png?v=20261021",
+      "sizes": "192x192",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "./elite-icon-maskable.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "./elite-icon-512.png?v=20261021",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./elite-icon-512-maskable.png?v=20261021",
+      "sizes": "512x512",
+      "type": "image/png",
       "purpose": "maskable"
     }
   ]
