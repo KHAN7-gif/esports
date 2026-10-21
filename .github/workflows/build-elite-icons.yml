@@ -1,0 +1,37 @@
+name: Build THE ELITE PWA icons
+on:
+  push:
+    paths:
+      - 'elite-icon.svg'
+      - 'elite-icon-maskable.svg'
+      - '.github/workflows/build-elite-icons.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Render PWA PNG icon sizes
+        run: |
+          python -m pip install --quiet cairosvg pillow
+          python - <<'PY'
+          import cairosvg
+          for path, source, size in [
+              ("elite-icon-192.png", "elite-icon.svg", 192),
+              ("elite-icon-512.png", "elite-icon.svg", 512),
+              ("elite-icon-512-maskable.png", "elite-icon-maskable.svg", 512),
+          ]:
+              cairosvg.svg2png(url=source,write_to=path,output_width=size,output_height=size)
+              print(path)
+          PY
+      - name: Commit generated PNGs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add elite-icon-192.png elite-icon-512.png elite-icon-512-maskable.png
+          if ! git diff --cached --quiet; then
+            git commit -m "Generate THE ELITE PWA PNG icons"
+            git push
+          fi
