@@ -1,0 +1,26 @@
+{
+  "id": "./the-elite.html",
+  "name": "THE ELITE · Gran Turismo 7",
+  "short_name": "THE ELITE",
+  "description": "MAIDA Esports GT7 Time Attack · Circuit de Spa-Francorchamps",
+  "lang": "ms",
+  "start_url": "./the-elite.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#061331",
+  "theme_color": "#061331",
+  "icons": [
+    {
+      "src": "./elite-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./elite-icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
