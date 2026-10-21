@@ -5,7 +5,8 @@ create table if not exists public.elite_admins (
  created_at timestamptz not null default now()
 );
 create table if not exists public.elite_drivers (
- id integer primary key check (id between 1 and 500),
+ id integer primary key check (id between 1 and 10000),
+ is_dummy boolean not null default false,
  n text not null check (char_length(n) between 1 and 60),
  state text not null default 'WP Labuan',
  club text not null default 'MAIDA ESPORTS',
@@ -37,3 +38,8 @@ grant select on public.elite_admins to authenticated;
 -- grant access using that user's exact UUID (never expose this SQL in public UI):
 -- insert into public.elite_admins(user_id) values ('<ADMIN-USER-UUID>') on conflict do nothing;
 -- Keep email confirmation and MFA enabled for actual admin accounts.
+
+-- Migration for databases created with earlier versions.
+alter table public.elite_drivers add column if not exists is_dummy boolean not null default false;
+-- Existing unidentified records are deliberately NOT marked dummy.
+-- The application also recognizes unmodified legacy seed profiles for safe cleanup.
