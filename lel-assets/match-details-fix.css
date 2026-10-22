@@ -16,3 +16,6 @@
 .modal-match.lel-result-card .match-state,.modal-match.lel-result-card .match-club{flex:none;width:21px;height:17px;object-fit:contain}
 .modal-match.lel-result-card .lel-result-footer{margin-top:0;padding-top:12px}
 @media(max-width:390px){.modal-match.lel-result-card{padding:14px 10px!important;gap:12px 8px!important}.modal-match.lel-result-card .match-player-detail>span{font-size:10px}.modal-match.lel-result-card .match-player-name strong{font-size:11px!important}}
+
+.modal-match.lel-result-card .lel-result-center>b{order:0!important}
+.modal-match.lel-result-card .lel-result-center .lel-result-status{order:1!important}
