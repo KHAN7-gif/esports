@@ -1,0 +1,18 @@
+/* Match Details responsive layout — 22 Oct 2026 */
+.modal-match.lel-result-card{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;grid-template-areas:"heading heading" "score score" "home away" "footer footer"!important;gap:16px 12px!important;padding:18px 16px!important;overflow:hidden}
+.modal-match.lel-result-card .lel-result-heading{font-weight:800;font-size:12px;letter-spacing:.12em}
+.modal-match.lel-result-card .lel-result-center{gap:7px;padding:8px 0 14px;border-bottom:1px solid #e0e7f2}
+.modal-match.lel-result-card .lel-result-center>b{font-size:clamp(38px,9vw,58px)!important;line-height:1.1;color:#e43c50;white-space:nowrap}
+.modal-match.lel-result-card .lel-result-home,.modal-match.lel-result-card .lel-result-away{min-width:0;align-self:start;justify-content:center}
+.modal-match.lel-result-card .match-identity{display:flex!important;flex-direction:column!important;align-items:center!important;text-align:center;width:100%;min-width:0;gap:9px}
+.modal-match.lel-result-card .match-player-photo{display:flex;justify-content:center;width:100%;min-width:0}
+.modal-match.lel-result-card .match-player-photo .avatar{width:clamp(64px,20vw,105px)!important;height:clamp(76px,24vw,120px)!important;object-fit:cover;object-position:center top}
+.modal-match.lel-result-card .match-player-info{display:flex!important;flex-direction:column!important;align-items:center!important;min-width:0!important;width:100%!important;gap:7px}
+.modal-match.lel-result-card .match-player-name{display:flex!important;flex-direction:column!important;align-items:center!important;gap:4px;width:100%;min-width:0;text-align:center}
+.modal-match.lel-result-card .match-player-name strong{display:block;max-width:100%;width:100%;font-size:clamp(11px,3vw,15px)!important;line-height:1.35;overflow-wrap:break-word!important;word-break:normal!important;white-space:normal!important;hyphens:none;text-align:center}
+.modal-match.lel-result-card .match-player-name small{order:-1;font-size:10px!important;letter-spacing:.1em}
+.modal-match.lel-result-card .match-player-detail{display:flex!important;flex-direction:row!important;justify-content:center!important;align-items:center!important;gap:6px;max-width:100%;width:100%;min-width:0;text-align:center}
+.modal-match.lel-result-card .match-player-detail>span{display:block;min-width:0;max-width:100%;font-size:11px;line-height:1.35;overflow-wrap:break-word!important;word-break:normal!important;white-space:normal!important}
+.modal-match.lel-result-card .match-state,.modal-match.lel-result-card .match-club{flex:none;width:21px;height:17px;object-fit:contain}
+.modal-match.lel-result-card .lel-result-footer{margin-top:0;padding-top:12px}
+@media(max-width:390px){.modal-match.lel-result-card{padding:14px 10px!important;gap:12px 8px!important}.modal-match.lel-result-card .match-player-detail>span{font-size:10px}.modal-match.lel-result-card .match-player-name strong{font-size:11px!important}}
