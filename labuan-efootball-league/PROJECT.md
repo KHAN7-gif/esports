@@ -11,6 +11,7 @@
 Independent application with its own source repository, Site and D1 database. No BOTS API or data dependencies.
 
 - / read view; /admin editing through ChatGPT sign-in and ADMIN_EMAIL allowlist.
+- Admin-only Tetapan tab consolidates league metadata, tournament format, flags, group setup, manual slots and schedule actions; public navigation remains unchanged. Settings remain category-specific and save through the existing admin workflow.
 - Mobile and console have independent records and optimistic version checking.
 - User-requested demo: 32 participants per category, 4 groups of 8, Top 4 into the round of 16. Sample group scores and MOTM are explicitly marked DEMO.
 - On the first GET of an absent category, insert the deterministic demo record using INSERT OR IGNORE. Never overwrite existing records. Subsequent reads use stored data.

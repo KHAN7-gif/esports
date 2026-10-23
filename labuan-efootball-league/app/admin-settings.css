@@ -1,0 +1,14 @@
+main[data-page="settings"] > .section-heading,
+main[data-page="settings"] > .search,
+main[data-page="settings"] > .players-grid,
+main[data-page="settings"] > .players-grid + .empty {
+  display: none;
+}
+
+main[data-page="players"] .setup-panel {
+  display: none;
+}
+
+.bottom-nav:has(> button:nth-child(6)) {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
