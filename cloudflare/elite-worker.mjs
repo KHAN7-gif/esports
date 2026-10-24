@@ -36,12 +36,34 @@ export default {
    if(!env.DB)return json({error:'Pangkalan data belum tersedia.'},503);
    if(req.method!=='GET'&&req.headers.get('origin')!==url.origin)return json({error:'Origin tidak sah.'},403);
    if(path==='/api/admin/logout'&&req.method==='POST')return json({ok:true},200,{'Set-Cookie':sessionCookie('',0)});
+   if(path==='/api/admin/config'&&req.method==='GET')return json({turnstileSiteKey:env.TURNSTILE_SITE_KEY||'',turnstileConfigured:!!(env.TURNSTILE_SITE_KEY&&env.TURNSTILE_SECRET_KEY)});
    if(path==='/api/admin/session'&&req.method==='GET')return json({admin:await authorized(req,env)});
    if(path==='/api/admin/login'&&req.method==='POST') {
     if(!env.ADMIN_EMAIL||!env.ADMIN_PASSWORD_HASH||!env.ADMIN_PASSWORD_SALT||!env.ADMIN_SESSION_SECRET)return json({error:'Admin belum dikonfigurasi.'},503);
-    const text=await req.text();if(text.length>2048)return json({error:'Permintaan terlalu besar.'},413);
-    const body=JSON.parse(text);if(typeof body.email!=='string'||body.email.length>254||typeof body.password!=='string'||body.password.length>256)return json({error:'Login tidak sah.'},400);
-    const ip=req.headers.get('cf-connecting-ip')||'local';const key=hex(await crypto.subtle.digest('SHA-256',encoder.encode(ip)));const now=Date.now();
+    if(!env.TURNSTILE_SITE_KEY||!env.TURNSTILE_SECRET_KEY)return json({error:'Cloudflare Turnstile belum dikonfigurasi.'},503);
+    const text=await req.text();if(text.length>8192)return json({error:'Permintaan terlalu besar.'},413);
+    const body=JSON.parse(text);if(typeof body.email!=='string'||body.email.length>254||typeof body.password!=='string'||body.password.length>256||typeof body.turnstileToken!=='string'||body.turnstileToken.length>2048)return json({error:'Login tidak sah.'},400);
+    const ip=req.headers.get('cf-connecting-ip')||'local';
+    let verificationResponse;
+    try {
+     verificationResponse=await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({secret:env.TURNSTILE_SECRET_KEY,response:body.turnstileToken,remoteip:ip})});
+    } catch(error) {
+     console.error('Turnstile verification request failed',error);
+     return json({error:'Pengesahan Cloudflare gagal dihubungi. Cuba semula.'},502);
+    }
+    if(!verificationResponse.ok) {
+     console.error('Turnstile verification returned HTTP',verificationResponse.status);
+     return json({error:'Pengesahan Cloudflare gagal dihubungi. Cuba semula.'},502);
+    }
+    let verification;
+    try {
+     verification=await verificationResponse.json();
+    } catch(error) {
+     console.error('Turnstile verification returned invalid JSON',error);
+     return json({error:'Pengesahan Cloudflare gagal dihubungi. Cuba semula.'},502);
+    }
+    if(!verification||verification.success!==true||verification.hostname!==url.hostname||verification.action!=='admin-login')return json({error:'Pengesahan Cloudflare tidak berjaya. Sila cuba semula.'},403);
+    const key=hex(await crypto.subtle.digest('SHA-256',encoder.encode(ip)));const now=Date.now();
     await env.DB.prepare('DELETE FROM admin_login_attempts WHERE reset_at <= ?').bind(now).run();
     await env.DB.prepare('INSERT INTO admin_login_attempts(key,attempts,reset_at) VALUES(?,1,?) ON CONFLICT(key) DO UPDATE SET attempts=attempts+1').bind(key,now+900000).run();
     const attempt=await env.DB.prepare('SELECT attempts FROM admin_login_attempts WHERE key=?').bind(key).first();

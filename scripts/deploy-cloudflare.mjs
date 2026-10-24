@@ -11,7 +11,7 @@ if(!dry&&!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test
 const dir=path.join(root,settings.dir), out=path.join(root,'.cloudflare',target);
 await mkdir(out,{recursive:true});
 await import('./prepare-elite.mjs');
-const config={main:path.join(root,'cloudflare/elite-worker.mjs'),compatibility_date:'2026-05-15',assets:{directory:path.join(root,'.cloudflare/elite/assets'),binding:'ASSETS',run_worker_first:true,html_handling:'none'},observability:{enabled:true}};
+const config={main:path.join(root,'cloudflare/elite-worker.mjs'),compatibility_date:'2026-05-15',assets:{directory:path.join(root,'.cloudflare/elite/assets'),binding:'ASSETS',run_worker_first:true,html_handling:'none'},vars:{TURNSTILE_SITE_KEY:process.env.TURNSTILE_SITE_KEY||''},observability:{enabled:true}};
 Object.assign(config,{name:settings.name,workers_dev:false,routes:[{pattern:settings.domain,custom_domain:true}],d1_databases:[{binding:'DB',database_name:`esukan-${target}`,database_id:id||'00000000-0000-4000-8000-000000000000',migrations_dir:path.join(root,'cloudflare/migrations')}]});
 const filename=path.join(out,'wrangler.json');await writeFile(filename,JSON.stringify(config,null,2)+'\n');
 const cli=path.join(dir,'node_modules/wrangler/bin/wrangler.js');
