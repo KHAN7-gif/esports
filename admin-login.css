@@ -17,4 +17,5 @@ main:has(#login:not(.hidden)){min-height:calc(100vh - 98px);display:grid;place-i
 #login .login-submit{width:100%;min-height:52px;margin-top:2px}
 #login .login-help{margin:16px 0 0;text-align:center;font-size:12px}
 #login .login-help a{font-weight:700}
+#login .login-feedback{margin:14px 0 0;padding:10px 12px;border:1px solid #a94b69;border-radius:10px;background:#3a1c35;color:#ffd7e2;font-size:13px}
 @media(max-width:560px){main:has(#login:not(.hidden)){padding:16px}#login.login-card{padding:22px 18px;margin:12px auto}}
