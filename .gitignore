@@ -1,0 +1,4 @@
+# Local Cloudflare build output and credentials
+/.cloudflare/
+/.dev.vars*
+/.env*

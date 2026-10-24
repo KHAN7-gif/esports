@@ -1,0 +1,21 @@
+import { writeFile, mkdir } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+const root=fileURLToPath(new URL('../',import.meta.url));
+const target=process.argv[2], dry=process.argv.includes('--dry-run');
+if(target!=='elite')throw Error('Usage: node scripts/deploy-cloudflare.mjs elite [--dry-run]');
+const settings={dir:'the-elite',name:'the-elite',domain:'the-elite.esukan.app'};
+const id=process.env.D1_DATABASE_ID;
+if(!dry&&!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id||''))throw Error('Set D1_DATABASE_ID to the UUID of this application’s new Cloudflare D1 database in Workers Builds build variables. Each application needs a separate database.');
+const dir=path.join(root,settings.dir), out=path.join(root,'.cloudflare',target);
+await mkdir(out,{recursive:true});
+await import('./prepare-elite.mjs');
+const config={main:path.join(root,'cloudflare/elite-worker.mjs'),compatibility_date:'2026-05-15',assets:{directory:path.join(root,'.cloudflare/elite/assets'),binding:'ASSETS',run_worker_first:true,html_handling:'none'},observability:{enabled:true}};
+Object.assign(config,{name:settings.name,workers_dev:false,routes:[{pattern:settings.domain,custom_domain:true}],d1_databases:[{binding:'DB',database_name:`esukan-${target}`,database_id:id||'00000000-0000-4000-8000-000000000000',migrations_dir:path.join(root,'cloudflare/migrations')}]});
+const filename=path.join(out,'wrangler.json');await writeFile(filename,JSON.stringify(config,null,2)+'\n');
+const cli=path.join(dir,'node_modules/wrangler/bin/wrangler.js');
+const childEnv={...process.env,XDG_CONFIG_HOME:process.env.XDG_CONFIG_HOME||path.join(out,'xdg-config'),WRANGLER_SEND_METRICS:'false',CLOUDFLARE_CF_FETCH_ENABLED:'false'};
+function run(args) {const r=spawnSync(process.execPath,[cli,...args],{cwd:dir,env:childEnv,stdio:'inherit'});if(r.error)throw r.error;if(r.status!==0)process.exit(r.status||1);}
+if(!dry)run(['d1','migrations','apply','DB','--remote','--config',filename]);
+run(['deploy','--config',filename,...(dry?['--dry-run']:[])]);
