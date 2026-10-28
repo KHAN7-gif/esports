@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS elite_stage_videos (stage TEXT PRIMARY KEY CHECK(stage IN ('q','s','p','f')), youtube_url TEXT NOT NULL DEFAULT '', start_seconds INTEGER NOT NULL DEFAULT 0 CHECK(start_seconds BETWEEN 0 AND 86400), updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP);
