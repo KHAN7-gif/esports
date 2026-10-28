@@ -83,4 +83,27 @@ export default {
     const bodyText=await req.text();if(bodyText.length>2048)return json({error:'Permintaan terlalu besar.'},413);
     const entry=JSON.parse(bodyText),stage=entry.stage,urlText=String(entry.youtube_url||'').trim(),start=Number(entry.start_seconds);
     if(!['q','s','p','f'].includes(stage)||!Number.isInteger(start)||start<0||start>86400||urlText.length>600)return json({error:'Rekod video tidak sah.'},400);
-    if(urlText){try{const link=new URL(urlText);if(link.protocol!=='https:'||!['youtube.com','www.youtube.com','m.youtube.com','youtu.be','www.youtube-nocookie.com'].includes(link.hostname))throw Error('domain');const seg=link.pathname.split('/').filter(Boolean);const id=link.hostname==='youtu.be'?seg[0]:link.searchParams.get('v')||(['shorts','live','embed'].includes(seg[0])?seg[1]:null)
+    if(urlText){try{const link=new URL(urlText);if(link.protocol!=='https:'||!['youtube.com','www.youtube.com','m.youtube.com','youtu.be','www.youtube-nocookie.com'].includes(link.hostname))throw Error('domain');const seg=link.pathname.split('/').filter(Boolean);const id=link.hostname==='youtu.be'?seg[0]:link.searchParams.get('v')||(['shorts','live','embed'].includes(seg[0])?seg[1]:null);if(!/^[a-zA-Z0-9_-]{11}$/.test(id||''))throw Error('id')}catch(e){return json({error:'Pautan video YouTube tidak sah.'},400)}}
+    await env.DB.prepare('INSERT INTO elite_stage_videos(stage,youtube_url,start_seconds) VALUES(?,?,?) ON CONFLICT(stage) DO UPDATE SET youtube_url=excluded.youtube_url,start_seconds=excluded.start_seconds,updated_at=CURRENT_TIMESTAMP').bind(stage,urlText,start).run();return json({ok:true});
+   }
+   if(path!=='/api/drivers')return json({error:'Tidak ditemui.'},404);
+   if(req.method==='GET') {
+    const {results}=await env.DB.prepare('SELECT * FROM elite_drivers ORDER BY id').all();
+    return json({data:results.map(d=>({...d,recorded:JSON.parse(d.recorded),is_dummy:!!d.is_dummy}))});
+   }
+   if(!await authorized(req,env))return json({error:'Akses admin diperlukan.'},403);
+   if(!['POST','PUT','DELETE'].includes(req.method))return json({error:'Method tidak sah.'},405);
+   const text=await req.text();if(text.length>100000)return json({error:'Permintaan terlalu besar.'},413);
+   const body=JSON.parse(text);
+   if(req.method==='DELETE') {
+    if(!Array.isArray(body.ids)||!body.ids.length||body.ids.length>100||!body.ids.every(id=>Number.isInteger(id)&&id>=1&&id<=10000))return json({error:'ID tidak sah.'},400);
+    const rows=await env.DB.prepare(`DELETE FROM elite_drivers WHERE id IN (${body.ids.map(()=>'?').join(',')}) RETURNING id`).bind(...body.ids).all();return json({data:rows.results});
+   }
+   const rows=(Array.isArray(body)?body:[body]).map(validate);if(!rows.length||rows.length>100)throw Error('Had rekod dicapai.');
+   const statements=rows.map(d=>req.method==='POST'
+    ?env.DB.prepare('INSERT INTO elite_drivers(id,n,state,club,photo,q,s,p,f,recorded,is_dummy) VALUES(?,?,?,?,?,?,?,?,?,?,?) RETURNING id').bind(d.id,d.n.trim(),d.state,d.club,d.photo,d.q,d.s,d.p,d.f,JSON.stringify(d.recorded),Number(d.is_dummy))
+    :env.DB.prepare('UPDATE elite_drivers SET n=?,state=?,club=?,photo=?,q=?,s=?,p=?,f=?,recorded=?,is_dummy=? WHERE id=? RETURNING id').bind(d.n.trim(),d.state,d.club,d.photo,d.q,d.s,d.p,d.f,JSON.stringify(d.recorded),Number(d.is_dummy),d.id));
+   const results=await env.DB.batch(statements);return json({data:results.flatMap(r=>r.results)});
+  }catch(error){console.error('Elite API operation failed',error);return json({error:'Permintaan gagal. Semak data dan cuba semula.'},400);}
+ }
+};
