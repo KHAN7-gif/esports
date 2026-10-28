@@ -76,6 +76,16 @@ export default {
     const payload=(Math.floor(Date.now()/1000)+28800)+'.'+crypto.randomUUID();
     return json({ok:true},200,{'Set-Cookie':sessionCookie(payload+'.'+await sign(payload,env.ADMIN_SESSION_SECRET))});
    }
+   if(path==='/api/stage-videos') {
+    if(req.method==='GET'){const {results}=await env.DB.prepare('SELECT stage,youtube_url,start_seconds FROM elite_stage_videos ORDER BY stage').all();return json({data:results});}
+    if(req.method!=='PUT')return json({error:'Method tidak sah.'},405);
+    if(!await authorized(req,env))return json({error:'Akses admin diperlukan.'},403);
+    const bodyText=await req.text();if(bodyText.length>2048)return json({error:'Permintaan terlalu besar.'},413);
+    const entry=JSON.parse(bodyText),stage=entry.stage,urlText=String(entry.youtube_url||'').trim(),start=Number(entry.start_seconds);
+    if(!['q','s','p','f'].includes(stage)||!Number.isInteger(start)||start<0||start>86400||urlText.length>600)return json({error:'Rekod video tidak sah.'},400);
+    if(urlText){try{const link=new URL(urlText);if(link.protocol!=='https:'||!['youtube.com','www.youtube.com','m.youtube.com','youtu.be','www.youtube-nocookie.com'].includes(link.hostname))throw Error('domain');const id=link.hostname==='youtu.be'?link.pathname.slice(1).split('/')[0]:link.searchParams.get('v')||(link.pathname.match(/\\/(?:shorts|live|embed)\\/([^/]+)/)||[])[1];if(!/^[a-zA-Z0-9_-]{11}$/.test(id||''))throw Error('id')}catch(e){return json({error:'Pautan video YouTube tidak sah.'},400)}}
+    await env.DB.prepare('INSERT INTO elite_stage_videos(stage,youtube_url,start_seconds) VALUES(?,?,?) ON CONFLICT(stage) DO UPDATE SET youtube_url=excluded.youtube_url,start_seconds=excluded.start_seconds,updated_at=CURRENT_TIMESTAMP').bind(stage,urlText,start).run();return json({ok:true});
+   }
    if(path!=='/api/drivers')return json({error:'Tidak ditemui.'},404);
    if(req.method==='GET') {
     const {results}=await env.DB.prepare('SELECT * FROM elite_drivers ORDER BY id').all();
