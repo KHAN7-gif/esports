@@ -1,0 +1,1 @@
+ALTER TABLE elite_drivers ADD COLUMN replays TEXT NOT NULL DEFAULT '{}';
