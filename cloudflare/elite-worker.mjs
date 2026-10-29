@@ -21,6 +21,7 @@ function validate(row) {
  for(const k of ['q','s','p','f']) if(row[k]!==null&&(!Number.isInteger(row[k])||row[k]<=0||row[k]>=6000000))throw Error('Masa tidak sah.');
  if(typeof row.is_dummy!=='boolean'||!row.recorded||typeof row.recorded!=='object')throw Error('Rekod tidak sah.');
  for(const k of ['q','s','p','f']) {const rec=row.recorded[k];if(rec!=null&&(!/^\d{4}-\d{2}-\d{2}$/.test(rec.date)||!/^([01]\d|2[0-3]):[0-5]\d$/.test(rec.time)))throw Error('Tarikh / masa tidak sah.');}
+ if(row.replays!==undefined){if(!row.replays||typeof row.replays!=='object'||Array.isArray(row.replays))throw Error('Video tidak sah.');for(const k of ['s','p','f']){const v=row.replays[k];if(v==null)continue;if(typeof v.url!=='string'||v.url.length>600||!Number.isInteger(v.start)||v.start<0||v.start>86400)throw Error('Rekod video tidak sah.');if(v.url){let u;try{u=new URL(v.url)}catch(e){throw Error('YouTube URL tidak sah.')}if(u.protocol!=='https:'||!['youtu.be','youtube.com','www.youtube.com','m.youtube.com','www.youtube-nocookie.com'].includes(u.hostname))throw Error('YouTube URL tidak sah.')}}}
  return row;
 }
 export default {
@@ -89,7 +90,7 @@ export default {
    if(path!=='/api/drivers')return json({error:'Tidak ditemui.'},404);
    if(req.method==='GET') {
     const {results}=await env.DB.prepare('SELECT * FROM elite_drivers ORDER BY id').all();
-    return json({data:results.map(d=>({...d,recorded:JSON.parse(d.recorded),is_dummy:!!d.is_dummy}))});
+    return json({data:results.map(d=>({...d,recorded:JSON.parse(d.recorded),replays:JSON.parse(d.replays||'{}'),is_dummy:!!d.is_dummy}))});
    }
    if(!await authorized(req,env))return json({error:'Akses admin diperlukan.'},403);
    if(!['POST','PUT','DELETE'].includes(req.method))return json({error:'Method tidak sah.'},405);
@@ -101,8 +102,8 @@ export default {
    }
    const rows=(Array.isArray(body)?body:[body]).map(validate);if(!rows.length||rows.length>100)throw Error('Had rekod dicapai.');
    const statements=rows.map(d=>req.method==='POST'
-    ?env.DB.prepare('INSERT INTO elite_drivers(id,n,state,club,photo,q,s,p,f,recorded,is_dummy) VALUES(?,?,?,?,?,?,?,?,?,?,?) RETURNING id').bind(d.id,d.n.trim(),d.state,d.club,d.photo,d.q,d.s,d.p,d.f,JSON.stringify(d.recorded),Number(d.is_dummy))
-    :env.DB.prepare('UPDATE elite_drivers SET n=?,state=?,club=?,photo=?,q=?,s=?,p=?,f=?,recorded=?,is_dummy=? WHERE id=? RETURNING id').bind(d.n.trim(),d.state,d.club,d.photo,d.q,d.s,d.p,d.f,JSON.stringify(d.recorded),Number(d.is_dummy),d.id));
+    ?env.DB.prepare('INSERT INTO elite_drivers(id,n,state,club,photo,q,s,p,f,recorded,is_dummy,replays) VALUES(?,?,?,?,?,?,?,?,?,?,?,?) RETURNING id').bind(d.id,d.n.trim(),d.state,d.club,d.photo,d.q,d.s,d.p,d.f,JSON.stringify(d.recorded),Number(d.is_dummy),JSON.stringify(d.replays||{}))
+    :env.DB.prepare('UPDATE elite_drivers SET n=?,state=?,club=?,photo=?,q=?,s=?,p=?,f=?,recorded=?,is_dummy=?,replays=? WHERE id=? RETURNING id').bind(d.n.trim(),d.state,d.club,d.photo,d.q,d.s,d.p,d.f,JSON.stringify(d.recorded),Number(d.is_dummy),JSON.stringify(d.replays||{}),d.id));
    const results=await env.DB.batch(statements);return json({data:results.flatMap(r=>r.results)});
   }catch(error){console.error('Elite API operation failed',error);return json({error:'Permintaan gagal. Semak data dan cuba semula.'},400);}
  }
