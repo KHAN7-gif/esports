@@ -25,7 +25,7 @@ let lblDate=el('label','','Tarikh & masa'),dateInput=el('input');dateInput.type=
 dateInput.addEventListener('change',()=>{cfg.datetime=dateInput.value;render()});lblDate.append(dateInput);controls.append(lblDate);col.append(controls);if(admin){let tip=el('div','edit-hint','Double-click tajuk untuk BO3/BO5 & tarikh/masa');col.append(tip);editOnDouble(h,()=>controls.classList.toggle('open'))} 
 let stack=el('div','matches');round.forEach(id=>{let st=state[id],m=el('div','match bracket-match');
 m.title='Double-click / double-tap untuk detail perlawanan';
-let openDetail=()=>{let state=recompute()[id],config=setting(roundKey(id));let payload={id,players:[state.a||'TBD',state.b||'TBD'],score:state.score||null,format:config.need===2?'BO3':'BO5',datetime:config.datetime||'',live:!!liveMatches[id],photos:playerPhotos,selection:JSON.parse(localStorage.getItem('tekken-selection-'+id)||'{}')};window.open('match.html#'+encodeURIComponent(JSON.stringify(payload)),'_blank','noopener')};
+let openDetail=()=>{let state=recompute()[id],config=setting(roundKey(id));let payload={id,players:[state.a||'TBD',state.b||'TBD'],score:state.score||null,format:config.need===2?'BO3':'BO5',datetime:config.datetime||'',live:!!liveMatches[id],photos:playerPhotos,selection:JSON.parse(localStorage.getItem('tekken-selection-'+id)||'{}')};window.open('match-v2.html#'+encodeURIComponent(JSON.stringify(payload)),'_blank','noopener')};
 m.addEventListener('dblclick',e=>{if(e.target.closest('button,input,select'))return;openDetail()});
 let lastTap=0;m.addEventListener('touchend',e=>{if(e.target.closest('button,input,select'))return;let now=Date.now();if(now-lastTap<360){e.preventDefault();openDetail()}lastTap=now},{passive:false});
 let head=el('div','bracket-match-head');head.append(el('span','mid',id));if(liveMatches[id])head.append(el('span','bracket-live','LIVE'));m.append(head);
@@ -46,7 +46,7 @@ function renderTabContent(state){
  const summary=el('div','dash-summary');
  const metrics={Overview:[['Players',n],['Completed',completed.length],['Pending',all.length-completed.length]],Stats:[['Completed',completed.length],['Active matchups',ongoing.length],['Participants',n]]};
  if(metrics[activeTab]){metrics[activeTab].forEach(v=>summary.append(card(...v)));panel.append(summary)}
- const more=(id)=>{let match=state[id],cfg=setting(roundKey(id));let payload={id,players:[match.a||'TBD',match.b||'TBD'],score:match.score||null,format:cfg.need===2?'BO3':'BO5',datetime:cfg.datetime||'',live:!!liveMatches[id],photos:playerPhotos,selection:JSON.parse(localStorage.getItem('tekken-selection-'+id)||'{}')};window.open('match.html#'+encodeURIComponent(JSON.stringify(payload)),'_blank','noopener')};
+ const more=(id)=>{let match=state[id],cfg=setting(roundKey(id));let payload={id,players:[match.a||'TBD',match.b||'TBD'],score:match.score||null,format:cfg.need===2?'BO3':'BO5',datetime:cfg.datetime||'',live:!!liveMatches[id],photos:playerPhotos,selection:JSON.parse(localStorage.getItem('tekken-selection-'+id)||'{}')};window.open('match-v2.html#'+encodeURIComponent(JSON.stringify(payload)),'_blank','noopener')};
  if(activeTab==='Overview'){
   let recent=completed.slice(-5).reverse();panel.append(el('h3','','Recent results'));
   if(!recent.length)panel.append(el('p','empty-state','Belum ada keputusan perlawanan.'));
