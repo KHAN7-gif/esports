@@ -79,4 +79,4 @@ window.resizeTrackGuide=function(){try{const doc=frame.contentDocument;if(!doc)r
 window.addEventListener('message',event=>{if(event.origin!==window.location.origin||event.source!==frame.contentWindow)return;const d=event.data;if(d&&d.type==='elite-track-guide:height'&&Number.isFinite(d.height)&&d.height>0&&d.height<20000){frame.style.height=(Math.ceil(d.height)+4)+'px'}});
 window.addEventListener('resize',()=>window.resizeTrackGuide());
 })();
-</script><script src="./elite-registration.js"></script></body></html>
+</script><script src="./elite-registration.js?v=20261103"></script></body></html>
