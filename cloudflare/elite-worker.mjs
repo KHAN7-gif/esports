@@ -120,6 +120,16 @@ export default {
       await env.DB.prepare('INSERT INTO elite_registrations(id,receipt_hash,full_name,ign,state,gender,phone,club,consent) VALUES(?,?,?,?,?,?,?,?,1)').bind(id,digest,full,ign,state,gender,phone,club).run();
       return json({id,status:'pending'},201);
     }
+    if(req.method==='DELETE'){
+      if(!admin)return json({error:'Akses admin diperlukan.'},403);
+      const raw=await req.text();if(raw.length>512)return json({error:'Permintaan terlalu besar.'},413);
+      const body=JSON.parse(raw),id=String(body.id||'').trim().toUpperCase(),confirmation=String(body.confirm_id||'').trim().toUpperCase();
+      if(!/^ELT26-[A-F0-9]{12}$/.test(id)||confirmation!==id)return json({error:'Pengesahan Registration ID tidak sepadan.'},400);
+      // Remove registration record only; never delete Race Control driver or recorded lap times.
+      const result=await env.DB.prepare('DELETE FROM elite_registrations WHERE id=? RETURNING id').bind(id).first();
+      if(!result)return json({error:'Pendaftaran tidak ditemui.'},404);
+      return json({ok:true,id:result.id});
+    }
     if(req.method==='PATCH'){
       if(!admin)return json({error:'Akses admin diperlukan.'},403);
       const raw=await req.text();if(raw.length>1024)return json({error:'Data terlalu besar.'},413);
