@@ -1,0 +1,21 @@
+(function(){
+const form=document.getElementById('regForm');if(!form)return;
+const $=id=>document.getElementById(id);
+const states=['WP Labuan','Sabah','Sarawak','Selangor','Johor','WP Kuala Lumpur','Pulau Pinang','Perak','Kedah','Melaka','Negeri Sembilan','Pahang','Terengganu','Kelantan','Perlis','WP Putrajaya'];
+$('regState').innerHTML=states.map(s=>'<option>'+s+'</option>').join('');
+const endpoint=path=>(window.ELITE_API_CONFIG?.baseUrl||'')+path;
+const message=s=>{$('regMessage').textContent=s};
+const fields=['full_name','ign','state','phone','club'];
+function getData(){return Object.fromEntries([...fields,'consent','website'].map(k=>[k,k==='consent'?form.elements[k].checked:form.elements[k].value.trim()]))}
+function valid(){const f=form.elements;for(const k of ['full_name','ign','state','phone'])if(!f[k].checkValidity()){f[k].reportValidity();return false}if(!/^[+()0-9\s-]{9,20}$/.test(f.phone.value.trim())){message('No. telefon tidak sah.');return false}if(!f.consent.checked){message('Sila setuju dengan syarat pertandingan.');return false}return true}
+$('regNext').onclick=()=>{if(!valid())return;const data=getData(),summary=[['Nama Penuh',data.full_name],['Driver / IGN',data.ign],['Negeri',data.state],['Telefon',data.phone],['Pasukan',data.club||'—']];$('regSummary').replaceChildren(...summary.map(([label,value])=>{const box=document.createElement('div'),a=document.createElement('span'),b=document.createElement('strong');a.textContent=label;b.textContent=value;box.append(a,b);return box}));$('regFields').hidden=true;$('regConfirm').hidden=false;$('regStepLabel').textContent='STEP 02 / 02';$('regProgressBar').style.width='100%';message('')};
+$('regBack').onclick=()=>{$('regFields').hidden=false;$('regConfirm').hidden=true;$('regStepLabel').textContent='STEP 01 / 02';$('regProgressBar').style.width='50%';message('')};
+$('regRulesLink').onclick=e=>{e.preventDefault();if(typeof go==='function')go('rules')};
+let saved=null;
+form.onsubmit=async e=>{e.preventDefault();if(!valid())return;const button=$('regSubmit');button.disabled=true;message('Menghantar pendaftaran…');try{const res=await fetch(endpoint('/api/registrations'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(getData())});const j=await res.json();if(!res.ok)throw Error(j.error||'Permohonan gagal dihantar.');saved={id:j.id,receipt:j.receipt};$('regForm').hidden=true;$('regSuccess').hidden=false;$('regReceipt').textContent=j.id;message('Permohonan berjaya dihantar. Status: PENDING.')}catch(error){message(error.message||'Sambungan gagal. Sila cuba semula.')}finally{button.disabled=false}};
+$('regCopyReceipt').onclick=async()=>{if(!saved)return;const url=new URL(location.href);url.hash='registration';url.searchParams.set('registration_id',saved.id);url.searchParams.set('receipt',saved.receipt);try{await navigator.clipboard.writeText(url.toString());message('Pautan status berjaya disalin. Simpan secara peribadi.')}catch{message('Pautan: '+url)}};
+$('regAgain').onclick=()=>{form.reset();$('regForm').hidden=false;$('regSuccess').hidden=true;$('regFields').hidden=false;$('regConfirm').hidden=true;$('regProgressBar').style.width='50%';$('regStepLabel').textContent='STEP 01 / 02';saved=null;message('')};
+async function checkStatus(){const id=$('regCheckId').value.trim().toUpperCase(),receipt=$('regCheckSecret').value.trim();if(!id||!receipt){$('regCheckResult').textContent='Masukkan ID dan kod resit.';return}try{const res=await fetch(endpoint('/api/registrations')+'?id='+encodeURIComponent(id)+'&receipt='+encodeURIComponent(receipt));const j=await res.json();if(!res.ok)throw Error(j.error||'Gagal membaca status.');$('regCheckResult').textContent='Status: '+String(j.status).toUpperCase()}catch(e){$('regCheckResult').textContent=e.message}};
+$('regCheckBtn').onclick=checkStatus;
+const q=new URLSearchParams(location.search);if(q.has('registration_id')&&q.has('receipt')){$('regCheckId').value=q.get('registration_id');$('regCheckSecret').value=q.get('receipt');if(typeof go==='function')go('registration');checkStatus()}
+})();
