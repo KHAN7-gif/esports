@@ -80,7 +80,7 @@ export default {
    if(path==='/api/registrations') {
     const admin=await authorized(req,env);
     if(req.method==='GET'&&admin){
-      const {results}=await env.DB.prepare('SELECT id,full_name,ign,state,phone,club,status,driver_id,created_at,reviewed_at FROM elite_registrations ORDER BY created_at DESC LIMIT 300').all();
+      const {results}=await env.DB.prepare('SELECT id,full_name,ign,state,gender,phone,club,status,driver_id,created_at,reviewed_at FROM elite_registrations ORDER BY created_at DESC LIMIT 300').all();
       return json({data:results});
     }
     if(req.method==='GET'){
@@ -96,9 +96,9 @@ export default {
       if(raw.length>4096)return json({error:'Borang terlalu besar.'},413);
       const v=JSON.parse(raw);
       if(v.website)return json({error:'Pendaftaran tidak berjaya.'},400);
-      const full=String(v.full_name||'').trim(),ign=String(v.ign||'').trim(),state=String(v.state||'').trim(),phone=String(v.phone||'').trim(),club=String(v.club||'').trim();
+      const full=String(v.full_name||'').trim(),ign=String(v.ign||'').trim(),state=String(v.state||'').trim(),gender=String(v.gender||'').trim(),phone=String(v.phone||'').trim(),club=String(v.club||'').trim();
       const validStates=['WP Labuan','Sabah','Sarawak','Selangor','Johor','WP Kuala Lumpur','Pulau Pinang','Perak','Kedah','Melaka','Negeri Sembilan','Pahang','Terengganu','Kelantan','Perlis','WP Putrajaya'];
-      if(full.length<2||full.length>100||ign.length<2||ign.length>60||!validStates.includes(state)||!/^[-+()0-9\s]{9,20}$/.test(phone)||club.length>120||v.consent!==true)return json({error:'Sila lengkapkan borang dan persetujuan.'},400);
+      if(full.length<2||full.length>100||ign.length<2||ign.length>60||!validStates.includes(state)||!['Lelaki','Perempuan'].includes(gender)||!(/^(011[0-9]{8}|01[2346789][0-9]{7})$/.test(phone))||club.length>120||v.consent!==true)return json({error:'Sila lengkapkan borang dan persetujuan.'},400);
       const existing=await env.DB.prepare("SELECT id FROM elite_registrations WHERE ign=? AND status IN ('pending','approved') LIMIT 1").bind(ign).first();
       if(existing)return json({error:'IGN ini telah mempunyai permohonan aktif.'},409);
       const sourceIp=req.headers.get('CF-Connecting-IP')||'unknown';
@@ -110,7 +110,7 @@ export default {
       if(!limit||limit.submissions>5)return json({error:'Had pendaftaran dicapai. Sila cuba kemudian.'},429);
       const id='ELT26-'+crypto.randomUUID().replace(/-/g,'').slice(0,12).toUpperCase(),receipt=crypto.randomUUID();
       const digest=hex(await crypto.subtle.digest('SHA-256',encoder.encode(receipt)));
-      await env.DB.prepare('INSERT INTO elite_registrations(id,receipt_hash,full_name,ign,state,phone,club,consent) VALUES(?,?,?,?,?,?,?,1)').bind(id,digest,full,ign,state,phone,club).run();
+      await env.DB.prepare('INSERT INTO elite_registrations(id,receipt_hash,full_name,ign,state,gender,phone,club,consent) VALUES(?,?,?,?,?,?,?,?,1)').bind(id,digest,full,ign,state,gender,phone,club).run();
       return json({id,receipt,status:'pending'},201);
     }
     if(req.method==='PATCH'){
