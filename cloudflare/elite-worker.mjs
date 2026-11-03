@@ -79,18 +79,25 @@ export default {
    }
    if(path==='/api/registrations') {
     const admin=await authorized(req,env);
+    if(req.method==='GET'&&url.searchParams.has('id')){
+      // Public lookup intentionally discloses status only, never participant details.
+      const id=String(url.searchParams.get('id')||'').trim().toUpperCase();
+      if(!/^ELT26-[A-F0-9]{12}$/.test(id))return json({error:'Format Registration ID tidak sah.'},400);
+      const sourceIp=req.headers.get('CF-Connecting-IP')||'unknown';
+      const key=hex(await crypto.subtle.digest('SHA-256',encoder.encode('elite-status|'+sourceIp)));
+      const now=Math.floor(Date.now()/1000);
+      await env.DB.prepare('DELETE FROM elite_registration_limits WHERE expires_at<?').bind(now).run();
+      const limiter=await env.DB.prepare('INSERT INTO elite_registration_limits(ip_hash,submissions,expires_at) VALUES(?,1,?) ON CONFLICT(ip_hash) DO UPDATE SET submissions=CASE WHEN expires_at<=? THEN 1 ELSE submissions+1 END, expires_at=CASE WHEN expires_at<=? THEN ? ELSE expires_at END WHERE expires_at<=? OR submissions<30').bind(key,now+3600,now,now,now+3600,now).run();
+      if(!limiter.meta?.changes)return json({error:'Had semakan status dicapai. Cuba lagi dalam satu jam.'},429);
+      const row=await env.DB.prepare('SELECT status FROM elite_registrations WHERE id=?').bind(id).first();
+      if(!row)return json({error:'Registration ID tidak ditemui.'},404);
+      return json({id,status:row.status});
+    }
     if(req.method==='GET'&&admin){
       const {results}=await env.DB.prepare('SELECT id,full_name,ign,state,gender,phone,club,status,driver_id,created_at,reviewed_at FROM elite_registrations ORDER BY created_at DESC LIMIT 300').all();
       return json({data:results});
     }
-    if(req.method==='GET'){
-      const id=url.searchParams.get('id')||'',receipt=url.searchParams.get('receipt')||'';
-      if(!/^ELT26-[A-F0-9]{12}$/.test(id)||!/^[-a-f0-9]{36}$/.test(receipt))return json({error:'Rujukan tidak sah.'},400);
-      const digest=hex(await crypto.subtle.digest('SHA-256',encoder.encode(receipt)));
-      const row=await env.DB.prepare('SELECT status,receipt_hash FROM elite_registrations WHERE id=?').bind(id).first();
-      if(!row||!equal(row.receipt_hash,digest))return json({error:'Pendaftaran tidak ditemui.'},404);
-      return json({id,status:row.status});
-    }
+    if(req.method==='GET')return json({error:'Masukkan Registration ID untuk semakan.'},400);
     if(req.method==='POST'){
       const raw=await req.text();
       if(raw.length>4096)return json({error:'Borang terlalu besar.'},413);
@@ -108,10 +115,10 @@ export default {
       const limiter=await env.DB.prepare('INSERT INTO elite_registration_limits(ip_hash,submissions,expires_at) VALUES(?,1,?) ON CONFLICT(ip_hash) DO UPDATE SET submissions=submissions+1 WHERE submissions<5').bind(ipHash,now+3600).run();if(!limiter.meta?.changes)return json({error:'Had pendaftaran dicapai. Sila cuba kemudian.'},429);
       const limit=await env.DB.prepare('SELECT submissions FROM elite_registration_limits WHERE ip_hash=?').bind(ipHash).first();
       if(!limit||limit.submissions>5)return json({error:'Had pendaftaran dicapai. Sila cuba kemudian.'},429);
-      const id='ELT26-'+crypto.randomUUID().replace(/-/g,'').slice(0,12).toUpperCase(),receipt=crypto.randomUUID();
-      const digest=hex(await crypto.subtle.digest('SHA-256',encoder.encode(receipt)));
+      const id='ELT26-'+crypto.randomUUID().replace(/-/g,'').slice(0,12).toUpperCase();
+      const digest=hex(await crypto.subtle.digest('SHA-256',encoder.encode(crypto.randomUUID())));
       await env.DB.prepare('INSERT INTO elite_registrations(id,receipt_hash,full_name,ign,state,gender,phone,club,consent) VALUES(?,?,?,?,?,?,?,?,1)').bind(id,digest,full,ign,state,gender,phone,club).run();
-      return json({id,receipt,status:'pending'},201);
+      return json({id,status:'pending'},201);
     }
     if(req.method==='PATCH'){
       if(!admin)return json({error:'Akses admin diperlukan.'},403);
