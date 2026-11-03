@@ -4,6 +4,20 @@ Konfigurasi ini hanya untuk The Elite. LEL dan BOTS tidak diubah.
 Worker menyajikan laman sedia ada dan API D1. Supabase tidak lagi diperlukan untuk The Elite.
 Database baharu bermula tanpa pelumba; tiada data lama diimport atau dummy dimasukkan secara automatik.
 
+## Registration 2026 · D1 sudah diaktifkan
+
+Jika database D1 `esukan-elite` telah dibuat, **gunakan database yang sama**; jangan cipta D1 baharu atau jalankan reset.
+
+1. Cloudflare → **Workers & Pages → the-elite → Settings → Bindings**: semak D1 binding bernama tepat `DB` menunjuk ke `esukan-elite`.
+2. Cloudflare → **Workers & Pages → the-elite → Settings → Builds**: repository `KHAN7-gif/esports`, branch `main`, root directory `the-elite`, dan build variable `D1_DATABASE_ID` mesti sama dengan UUID database itu.
+3. Build command: `pnpm install --frozen-lockfile && pnpm run build`; deploy command: `pnpm run deploy`. Skrip deploy menjalankan **migrations D1 --remote sebelum deploy Worker**, termasuk `0004_registrations.sql`, dan tidak reset data pelumba.
+4. Selepas deployment berjaya, semak `https://the-elite.esukan.app/elite-registration.js` dan `https://the-elite.esukan.app/elite-admin-registrations.js` memulangkan JavaScript (bukan 404). Fail ini kini dibundel oleh `scripts/prepare-elite.mjs`.
+5. Semak `https://the-elite.esukan.app/api/drivers` dan `https://the-elite.esukan.app/api/admin/session`. `/api/registrations` GET tanpa resit/admin **sepatutnya menolak permintaan**, bukannya memaparkan data peribadi.
+6. Semak jadual D1 `elite_registrations` dan `elite_registration_limits`; jangan cipta secara manual jika migration sudah direkodkan dalam `d1_migrations`.
+7. Uji borang menggunakan rekod ujian dengan izin; pastikan status Pending boleh dilihat Admin, diluluskan dan kemudian dimasukkan ke Race Control menggunakan butang Add to Race Control. Padam rekod ujian melalui prosedur pentadbir sebelum penggunaan rasmi.
+
+**Nota:** GitHub Pages hanya menerbitkan frontend. API berasaskan Cloudflare perlu dipanggil dari domain Worker `the-elite.esukan.app`, kerana `elite-config.js` menggunakan API same-origin. Worker & D1 production hanya dianggap aktif selepas deployment dan ujian endpoint berjaya. Jangan masukkan secret atau token Cloudflare dalam GitHub repository.
+
 ## 1. Cipta D1 baharu
 
 Cloudflare → Storage & databases → D1 → Create database → nama `esukan-elite`.
