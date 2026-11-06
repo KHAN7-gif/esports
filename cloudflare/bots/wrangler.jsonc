@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bots-api",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "bots-database",
+      "database_id": "REPLACE_WITH_CLOUDFLARE_D1_DATABASE_ID"
+    }
+  ],
+  "vars": {
+    "ALLOWED_ORIGIN": "https://khan7-gif.github.io"
+  }
+}
