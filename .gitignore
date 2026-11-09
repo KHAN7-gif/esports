@@ -2,3 +2,7 @@
 /.cloudflare/
 /.dev.vars*
 /.env*
+
+# Generated application dependencies and TypeScript caches
+**/node_modules
+**/*.tsbuildinfo

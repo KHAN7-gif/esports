@@ -1,3 +1,4 @@
+import {centralLoginEnabled,centralUser} from '../../sso-auth';
 import {env} from 'cloudflare:workers';
 import {getChatGPTUser} from '../../chatgpt-auth';
 import {registrationLeague,demoLeague,leagueSchema,validateLeague} from '../../../lib/league';
@@ -16,7 +17,7 @@ export async function GET(request:Request){
  return publicResponse(request,{data:registrationLeague(JSON.parse(row.data)),version:row.version});
 }
 export async function PUT(request:Request){
- const user=await getChatGPTUser();if(!user||!env.ADMIN_EMAIL||user.email.toLowerCase()!==env.ADMIN_EMAIL.toLowerCase())return Response.json({error:'Akses admin diperlukan.'},{status:403});
+ const central=centralLoginEnabled();const user=central?await centralUser():await getChatGPTUser();if(!user||(!central&&(!env.ADMIN_EMAIL||user.email.toLowerCase()!==env.ADMIN_EMAIL.toLowerCase())))return Response.json({error:'Akses admin diperlukan.'},{status:403});
  if(request.headers.get('Origin')!==new URL(request.url).origin)return Response.json({error:'Origin tidak sah.'},{status:403});
  const category=new URL(request.url).searchParams.get('category');if(category!=='mobile'&&category!=='console')return Response.json({error:'Kategori tidak sah.'},{status:400});
  if(!env.DB)return Response.json({error:'Pangkalan data belum tersedia.'},{status:503});

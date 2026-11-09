@@ -1,3 +1,4 @@
+import {centralLoginEnabled,centralUser} from './sso-auth';
 import {env} from 'cloudflare:workers';
 import {cookies} from 'next/headers';
 const COOKIE='__Host-bots-admin';
@@ -10,5 +11,5 @@ async function signature(payload:string){const secret=config().ADMIN_SESSION_SEC
 export async function checkPassword(phone:string,password:string){const c=config();if(!c.ADMIN_PHONE||!c.ADMIN_PASSWORD_HASH||!c.ADMIN_PASSWORD_SALT)throw Error('Admin configuration missing');const salt=Uint8Array.from(c.ADMIN_PASSWORD_SALT.match(/.{2}/g)!,s=>parseInt(s,16));const key=await crypto.subtle.importKey('raw',encoder.encode(password),'PBKDF2',false,['deriveBits']);const hash=hex(await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:100000,hash:'SHA-256'},key,256));return equal(hash,c.ADMIN_PASSWORD_HASH)&&phone.replace(/[^0-9]/g,'')===c.ADMIN_PHONE.replace(/[^0-9]/g,'')}
 export async function issueSession(){const expires=Math.floor(Date.now()/1000)+SESSION_SECONDS;const payload=expires+'.'+crypto.randomUUID();return payload+'.'+await signature(payload)}
 export async function verifySession(value:string){const parts=value.split('.');if(parts.length!==3||!/^\d+$/.test(parts[0]))return false;const expires=Number(parts[0]),now=Math.floor(Date.now()/1000);if(expires<=now||expires>now+SESSION_SECONDS)return false;try{return equal(parts[2],await signature(parts.slice(0,2).join('.')))}catch{return false}}
-export async function isSuperadmin(){const jar=await cookies();const value=jar.get(COOKIE)?.value;return !!value&&await verifySession(value)}
+export async function isSuperadmin(){if(centralLoginEnabled())return !!await centralUser();const jar=await cookies();const value=jar.get(COOKIE)?.value;return !!value&&await verifySession(value)}
 export function sessionCookie(value:string,maxAge=SESSION_SECONDS){return `${COOKIE}=${value}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${maxAge}`}

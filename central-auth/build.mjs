@@ -1,0 +1,10 @@
+import {mkdir,cp,rm,readFile,writeFile} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+import {spawnSync} from 'node:child_process';
+process.chdir(fileURLToPath(new URL('.',import.meta.url)));
+const manifest=JSON.parse(await readFile('.openai/hosting.json','utf8'));
+if(!manifest.project_id)throw Error('Register the central login Site first.');
+const check=spawnSync(process.execPath,['--check','worker/index.js'],{stdio:'inherit'});if(check.status)process.exit(check.status);
+await rm('dist',{recursive:true,force:true});await mkdir('dist/server',{recursive:true});await mkdir('dist/.openai',{recursive:true});
+await cp('worker/index.js','dist/server/index.js');await cp('.openai/hosting.json','dist/.openai/hosting.json');await cp('drizzle','dist/.openai/drizzle',{recursive:true});
+console.log('Central login Worker and D1 migration packaged.');

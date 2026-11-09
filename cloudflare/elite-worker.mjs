@@ -1,3 +1,4 @@
+import {ssoEnabled,ssoUser,ssoRoute} from '../sso/client.mjs';
 const cookieName = '__Host-elite-admin';
 const encoder = new TextEncoder();
 const hex = bytes => Array.from(new Uint8Array(bytes), b => b.toString(16).padStart(2, '0')).join('');
@@ -7,6 +8,7 @@ async function sign(payload, secret) {
  return hex(await crypto.subtle.sign('HMAC',key,encoder.encode(payload)));
 }
 async function authorized(req, env) {
+ if(ssoEnabled(env))return !!await ssoUser(req,env);
  if (!env.ADMIN_SESSION_SECRET) return false;
  const value=(req.headers.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(cookieName+'='))?.slice(cookieName.length+1)||'';
  const parts=value.split('.'), now=Math.floor(Date.now()/1000);
@@ -27,6 +29,8 @@ function validate(row) {
 export default {
  async fetch(req, env) {
   const url=new URL(req.url), path=url.pathname;
+  if(path.startsWith('/api/sso/'))return await ssoRoute(req,env)??json({error:'Not found'},404);
+  if(ssoEnabled(env)&&['/admin','/admin/','/elite-admin.html'].includes(path)&&!await authorized(req,env))return Response.redirect(url.origin+'/api/sso/start',303);
   if(!path.startsWith('/api/')) {
    if(path==='/admin/')return Response.redirect(url.origin+'/admin'+url.search,308);
    if(path==='/')url.pathname='/the-elite.html';
@@ -36,10 +40,12 @@ export default {
   try {
    if(!env.DB)return json({error:'Pangkalan data belum tersedia.'},503);
    if(req.method!=='GET'&&req.headers.get('origin')!==url.origin)return json({error:'Origin tidak sah.'},403);
+   if(path==='/api/admin/logout'&&req.method==='POST'&&ssoEnabled(env))return json({ok:true,ssoLogoutUrl:'/api/sso/logout'});
    if(path==='/api/admin/logout'&&req.method==='POST')return json({ok:true},200,{'Set-Cookie':sessionCookie('',0)});
-   if(path==='/api/admin/config'&&req.method==='GET')return json({turnstileSiteKey:env.TURNSTILE_SITE_KEY||'',turnstileConfigured:!!(env.TURNSTILE_SITE_KEY&&env.TURNSTILE_SECRET_KEY)});
+   if(path==='/api/admin/config'&&req.method==='GET')return json({ssoLoginUrl:ssoEnabled(env)?'/api/sso/start':null,turnstileSiteKey:env.TURNSTILE_SITE_KEY||'',turnstileConfigured:!!(env.TURNSTILE_SITE_KEY&&env.TURNSTILE_SECRET_KEY)});
    if(path==='/api/admin/session'&&req.method==='GET')return json({admin:await authorized(req,env)});
    if(path==='/api/admin/login'&&req.method==='POST') {
+    if(ssoEnabled(env))return json({error:'Gunakan login pusat.',loginUrl:'/api/sso/start'},409);
     if(!env.ADMIN_EMAIL||!env.ADMIN_PASSWORD_HASH||!env.ADMIN_PASSWORD_SALT||!env.ADMIN_SESSION_SECRET)return json({error:'Admin belum dikonfigurasi.'},503);
     if(!env.TURNSTILE_SITE_KEY||!env.TURNSTILE_SECRET_KEY)return json({error:'Cloudflare Turnstile belum dikonfigurasi.'},503);
     const text=await req.text();if(text.length>8192)return json({error:'Permintaan terlalu besar.'},413);
