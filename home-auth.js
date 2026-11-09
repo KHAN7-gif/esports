@@ -1,4 +1,4 @@
-(()=>{'use strict';const config=window.ESPORTS_AUTH_CONFIG,key='maida_esports_home_session_v1',pendingKey='maida_esports_home_request_v1';let session=null,busy=false,timer;
+(()=>{'use strict';if(location.hostname==='theelite.esukan.app'&&location.pathname==='/'){location.replace('/the-elite.html');return}const config=window.ESPORTS_AUTH_CONFIG,key='maida_esports_home_session_v1',pendingKey='maida_esports_home_request_v1';let session=null,busy=false,timer;
  const el=id=>document.getElementById(id),params=new URLSearchParams(location.search),request=params.get('request'),app=params.get('app'),logoutRequested=params.get('logout')==='1';
  const store={get(name){try{return sessionStorage.getItem(name)}catch{return null}},set(name,value){try{sessionStorage.setItem(name,value)}catch{}},remove(name){try{sessionStorage.removeItem(name)}catch{}}};
  let pending=/^[-_A-Za-z0-9]{43}$/.test(request||'')?request:store.get(pendingKey);if(pending)store.set(pendingKey,pending);

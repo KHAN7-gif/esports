@@ -20,14 +20,14 @@ The existing Sites issuer exposes `/portal-api/config`, `/portal-api/login`, `/p
 
 ## Deployment gate and required access decision
 
-Changes are prepared on `home-login-only`; the live GitHub Pages home and Site audience settings have not been changed by this work.
+The owner approved public API access and the public eFLL read view. Deployment uses the tested `home-login-only` implementation; admin editing remains authenticated.
 
-The issuer Site and eFLL currently have owner-private platform access. GitHub Pages cannot call a private issuer API anonymously, and a private eFLL Site can still prompt for ChatGPT sign-in before the app receives the request. To satisfy home-only login, the owner must explicitly approve:
+The issuer Site and eFLL currently have owner-private platform access. GitHub Pages cannot call a private issuer API anonymously, and a private eFLL Site can still prompt for ChatGPT sign-in before the app receives the request. To satisfy home-only login, the approved access changes are:
 
 1. Public platform access for the central issuer Site. Home-only mode redirects its home to GitHub and protects Tekken HTML/data with shared authentication. Owner-only account setup remains protected by trusted identity headers and the owner allowlist.
 2. Public platform access for eFLL. Its league read view becomes publicly accessible, like BOST and LEL; admin editing remains session-protected. BOST/LEL are already public and need no audience change.
 
-Do not change either audience or merge the new locked home into main until that decision is supplied. This is a Sites audience/access requirement, not a request for Cloudflare credentials. The Elite remains excluded.
+The access decision was supplied by the owner. No Cloudflare credentials are needed. The Elite remains excluded, including its existing hostname redirect compatibility.
 
 After approval, deploy the prepared Sites backend with `LOGIN_HOME_URL=https://khan7-gif.github.io/esports/`. Set each client to `SSO_ENABLED=true`, keep the existing issuer and client ID, and set `SSO_LOGIN_HOME` to the same home URL. Publish current source artifacts and preserve all existing data. Then merge/deploy the Pages home. The API is publicly reachable but each privileged operation still authenticates its bearer/cookie; no secret belongs in auth-config.js.
 
