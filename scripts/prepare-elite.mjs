@@ -1,4 +1,5 @@
-import { mkdir, copyFile, stat, cp } from 'node:fs/promises';
+import {prepareTekken} from './prepare-tekken.mjs';
+import { mkdir, copyFile, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 const root=fileURLToPath(new URL('../',import.meta.url));
@@ -10,5 +11,5 @@ for(const name of ['esports.html','the-elite.html','elite-track-guide.html','IMG
  if(!info.isFile()||info.size===0)throw Error('Missing or empty The Elite asset: '+name);
  await copyFile(source,path.join(out,name));
 }
-await cp(path.join(root,'tekken'),path.join(out,'tekken'),{recursive:true,filter:source=>!source.endsWith('model.mjs')});
+await prepareTekken(root,out);
 console.log('The Elite static assets prepared. No database records are seeded.');

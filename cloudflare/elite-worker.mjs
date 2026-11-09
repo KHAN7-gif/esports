@@ -44,6 +44,7 @@ export default {
    if(path==='/admin/')return Response.redirect(url.origin+'/admin'+url.search,308);
    if(path==='/')url.pathname='/the-elite.html';
    if(path==='/esports'||path==='/esports/')url.pathname='/esports.html';
+   if(['/tekken/match.html','/tekken/match-v2.html'].includes(path))return Response.redirect(url.origin+'/tekken/match-v3.html'+url.search,308);
    if(path==='/tekken')return Response.redirect(url.origin+'/tekken/',308);
    if(path==='/tekken/')url.pathname='/tekken/index.html';
    if(path==='/admin'||path==='/admin/')url.pathname='/elite-admin.html';
