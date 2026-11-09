@@ -10,7 +10,7 @@ with sync_playwright() as p:
  assert page.locator('.card').count()==4
  page.screenshot(path='/workspace/esports-directory-preview.png',full_page=True)
  for module,origin in [('bost','https://bost.test:8801'),('lel','https://lel.test:8802'),('efll','https://efll.test:8803'),('tekken','https://issuer.test:8798')]:
-  page.goto(home);page.locator('[data-app='+module+']').click()
+  page.goto(home);page.locator('[data-app='+module+'] .public-link').click()
   if module=='tekken':
    page.wait_for_url(origin+'/tekken/');page.locator('#auth').click()
   else:page.get_by_role('link',name='Log masuk',exact=True).click()

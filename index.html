@@ -1,1 +1,67 @@
-<!doctype html><html lang="ms"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#101a34"><meta name="referrer" content="same-origin"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src https://esports-login.apengtakahashi.chatgpt.site; img-src 'self' data:; base-uri 'self'; form-action 'self';"><title>MAIDA Esports · Portal Kejohanan</title><link rel="stylesheet" href="./home-auth.css"><script src="./home-auth.js" defer></script></head><body><main id="homeApp"><header><div class="brand"><span class="mark">M</span><b>MAIDA ESPORTS</b></div></header><section class="intro"><small>PORTAL KEJOHANAN</small><h1>Empat arena.<br><em>Satu portal.</em></h1><p>Semua pautan kejohanan di satu tempat. Log masuk di setiap subweb dengan e-mel dan kata laluan yang sama.</p></section><nav class="cards" aria-label="Kejohanan"><a href="https://battle-states-efootball.apengtakahashi.chatgpt.site/" data-app="bost" class="card"><small>01 · eFOOTBALL MOBILE</small><h2>BOST</h2><p>Battle of the States · Pasukan, keputusan dan statistik liga.</p><strong>Buka BOST →</strong></a><a href="https://labuan-efootball-league.apengtakahashi.chatgpt.site/" data-app="lel" class="card"><small>02 · MOBILE &amp; KONSOL</small><h2>LEL</h2><p>Labuan eFootball League · Kumpulan dan knockout.</p><strong>Buka LEL →</strong></a><a href="https://esports-login.apengtakahashi.chatgpt.site/tekken/" data-app="tekken" class="card"><small>03 · TEKKEN 8</small><h2>Tekken</h2><p>Bracket, skor, Character dan Map.</p><strong>Buka Tekken →</strong></a><a href="https://efll-labuan.apengtakahashi.chatgpt.site/" data-app="efll" class="card"><small>04 · eFOOTBALL MOBILE</small><h2>eFLL</h2><p>Liga kelab Labuan · Pemain, jadual dan klasemen.</p><strong>Buka eFLL →</strong></a></nav><p id="homeStatus" role="status"></p><footer>© 2026 MAIDA Esports · Semua kejohanan di satu tempat.</footer></main></body></html>
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0b1224">
+  <meta name="referrer" content="same-origin">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; base-uri 'self'; form-action 'self';">
+  <title>MAIDA Esports · Portal Kejohanan</title>
+  <link rel="stylesheet" href="./home-auth.css">
+  <script src="./home-auth.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#kejohanan">Terus ke kejohanan</a>
+<main id="homeApp">
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="MAIDA Esports, halaman utama"><span class="mark" aria-hidden="true">M</span><span>MAIDA <b>ESPORTS</b><small>PORTAL KEJOHANAN</small></span></a>
+    <a class="header-login" href="#akses-admin"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg> Log masuk</a>
+  </header>
+  <section class="intro" aria-labelledby="pageTitle">
+    <span class="eyebrow"><span class="status-dot" aria-hidden="true"></span> SEMUA ARENA DI SINI</span>
+    <h1 id="pageTitle">Satu tempat.<br><em>Semua kejohanan.</em></h1>
+    <p>Pilih arena anda. Ikuti pertandingan melalui paparan awam atau log masuk untuk mengurus kejohanan.</p>
+    <div class="intro-meta"><span>04 <small>SUBWEB</small></span><span class="meta-rule" aria-hidden="true"></span><span class="account-note">Satu e-mel &amp; kata laluan<br>untuk semua akaun admin.</span></div>
+  </section>
+  <section id="kejohanan" aria-labelledby="arenasTitle">
+    <div class="section-heading"><h2 id="arenasTitle">Pilih kejohanan</h2><span>AWAM &amp; ADMIN</span></div>
+    <div class="cards">
+      <article class="card card-bost" data-app="bost" aria-labelledby="bostTitle">
+        <div class="card-top"><span class="arena-tag">eFOOTBALL MOBILE</span><span class="arena-number">01</span></div>
+        <div class="logo-stage"><img src="./battle-of-the-states/public/bots-logo-2026.png" alt="Logo Battle of the States" width="240" height="96" fetchpriority="high"></div>
+        <div class="card-copy"><h3 id="bostTitle">BOST</h3><span class="full-name">Battle of the States</span><p>Pasukan, jadual, keputusan dan statistik pertandingan antara negeri.</p></div>
+        <div class="card-actions"><a class="public-link" href="https://battle-states-efootball.apengtakahashi.chatgpt.site/">Paparan awam <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></a><a class="admin-link" href="https://battle-states-efootball.apengtakahashi.chatgpt.site/admin/login">Admin <span aria-hidden="true">→</span></a></div>
+      </article>
+      <article class="card card-lel" data-app="lel" aria-labelledby="lelTitle">
+        <div class="card-top"><span class="arena-tag">MOBILE &amp; KONSOL</span><span class="arena-number">02</span></div>
+        <div class="logo-stage"><img src="./labuan-efootball-league/public/lel-logo.png" alt="Logo Labuan eFootball League" width="240" height="96"></div>
+        <div class="card-copy"><h3 id="lelTitle">LEL</h3><span class="full-name">Labuan eFootball League</span><p>Dua arena, satu liga. Ikuti peringkat kumpulan hingga ke pentas akhir.</p></div>
+        <div class="card-actions"><a class="public-link" href="https://labuan-efootball-league.apengtakahashi.chatgpt.site/">Paparan awam <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></a><a class="admin-link" href="https://labuan-efootball-league.apengtakahashi.chatgpt.site/admin">Admin <span aria-hidden="true">→</span></a></div>
+      </article>
+      <article class="card card-tekken" data-app="tekken" aria-labelledby="tekkenTitle">
+        <div class="card-top"><span class="arena-tag">FIGHTING GAME</span><span class="arena-number">03</span></div>
+        <div class="logo-stage"><img src="./portal-assets/tekken.svg" alt="Logo TEKKEN 8" width="240" height="96"></div>
+        <div class="card-copy"><h3 id="tekkenTitle">TEKKEN</h3><span class="full-name">Tekken 8 Tournament</span><p>Bracket pertandingan, skor perlawanan serta pilihan Character dan Map.</p></div>
+        <div class="card-actions"><a class="public-link" href="https://esports-login.apengtakahashi.chatgpt.site/tekken/">Paparan awam <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></a><a class="admin-link" href="https://esports-login.apengtakahashi.chatgpt.site/login?return_to=%2Ftekken%2F">Admin <span aria-hidden="true">→</span></a></div>
+      </article>
+      <article class="card card-efll" data-app="efll" aria-labelledby="efllTitle">
+        <div class="card-top"><span class="arena-tag">eFOOTBALL MOBILE</span><span class="arena-number">04</span></div>
+        <div class="logo-stage"><img src="./efll/public/efll-logo.svg" alt="Logo eFLL" width="240" height="96"></div>
+        <div class="card-copy"><h3 id="efllTitle">eFLL</h3><span class="full-name">Liga Kelab Labuan</span><p>Pemain, kelab, jadual perlawanan dan kedudukan liga dalam satu arena.</p></div>
+        <div class="card-actions"><a class="public-link" href="https://efll-labuan.apengtakahashi.chatgpt.site/">Paparan awam <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></a><a class="admin-link" href="https://efll-labuan.apengtakahashi.chatgpt.site/admin/login">Admin <span aria-hidden="true">→</span></a></div>
+      </article>
+    </div>
+  </section>
+  <section id="akses-admin" class="login-panel" aria-labelledby="loginTitle">
+    <div><span class="eyebrow">RUANG PENTADBIR</span><h2 id="loginTitle">Log masuk admin</h2><p>Pilih subweb untuk log masuk dengan e-mel dan kata laluan yang sama.</p></div>
+    <nav class="login-options" aria-label="Pilih login subweb">
+      <a href="https://battle-states-efootball.apengtakahashi.chatgpt.site/admin/login">BOST <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      <a href="https://labuan-efootball-league.apengtakahashi.chatgpt.site/admin">LEL <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      <a href="https://esports-login.apengtakahashi.chatgpt.site/login?return_to=%2Ftekken%2F">TEKKEN <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+      <a href="https://efll-labuan.apengtakahashi.chatgpt.site/admin/login">eFLL <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M7 7h10v10"/></svg></a>
+    </nav>
+  </section>
+  <footer><span class="footer-brand">MAIDA ESPORTS</span><span>© 2026 · Semua kejohanan di satu tempat.</span></footer>
+</main>
+</body>
+</html>
