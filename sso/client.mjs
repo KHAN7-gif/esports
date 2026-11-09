@@ -7,7 +7,7 @@ const cookie=(name,value,age)=>`${name}=${value}; Path=/; HttpOnly; Secure; Same
 const noStore={'Cache-Control':'no-store','Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff'};
 function redirect(location,cookies=[]){const headers=new Headers({...noStore,Location:location});cookies.forEach(c=>headers.append('Set-Cookie',c));return new Response(null,{status:303,headers})}
 export function ssoEnabled(env){return env.SSO_ENABLED==='true'||env.SSO_ENABLED==='auto'}
-export function ssoConfig(env){if(!ssoEnabled(env))return null;try{const url=new URL(env.SSO_ISSUER);if(url.protocol!=='https:'||!['/','/sso','/sso/'].includes(url.pathname)||url.search||url.hash||url.username||url.password||!/^[-a-z0-9]+$/.test(env.SSO_CLIENT_ID||''))return null;return {issuer:url.origin+(url.pathname==='/'?'':url.pathname.replace(/\/$/,'')),clientId:env.SSO_CLIENT_ID,serviceToken:env.SSO_SERVICE_TOKEN}}catch{return null}}
+export function ssoConfig(env){if(!ssoEnabled(env))return null;try{const url=new URL(env.SSO_ISSUER);if(url.protocol!=='https:'||!['/','/sso','/sso/'].includes(url.pathname)||url.search||url.hash||url.username||url.password||!/^[-a-z0-9]+$/.test(env.SSO_CLIENT_ID||''))return null;return {issuer:url.origin+(url.pathname==='/'?'':url.pathname.replace(/\/$/,'')),clientId:env.SSO_CLIENT_ID,serviceToken:env.SSO_SERVICE_TOKEN,loginHome:env.SSO_LOGIN_HOME}}catch{return null}}
 async function call(url,init,config){const headers=new Headers(init.headers);if(config?.serviceToken)headers.set('OAI-Sites-Authorization','Bearer '+config.serviceToken);return fetch(url,{...init,headers,redirect:'error',signal:AbortSignal.timeout(5000)})}
 export async function ssoReady(env){
  if(env.SSO_ENABLED!=='auto')return ssoEnabled(env);
@@ -21,6 +21,7 @@ export async function ssoRoute(req,env){const path=new URL(req.url).pathname;if(
  const url=new URL(req.url),callback=url.origin+'/api/sso/callback';
  if(path==='/api/sso/logout'){
   if(req.method!=='POST'||req.headers.get('Origin')!==url.origin)return new Response('Forbidden',{status:403,headers:noStore});
+  if(config.loginHome){const home=new URL(config.loginHome);if(home.protocol!=='https:')return new Response('Invalid home configuration',{status:503});const token=read(req,COOKIE);if(token){try{const result=await call(config.issuer+'/revoke',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({client_id:config.clientId})},config);if(!result.ok)return new Response('Logout tidak dapat disahkan. Cuba semula.',{status:503,headers:noStore})}catch{return new Response('Logout tidak dapat disahkan. Cuba semula.',{status:503,headers:noStore})}}home.searchParams.set('logout','1');return redirect(home.href,[cookie(COOKIE,'',0),cookie(FLOW,'',0)])}
   return redirect(config.issuer+'/logout',[cookie(COOKIE,'',0),cookie(FLOW,'',0)]);
  }
  if(req.method!=='GET')return new Response('Method not allowed',{status:405,headers:noStore});
