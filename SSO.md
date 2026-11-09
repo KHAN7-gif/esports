@@ -1,3 +1,5 @@
+> Current production uses separate subweb login forms and signed local sessions. See [HOME_LOGIN.md](HOME_LOGIN.md). The PKCE handoff below is retained for compatibility and tests, and is disabled by `SSO_LOGIN_MODE=local`.
+
 # Shared esports login
 
 Login home: https://khan7-gif.github.io/esports/

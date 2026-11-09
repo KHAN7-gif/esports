@@ -1,3 +1,5 @@
+import {handleSubwebLogin} from './subweb-api.mjs';
+import {localUser,localLoginRoute} from './local-login.mjs';
 import {handlePortalApi,homeAuthorize,loginHome} from './portal-api.mjs';
 import auth,{centralIdentity,centralLogout,clientIdentity} from './index.js';
 import {handleTekken} from './tekken-api.mjs';
@@ -10,7 +12,10 @@ const encode=value=>btoa(JSON.stringify(value)).replace(/\+/g,'-').replace(/\//g
 function redirect(location,cookies=[]){const headers=new Headers({...noStore,Location:location});for(const value of cookies)headers.append('Set-Cookie',value);return new Response(null,{status:303,headers})}
 const readCookie=(req,name)=>(req.headers.get('cookie')||'').split(';').map(s=>s.trim()).find(s=>s.startsWith(name+'='))?.slice(name.length+1)||'';
 async function configured(origin,env){const result=await auth.fetch(new Request(origin+'/health'),env);if(!result.ok)return false;return (await result.json()).configured===true}
-export default {async fetch(req,env,ctx){const url=new URL(req.url),path=url.pathname;const home=loginHome(env);const identity=()=>home?clientIdentity(req,env,'tekken'):centralIdentity(req,env);try{
+export default {async fetch(req,env,ctx){const url=new URL(req.url),path=url.pathname;const local=env.SUBWEB_LOGIN_ENABLED==='true',tekkenEnv={...env,SSO_ISSUER:url.origin,SSO_CLIENT_ID:'tekken'},home=local?null:loginHome(env);const identity=()=>local?localUser(req,tekkenEnv):home?clientIdentity(req,env,'tekken'):centralIdentity(req,env);try{
+ if(local&&path==='/subweb-api/login')return handleSubwebLogin(req,env);
+ if(local&&(path==='/login'||path.startsWith('/api/sso/')))return await localLoginRoute(req,tekkenEnv)??new Response('Not found',{status:404});
+ if(local&&path==='/')return redirect('/tekken/');
  if(path.startsWith('/portal-api/')||path==='/revoke')return handlePortalApi(req,env);
  if(home&&path==='/authorize')return homeAuthorize(req,env);
  if(home&&path==='/login'&&req.method==='POST')return Response.json({error:'Login hanya di halaman utama esports.'},{status:409});
@@ -18,6 +23,7 @@ export default {async fetch(req,env,ctx){const url=new URL(req.url),path=url.pat
  if(path==='/api/admin/session')return Response.json({admin:!!await identity()},{headers:noStore});
  if(path==='/api/admin/logout'){
   if(req.method!=='POST'||req.headers.get('Origin')!==url.origin)return new Response('Forbidden',{status:403,headers:noStore});
+  if(local){const result=await localLoginRoute(new Request(url.origin+'/api/sso/logout',req),tekkenEnv);const h=new Headers(noStore);for(const c of result.headers.getSetCookie())h.append('Set-Cookie',c);return Response.json({ok:true,home_url:'/tekken/'},{headers:h})}
   if(home){const token=readCookie(req,'__Host-esports-sso');if(token){const result=await handlePortalApi(new Request(url.origin+'/revoke',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},body:JSON.stringify({client_id:'tekken'})}),env);if(!result.ok)return result;}const destination=new URL(home);destination.searchParams.set('logout','1');return Response.json({ok:true,home_url:destination.href},{headers:{...noStore,'Set-Cookie':'__Host-esports-sso=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0'}})}
   return Response.json({ok:true},{headers:{...noStore,'Set-Cookie':await centralLogout(req,env)}});
  }

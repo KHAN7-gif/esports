@@ -1,9 +1,7 @@
-# Esports home-login backend
+# Shared esports account service
 
-The only normal password form is https://khan7-gif.github.io/esports/. This Sites service supplies the login API, one-use PKCE request handoffs and the Tekken module. It redirects its home to GitHub Pages when LOGIN_HOME_URL is configured. BOST, LEL, Tekken and eFLL use the existing shared account. The Elite and PUBG are separate.
+The public GitHub Pages portal is a directory only. BOST, LEL, TEKKEN and eFLL each have a local login form and use the same existing account stored in this service's D1 database. The Elite and PUBG are separate.
 
-Runtime: DB binding, LOGIN_HOME_URL, SSO_CLIENTS and SETUP_OWNER_EMAIL. Public API access was explicitly approved; privileged actions remain authenticated. CORS allows the configured home origin only, without credentialed third-party cookies. Never put a service-access token in GitHub Pages code.
+See [the current login architecture](../HOME_LOGIN.md) for the browser login API, ES256 signatures, runtime key settings and independent session lifecycle. The browser communicates with this service directly; subweb servers verify signed sessions locally without cross-Worker fetches. Tekken public pages remain public; admin writes require a verified Tekken session.
 
-Build with `node build.mjs`; test with `node build.mjs && node --test tests/*.test.mjs`. The dependency-free Worker includes static Tekken assets and additive D1 migrations. QA HTTPS servers under tests are not deployed.
-
-Existing account data is preserved. One-time owner bootstrap at /setup requires trusted Sites identity headers and the owner allowlist. Ordinary login uses only the GitHub Pages home. No Cloudflare account token is needed for native Sites publication.
+Build with `node build.mjs`; test with `node build.mjs && node --test tests/*.test.mjs`. The Worker includes Tekken assets and additive D1 migrations. QA servers under tests are not deployed. Existing account data is preserved. Owner bootstrap at `/setup` requires trusted Sites identity and its owner allowlist. Native Sites publication needs no Cloudflare account API token.

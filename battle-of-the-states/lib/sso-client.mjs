@@ -1,3 +1,4 @@
+import {localUser,localLoginRoute} from './local-login.mjs';
 const COOKIE='__Host-esports-sso';
 const FLOW='__Host-esports-flow';
 const b64=bytes=>btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
@@ -14,8 +15,8 @@ export async function ssoReady(env){
  const config=ssoConfig(env);if(!config)return true;
  try{const result=await call(config.issuer+'/health',{},config);if(!result.ok)return true;const status=await result.json();return !(status.service==='esports-central-auth'&&status.configured===false)}catch{return true}
 }
-export async function ssoUser(req,env){const c=ssoConfig(env);if(!c)return null;const token=read(req,COOKIE);if(!/^[-_A-Za-z0-9]{43}$/.test(token))return null;try{const r=await call(c.issuer+'/userinfo?'+new URLSearchParams({client_id:c.clientId}),{headers:{Authorization:'Bearer '+token}},c);if(!r.ok)return null;const body=await r.json();return body.role==='superadmin'&&typeof body.email==='string'&&Number.isFinite(body.expires_at)&&body.expires_at>Date.now()/1000?body:null}catch{return null}}
-export async function ssoRoute(req,env){const path=new URL(req.url).pathname;if(!['/api/sso/start','/api/sso/callback','/api/sso/logout'].includes(path))return null;
+export async function ssoUser(req,env){if(env.SSO_LOGIN_MODE==='local')return ssoEnabled(env)?localUser(req,env):null;const c=ssoConfig(env);if(!c)return null;const token=read(req,COOKIE);if(!/^[-_A-Za-z0-9]{43}$/.test(token))return null;try{const r=await call(c.issuer+'/userinfo?'+new URLSearchParams({client_id:c.clientId}),{headers:{Authorization:'Bearer '+token}},c);if(!r.ok)return null;const body=await r.json();return body.role==='superadmin'&&typeof body.email==='string'&&Number.isFinite(body.expires_at)&&body.expires_at>Date.now()/1000?body:null}catch{return null}}
+export async function ssoRoute(req,env){if(env.SSO_LOGIN_MODE==='local')return ssoEnabled(env)?localLoginRoute(req,env):new Response('Login belum diaktifkan.',{status:404});const path=new URL(req.url).pathname;if(!['/api/sso/start','/api/sso/callback','/api/sso/logout'].includes(path))return null;
  if(!ssoEnabled(env))return new Response('Login pusat belum diaktifkan.',{status:404,headers:noStore});
  const config=ssoConfig(env);if(!config)return new Response('Konfigurasi login pusat belum lengkap.',{status:503,headers:noStore});
  const url=new URL(req.url),callback=url.origin+'/api/sso/callback';
