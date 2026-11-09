@@ -15,6 +15,13 @@
       "when": 1794211200000,
       "tag": "0001_tekken",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794214800000,
+      "tag": "0002_portal_requests",
+      "breakpoints": true
     }
   ]
 }

@@ -10,7 +10,7 @@
  function choices(){const out={};for(const id of Object.keys(matches)){try{const value=JSON.parse(localStorage.getItem(prefix+id)||'{}');if(Object.keys(value).length)out[id]=value}catch{}}return out}
  function snapshot(){return isBracket?{n,need,names,scores,roundSettings,liveMatches,playerPhotos,selections:choices(),demo:dummyActive}:selections}
  function dirty(){return loaded&&JSON.stringify(snapshot())!==baseline}
- window.tekkenAuth=async()=>{if(!admin){location.assign('/login?return_to=%2Ftekken%2F');return}try{await api('/api/admin/logout','POST',{});location.assign('/')}catch(error){info(error.message)}};
+ window.tekkenAuth=async()=>{if(!admin){location.assign('/login?return_to=%2Ftekken%2F');return}try{const result=await api('/api/admin/logout','POST',{});location.assign(result.home_url||'/')}catch(error){info(error.message)}};
  async function load(){try{
   const auth=await api('/api/admin/session');admin=auth.admin===true;save.hidden=!admin;
   if(isBracket){const response=await api(base+'/tournament');version=response.version;if(response.data){const value=response.data;n=value.n;need=value.need;names=value.names;scores=value.scores;roundSettings=value.roundSettings;liveMatches=value.liveMatches;playerPhotos=value.playerPhotos;dummyActive=value.demo;dummyKeys=Object.keys(value.selections);$('count').value=String(n);$('format').value=String(need);$('names').value=names.join('\n');build();for(const id of Object.keys(matches)){if(value.selections[id])localStorage.setItem(prefix+id,JSON.stringify(value.selections[id]));else localStorage.removeItem(prefix+id)}$('clearDummy').hidden=!dummyActive;}toggleAdmin(admin);

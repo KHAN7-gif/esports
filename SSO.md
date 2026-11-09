@@ -1,3 +1,7 @@
+# Home-only login update
+
+The next change is prepared on `home-login-only` for login only at https://khan7-gif.github.io/esports/. See [HOME_LOGIN.md](HOME_LOGIN.md) for tested behavior and the required Site visibility decision before activation. The deployment documented below remains the current live flow until then.
+
 # BOST, LEL, Tekken and eFLL on Sites
 
 Portal: https://esports-login.apengtakahashi.chatgpt.site/

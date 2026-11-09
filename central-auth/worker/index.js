@@ -31,7 +31,7 @@ async function credentials(env){
 }
 async function setupAccount(req,env){
  const identity=req.headers.get('oai-authenticated-user-email');
- if(!env.SETUP_OWNER_EMAIL||identity?.toLowerCase()!==env.SETUP_OWNER_EMAIL.toLowerCase()||!req.headers.get('oai-authenticated-user-id'))return page('<h1>Akses pemilik diperlukan</h1><p>Buka melalui akaun ChatGPT pemilik Site untuk menyediakan akaun pusat.</p>',403);
+ if(!env.SETUP_OWNER_EMAIL||identity?.toLowerCase()!==env.SETUP_OWNER_EMAIL.toLowerCase()||!req.headers.get('oai-authenticated-user-id'))return page('<h1>Akses pemilik diperlukan</h1><p>Buka melalui akaun ChatGPT pemilik Site untuk menyediakan akaun pusat.</p><a href="/signin-with-chatgpt?return_to=%2Fsetup" target="_top">Sahkan akaun pemilik</a>',403);
  if(ready(await credentials(env)))return page('<h1>Akaun pusat sudah disediakan</h1><p>Buka halaman admin subweb untuk log masuk.</p>',409);
  if(req.method==='GET'){const csrf=random();return page(`<small>MAIDA ESPORTS · PEMILIK SITE</small><h1>Sediakan akaun pusat</h1><p>Pilih satu e-mel dan kata laluan untuk semua subweb. Kata laluan tidak disimpan sebagai teks biasa.</p><form method="post" action="/setup"><input type="hidden" name="csrf" value="${csrf}"><label>E-mel admin<input name="email" type="email" required maxlength="254" autocomplete="username" value="${escape(identity)}"></label><label>Kata laluan baharu<input name="password" type="password" required minlength="12" maxlength="256" autocomplete="new-password"></label><label>Sahkan kata laluan<input name="confirm" type="password" required minlength="12" maxlength="256" autocomplete="new-password"></label><button>Simpan akaun pusat</button></form>`,200,[cookie(CSRF_COOKIE,csrf,600)])}
  if(req.method!=='POST')return json({error:'Method not allowed'},405);
@@ -127,3 +127,7 @@ export async function externalLogout(req,env){
 
 export async function centralIdentity(req,env){const current=await credentials(env);if(!ready(current))return null;const active=await session(req,current);return active?{email:active.email,role:'superadmin',expires_at:active.expires_at}:null;}
 export async function centralLogout(req,env){const current=await credentials(env);return ready(current)?externalLogout(req,current):cookie(SESSION_COOKIE,'',0);}
+export async function portalAccountConfig(env){return credentials(env);}
+export async function portalPasswordMatches(env,email,password){return passwordMatches(env,email,password);}
+export async function portalRevision(env){return credentialVersion(env);}
+export async function clientIdentity(req,env,clientId){const current=await credentials(env);if(!ready(current))return null;const token=readCookie(req,'__Host-esports-sso');if(!/^[-_A-Za-z0-9]{43}$/.test(token))return null;const row=await env.DB.prepare('SELECT s.email,s.expires_at FROM sso_tokens t JOIN sso_sessions s ON s.id=t.session_id WHERE t.id=? AND t.client_id=? AND t.expires_at>? AND s.expires_at>? AND s.credential_version=?').bind(await sha(token),clientId,now(),now(),await credentialVersion(current)).first();return row?{...row,role:'superadmin'}:null;}
