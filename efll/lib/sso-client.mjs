@@ -3,7 +3,7 @@ const FLOW='__Host-esports-flow';
 const b64=bytes=>btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const random=()=>b64(crypto.getRandomValues(new Uint8Array(32)));
 const read=(req,name)=>(req.headers.get('Cookie')||'').split(';').map(c=>c.trim()).find(c=>c.startsWith(name+'='))?.slice(name.length+1)||'';
-const cookie=(name,value,age)=>`${name}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${age}`;
+const cookie=(name,value,age)=>`${name}=${value}; Path=/; HttpOnly; Secure; SameSite=${name===FLOW?'None':'Lax'}; Max-Age=${age}`;
 const noStore={'Cache-Control':'no-store','Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff'};
 function redirect(location,cookies=[]){const headers=new Headers({...noStore,Location:location});cookies.forEach(c=>headers.append('Set-Cookie',c));return new Response(null,{status:303,headers})}
 export function ssoEnabled(env){return env.SSO_ENABLED==='true'||env.SSO_ENABLED==='auto'}
@@ -31,11 +31,20 @@ export async function ssoRoute(req,env){const path=new URL(req.url).pathname;if(
   const target=new URL(config.issuer+'/authorize');target.search=new URLSearchParams({client_id:config.clientId,redirect_uri:callback,state,code_challenge:challenge,code_challenge_method:'S256'}).toString();
   return redirect(target.href,[cookie(FLOW,flow,300)]);
  }
+ let failure='FLOW_MISSING';
  try{
-  const raw=read(req,FLOW);if(raw.length>2048)throw Error('Invalid flow');const flow=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(raw.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0))));
+  const raw=read(req,FLOW);if(!raw)throw Error('Missing flow');failure='FLOW_INVALID';if(raw.length>2048)throw Error('Invalid flow');const flow=JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(raw.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0))));
   if(!/^[-_A-Za-z0-9]{43}$/.test(flow.state||'')||flow.state!==url.searchParams.get('state')||!/^[-_A-Za-z0-9]{43}$/.test(flow.verifier||'')||!Number.isFinite(flow.created)||Date.now()-flow.created>300000||flow.created>Date.now()||!/^[-_A-Za-z0-9]{43}$/.test(url.searchParams.get('code')||''))throw Error('Invalid flow');
-  const response=await call(config.issuer+'/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({client_id:config.clientId,redirect_uri:callback,code:url.searchParams.get('code'),code_verifier:flow.verifier})},config);if(!response.ok)throw Error('Exchange rejected');
+  failure='EXCHANGE_NETWORK';
+  const response=await call(config.issuer+'/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({client_id:config.clientId,redirect_uri:callback,code:url.searchParams.get('code'),code_verifier:flow.verifier})},config);if(!response.ok){failure='EXCHANGE_HTTP_'+response.status;throw Error('Exchange rejected')}
+  failure='TOKEN_INVALID';
   const body=await response.json();if(!/^[-_A-Za-z0-9]{43}$/.test(body.access_token||'')||!Number.isInteger(body.expires_in)||body.expires_in<=0||body.expires_in>28800)throw Error('Invalid token');
   return redirect('/admin',[cookie(COOKIE,body.access_token,body.expires_in),cookie(FLOW,'',0)]);
- }catch{return new Response('Login gagal atau tamat. Buka /api/sso/start untuk cuba semula.',{status:400,headers:{...noStore,'Set-Cookie':cookie(FLOW,'',0)}})}
+ }catch(error){
+  // Log only a fixed stage and error type; never codes, cookies, tokens or URLs.
+  console.warn('esports_sso_callback',JSON.stringify({client:config.clientId,stage:failure,error:error instanceof Error?error.name:'Error'}));
+  const html=`<!doctype html><html lang="ms"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sambung login esports</title><body style="font:16px system-ui;max-width:32rem;margin:12vh auto;padding:24px;line-height:1.6"><h1>Sambung login esports</h1><p>Sesi sementara login tidak dapat disahkan. Mulakan semula dari pautan di bawah.</p><p><a href="/api/sso/start">Cuba semula</a></p><p>Gunakan pelayar dan tab yang sama sepanjang proses login.</p><small>Rujukan: ${failure}</small></body></html>`;
+  return new Response(html,{status:400,headers:{...noStore,'Content-Type':'text/html; charset=utf-8','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; base-uri 'none'; frame-ancestors 'none'",'Set-Cookie':cookie(FLOW,'',0)}})
+ }
+
 }
