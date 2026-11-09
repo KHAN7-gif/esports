@@ -1,6 +1,6 @@
 # The Elite → the-elite.esukan.app
 
-The Elite menjadi pusat login bersama dan hos dashboard kejohanan serta Tekken. Rujuk [SSO.md](SSO.md) untuk status rollout dan konfigurasi subweb.
+Konfigurasi ini hanya untuk The Elite. LEL dan BOTS tidak diubah.
 Worker menyajikan laman sedia ada dan API D1. Supabase tidak lagi diperlukan untuk The Elite.
 Database baharu bermula tanpa pelumba; tiada data lama diimport atau dummy dimasukkan secara automatik.
 

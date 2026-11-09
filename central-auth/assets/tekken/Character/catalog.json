@@ -1,0 +1,46 @@
+{
+  "Asuka Kazama": {
+    "image": "https://tk8.tekken-official.jp/images/character/asuka/btn.png",
+    "source": "official-link"
+  },
+  "Claudio Serafino": {
+    "image": "https://tk8.tekken-official.jp/images/character/claudio/btn.png",
+    "source": "official-link"
+  },
+  "Clive Rosfield": {
+    "image": "https://tk8.tekken-official.jp/images/character/clive/btn.png",
+    "source": "official-link"
+  },
+  "Devil Jin": {
+    "image": "https://tk8.tekken-official.jp/images/character/devil_jin/btn.png",
+    "source": "official-link"
+  },
+  "Jack-8": {
+    "image": "https://tk8.tekken-official.jp/images/character/jack8/btn.png",
+    "source": "official-link"
+  },
+  "Jun Kazama": {
+    "image": "https://tk8.tekken-official.jp/images/character/jun/btn.png",
+    "source": "official-link"
+  },
+  "King": {
+    "image": "https://tk8.tekken-official.jp/images/character/king/btn.png",
+    "source": "official-link"
+  },
+  "Miary Zo": {
+    "image": "https://tk8.tekken-official.jp/images/character/miary_zo/btn.png",
+    "source": "official-link"
+  },
+  "Raven": {
+    "image": "https://tk8.tekken-official.jp/images/character/raven/btn.png",
+    "source": "official-link"
+  },
+  "Shaheen": {
+    "image": "https://tk8.tekken-official.jp/images/character/shaheen/btn.png",
+    "source": "official-link"
+  },
+  "Yoshimitsu": {
+    "image": "https://tk8.tekken-official.jp/images/character/yoshimitsu/btn.png",
+    "source": "official-link"
+  }
+}

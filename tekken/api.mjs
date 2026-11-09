@@ -1,10 +1,10 @@
-import {validateTournament,validateSelection,resolved,MAX_TOURNAMENT_BYTES} from '../tekken/model.mjs';
+import {validateTournament,validateSelection,resolved,MAX_TOURNAMENT_BYTES} from './model.mjs';
 const json=(body,status=200)=>Response.json(body,{status,headers:{'Cache-Control':'no-store'}});
 async function body(req){const reader=req.body?.getReader();if(!reader)throw Error('Data diperlukan.');const chunks=[];let size=0;while(true){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>MAX_TOURNAMENT_BYTES+4096){await reader.cancel();throw Error('Data terlalu besar. Gunakan pautan imej HTTPS.');}chunks.push(value)}const bytes=new Uint8Array(size);let offset=0;for(const part of chunks){bytes.set(part,offset);offset+=part.length}return JSON.parse(new TextDecoder().decode(bytes))}
 export async function handleTekken(req,env,authorized){const url=new URL(req.url),path=url.pathname;if(!env.DB)return json({error:'Database belum tersedia.'},503);try{
  if(req.method!=='GET'&&(req.method!=='PUT'||req.headers.get('Origin')!==url.origin))return json({error:'Permintaan tidak sah.'},403);
  if(!['/api/tekken/tournament','/api/tekken/selection','/api/tekken/match'].includes(path))return json({error:'Not found'},404);
- if(req.method==='PUT'&&!await authorized())return json({error:'Log masuk The Elite diperlukan.'},403);
+ if(req.method==='PUT'&&!await authorized())return json({error:'Log masuk pusat diperlukan.'},403);
  const row=await env.DB.prepare("SELECT data,version FROM tekken_tournaments WHERE id='main'").first();
  if(req.method==='GET'){if(path==='/api/tekken/tournament')return json({data:row?JSON.parse(row.data):null,version:row?.version??0});if(path==='/api/tekken/match'&&row){const data=JSON.parse(row.data),id=url.searchParams.get('id'),match=resolved(data)[id];if(match)return json({data:{id,players:[match.a||'TBD',match.b||'TBD'],score:match.score,format:match.format,datetime:match.datetime,live:!!data.liveMatches[id],photos:data.playerPhotos,selection:data.selections[id]||{}},version:row.version})}return json({error:'Simpan bracket dahulu atau pilih perlawanan yang sah.'},404)}
  if(path==='/api/tekken/match')return json({error:'Method not allowed'},405);

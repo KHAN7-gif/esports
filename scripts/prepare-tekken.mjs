@@ -3,7 +3,7 @@ import path from 'node:path';
 // Preserve the existing static prototype. Build secure server-backed pages only
 // into the Elite Worker assets, where authentication and persistence exist.
 export async function prepareTekken(root,out){
- await cp(path.join(root,'tekken'),path.join(out,'tekken'),{recursive:true,filter:source=>!source.endsWith('model.mjs')});
+ await cp(path.join(root,'tekken'),path.join(out,'tekken'),{recursive:true,filter:source=>!source.endsWith('.mjs')});
  for(const filename of ['index.html','match-v3.html']){
   let html=await readFile(path.join(root,'tekken',filename),'utf8');html=html.replaceAll('tekken-selection-','esports-tekken-selection-');
   if(filename==='index.html'){

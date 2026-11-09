@@ -2,7 +2,7 @@ import {centralLoginEnabled} from '../../../sso-auth';
 import {env} from 'cloudflare:workers';
 import {checkPassword,issueSession,sessionCookie} from '../../../admin-auth';
 export const dynamic='force-dynamic';
-export async function POST(req:Request){if(centralLoginEnabled())return Response.json({error:'Gunakan login pusat.',loginUrl:'/api/sso/start'},{status:409});
+export async function POST(req:Request){if(await centralLoginEnabled())return Response.json({error:'Gunakan login pusat.',loginUrl:'/api/sso/start'},{status:409});
  if(req.headers.get('origin')!==new URL(req.url).origin)return Response.json({error:'Permintaan tidak sah.'},{status:403});
  try{
  const body=await req.json() as {email?:unknown;password?:unknown};if(typeof body.email!=='string'||typeof body.password!=='string'||body.email.length>254||body.password.length>256)return Response.json({error:'E-mel atau kata laluan tidak sah.'},{status:400});

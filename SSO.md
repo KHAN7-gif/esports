@@ -1,36 +1,33 @@
-# Shared admin login through The Elite
+# BOST, LEL, Tekken and eFLL on Sites
 
-The Elite is the login issuer. Keep its existing ADMIN_EMAIL, ADMIN_PASSWORD_HASH, ADMIN_PASSWORD_SALT, ADMIN_SESSION_SECRET and Turnstile secrets. No new admin account or standalone login setup is required.
+Portal: https://esports-login.apengtakahashi.chatgpt.site/
+Tekken: https://esports-login.apengtakahashi.chatgpt.site/tekken/
+Owner setup: https://esports-login.apengtakahashi.chatgpt.site/setup
 
-## Routes and modules
+The four requested modules share one Sites login. The Elite is excluded; its original source/deployment scripts have been restored and no Elite production deployment is part of this change. No customer Cloudflare API token is required. Sites still manages the underlying hosting/storage infrastructure.
 
-- Main dashboard: `https://the-elite.esukan.app/esports`.
-- Tekken with server persistence: `https://the-elite.esukan.app/tekken/`.
-- Existing eFLL, BOTM and LEL origins remain in use, linked from that dashboard. Their admin pages use The Elite via S256 PKCE when SSO is activated. This does not merge all apps into one origin.
-- Provider: `https://the-elite.esukan.app/sso`; exact callback registrations are in `sso/clients.json`.
+The portal links the existing BOST, LEL and eFLL Sites and hosts Tekken directly. Those three Sites retain their own URLs, audiences and tournament databases; this is one portal/login rather than a rewrite into one origin. Tekken state lives in the portal's separate DB table, created through a new additive Sites migration.
 
-The Elite validates credentials and Turnstile using its current login form. Its verified session can grant short-lived, one-use codes for the other apps. No alternative password endpoint or bootstrap is exposed on the Elite provider. The apps verify audience-bound opaque sessions server-side. Logging out at The Elite or confirming global logout revokes the shared session. Credential/session-secret rotation invalidates shared sessions.
+## Account and activation
+
+Open `/setup` as the Site owner, ChatGPT email `apengtakahashi@gmail.com`. Choose the shared account email/password on that page. The one-time insert cannot overwrite an existing account. Passwords are salted PBKDF2 hashes; no plaintext password is stored, committed or collected in chat.
+
+Client configuration uses `SSO_ENABLED=auto`, `SSO_ISSUER=https://esports-login.apengtakahashi.chatgpt.site`, and client IDs `bots`, `lel`, `efll`. `SSO_SERVICE_TOKEN` is the private portal's Sites service-access credential, set through native tools as a runtime secret. It is sent only by servers to the configured issuer. Never print it or commit it.
+
+Automatic activation preserves legacy BOST/LEL authentication only while the authenticated issuer health endpoint explicitly reports that no shared account exists. Once the owner saves the account, clients switch to SSO without another deploy. Issuer errors/malformed responses fail closed rather than permit legacy credentials. The eFLL admin also joins this shared account; it has no separately configured legacy password.
+
+PKCE S256, exact HTTPS callback registration, host-only HttpOnly cookies, single-use authorization codes and audience-bound tokens protect login. Admin requests verify sessions at the issuer. `/account` changes the shared credentials after verifying the current password and invalidates all sessions. `/logout` revokes the central session for all modules. Browser form pages use same-origin referrer policy so same-origin POST Origin checks work without leaking cross-origin referrers.
 
 ## Tekken
 
-The build removes the demo password from the active hosted bracket and match-detail pages. The original GitHub Pages prototype stays unchanged while production deployment is blocked. Legacy hosted match URLs redirect to the current secured detail page. Admin access comes from the real Elite session. Public tournament reads stay available; every write requires authenticated same-origin access. Save/Reload controls persist rosters, brackets, round formats/dates, scores, LIVE flags, photos and Character/Map selections. Version checks return 409 rather than overwrite another device's changes. Images accept HTTPS or bounded JPEG/PNG/WebP data URLs, with a 1.5 MB tournament limit. The server validates identifiers, scores and roster sizes, and computes match detail from the stored bracket.
+Secure hosted pages are built from the retained static prototype. The live portal has no demo password. Server APIs validate unique 8/16/32-player rosters, bracket/match IDs, score ranges, media URLs and a 1.5 MB payload limit. GET reads are public within the existing private portal boundary. Every PUT requires the shared admin session and same-origin access. Save and selection updates use optimistic versions and reject stale writes with 409.
 
-Existing browser-only draft selections are not deleted; server-backed drafts use a new storage namespace. Nothing is automatically imported from a visitor's browser or seeded into the database. Tekken starts with the existing placeholder bracket until an admin explicitly saves.
+Existing browser-only prototype selections are not deleted or silently imported. Hosted drafts use a distinct local namespace; saved rosters, scores, LIVE flags, dates, Character/Map selections and photos persist in the portal database. The separate GitHub Pages prototype stays unchanged.
 
-## Rollout status
+## Build and checks
 
-Code, 25 SQLite/API tests, three Vinext client builds and a Worker dry-run passed. Mobile browser QA with mocked API responses passed roster editing, save/reload, Character selection and public read-only controls without JavaScript errors.
+`node central-auth/build.mjs` produces a self-contained Worker with inline portal/Tekken assets and migration metadata, without dependency installation or direct Cloudflare deployment. `node --test central-auth/tests/*.test.mjs` covers the built portal, owner setup, login, save/refresh, logout and protocol errors. `central-auth/tests/serve-portal.mjs` plus `portal-browser.py` run a real local HTTPS browser test against SQLite. Never deploy the QA harness.
 
-The live Elite deployment attempt stopped at migration `0006_esports_sso_tekken.sql` with Cloudflare error 7500 (permission denied). The existing live worker/login was not replaced by that attempt. Client code is staged with SSO disabled; do not enable clients before the issuer deployment succeeds.
+`node scripts/sync-sso.mjs --check` verifies the portable client copies. Build each Vinext Site before native publication. Source identity and runtime configuration stay separate; preserve Site audiences. Client rollback uses SSO_ENABLED=false plus a native redeploy and retains existing legacy credentials.
 
-The managed environment's CLOUDFLARE_ACCOUNT_ID was a database UUID. API discovery confirmed the actual account as `1cf4264cff741f90be639418170e1248` and the existing Elite D1 database as `ed96447c-0b38-4f30-b7fd-024b032b76e3`. Use that existing database. The configured API token needs Account D1 Edit and Workers Scripts Edit for this account. Preserve existing production secret bindings and Turnstile site key. Never paste tokens/passwords into chat or Git.
-
-After token permissions are repaired:
-
-1. Run the existing Elite deployment script with the correct account/database IDs and current Turnstile site key. The script applies only pending migrations; it does not reset existing driver/registration data. Confirm `/api/admin/config`, `/esports`, `/tekken/` and the empty/new Tekken API response.
-2. On eFLL, BOTM and LEL, set `SSO_ISSUER=https://the-elite.esukan.app/sso`, `SSO_CLIENT_ID=efll|bots|lel`, and `SSO_ENABLED=true`, then deploy the saved SSO-enabled source version. No private Sites service token is needed for the public Elite issuer. Preserve each Site's audience and database.
-3. Test real admin login with Turnstile, cross-app login, save/refresh and global logout. Do not collect the password in chat. The live credential flow remains unverified until these checks run.
-
-Rollback: disable client SSO and redeploy; keep old admin secrets available. Disable SSO_PROVIDER_ENABLED on Elite if needed. The schema-only migration adds tables and does not change existing competition tables.
-
-The earlier private `esports-login` Site is a superseded prototype. Its `/setup` page is not part of this rollout; do not create a new shared account there.
+The original `0000_auth.sql` migration is preserved. `0001_tekken.sql` adds only the Tekken table. No existing tournament or registration records are reset.

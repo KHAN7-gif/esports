@@ -1,0 +1,241 @@
+<!doctype html><html lang="ms"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>TEKKEN 8 — Double Elimination</title><style>:root{font-family:Inter,system-ui,Arial;background:#080d1d;color:#eff4ff}*{box-sizing:border-box}body{margin:0}header{position:sticky;top:0;z-index:10;padding:17px 20px;background:#101831;border-bottom:1px solid #2d3652;display:flex;justify-content:space-between;align-items:center;gap:10px}h1{font-size:19px;margin:0}small,.muted{color:#96a5c5}.controls{display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:16px 20px}select,button,input{font:inherit}select,button{border:1px solid #394767;background:#151f3c;color:white;border-radius:9px;padding:9px 12px}button{cursor:pointer}button:hover{background:#24355d}.pill{background:#263356;color:#aebfe4;border-radius:20px;padding:6px 11px;font-size:12px}.board{padding:0 20px 38px}h2{font-size:16px;color:#e4ebff;margin:24px 0 12px}.scroll{overflow:auto;touch-action:pan-x pan-y;padding:8px 3px 22px;border-top:1px solid #263352}.rounds{display:flex;align-items:stretch;gap:42px;min-width:max-content}.round{width:240px;display:flex;flex-direction:column;gap:12px}.rt{min-height:30px;font-size:13px;font-weight:700;color:#a7c6ff;border-bottom:1px solid #2d3f61;padding-bottom:12px}.round-settings{display:none;gap:7px;margin:4px 0 10px;padding:10px;border:1px solid #354463;border-radius:9px;background:#121b30}.round-settings.open{display:grid}.round-settings label{display:flex;flex-direction:column;gap:4px;font-size:11px;color:#aebfe4}.round-settings select,.round-settings input{width:100%;min-width:0;background:#202c46;color:white;border:1px solid #475778;border-radius:6px;padding:7px;font-size:12px}.match-time{font-size:10px;color:#a4c5f8;padding:1px 4px 7px}.match-format{font-size:10px;color:#f3c7d6;background:#483047;border-radius:4px;padding:2px 5px;margin-left:5px}.matches{display:flex;flex-direction:column;justify-content:space-around;flex:1;min-height:220px;gap:18px}.match{border:1px solid #3c4866;background:#151d32;border-radius:9px;padding:6px;position:relative;box-shadow:0 8px 20px #0002}.match:after{content:'';position:absolute;right:-43px;top:50%;width:42px;border-top:1px solid #51627e}.round:last-child .match:after{display:none}.mid{font-size:10px;color:#728cb7;margin:2px 4px 5px}.player{display:grid;grid-template-columns:1fr 40px;align-items:center;gap:5px;padding:4px 6px;border-radius:5px}.player+ .player{border-top:1px solid #2c3853}.player span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}.score{width:40px;background:#24314e;border:1px solid #354769;border-radius:5px;color:#fff;padding:6px 0;text-align:center}.player.winner{background:#173c34}.player.winner .score{background:#279d6a}.player.lose{opacity:.62}.score:disabled{opacity:.5}.score{cursor:pointer}.result-stack{display:flex;flex-direction:column;align-items:flex-end;gap:7px;margin:8px 4px 2px auto;width:max-content;max-width:100%}.sets{display:grid;grid-template-columns:repeat(3,64px);gap:6px;margin:0;justify-content:end}.sets.five{grid-template-columns:repeat(5,52px)}.setbox{border:1px solid #344461;background:#202b45;border-radius:5px;padding:5px 2px;text-align:center;font-size:11px;color:#b6c8e8;cursor:pointer;min-height:62px}.setbox b{display:block;color:#fff;font-size:12px;margin-top:3px}.setbox.unplayed b{color:#7d8da9}.score-popup{position:fixed;inset:0;z-index:80;background:#000b;display:flex;align-items:center;justify-content:center;padding:16px}.score-panel{width:min(370px,100%);border:1px solid #4c5a7b;background:#151f38;border-radius:16px;padding:18px;box-shadow:0 22px 80px #0008}.number-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0}.number-grid button{padding:15px 0;font-weight:700}.dual-score{display:grid;grid-template-columns:1fr;gap:14px;margin:14px 0}.dual-player{border:1px solid #34476d;background:#1a2440;border-radius:12px;padding:12px}.dual-player h4{margin:0 0 10px;font-size:15px;color:#eff4ff}.dual-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.dual-grid button{padding:13px 0;font-weight:700}.set-result{font-size:11px;color:#a7bbde;text-align:right;max-width:320px;line-height:1.4}.score{appearance:none}.notice{color:#aab7d3;font-size:12px;margin:0 20px 16px}.names{margin:10px 20px 12px}.names summary{cursor:pointer;color:#aabfff}.names textarea{width:min(100%,580px);height:115px;margin-top:10px;background:#121c37;border:1px solid #425274;border-radius:8px;color:#fff;padding:10px}footer{padding:20px;font-size:12px;color:#8290ac}@media(max-width:600px){header{padding:13px 12px}h1{font-size:15px}.board{padding:0 12px}.controls{padding:12px}.round{width:208px}.rounds{gap:28px}.match:after{width:28px;right:-29px}.result-stack{width:100%;align-items:flex-end}.sets{grid-template-columns:repeat(3,58px)}.sets.five{grid-template-columns:repeat(5,44px)}.setbox{min-height:58px}.set-result{max-width:100%}} .admin-only{display:none}body.admin .admin-only{display:inline-flex}body.admin .names{display:block}body:not(.admin) .names{display:none}body:not(.admin) .score{pointer-events:none}body.admin .editable{cursor:pointer}body.admin .editable:hover{outline:1px dashed #ef4d78;outline-offset:2px}.round-tools{display:flex;gap:5px;align-items:center;justify-content:space-between}.edit-hint{font-size:10px;color:#97a8c9}.round-settings{margin-top:8px}.inline-editor{width:100%;min-width:0;background:#24314e;color:white;border:1px solid #e75a89;border-radius:5px;padding:5px;font-size:12px}#loginDialog{border:1px solid #3b4b70;border-radius:14px;background:#131d37;color:white;max-width:min(92vw,390px);padding:24px}#loginDialog::backdrop{background:#000a}.auth-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}#loginDialog input{width:100%;padding:11px;margin-top:12px;border-radius:8px;background:#22304e;color:#fff;border:1px solid #485a82}.rt{cursor:default}body.admin .rt{cursor:pointer} /* Version 5: scores in player-aligned columns */.round{width:355px}.score-table{--set-count:3;min-width:0;margin-top:7px}.score-table-head,.score-table-row{display:grid;grid-template-columns:minmax(85px,1fr) repeat(var(--set-count),32px) 38px;gap:3px;align-items:center}.score-table-head{font-size:10px;font-weight:700;color:#a7bce3;text-align:center;margin-bottom:5px;padding:0 3px}.score-table-head span:first-child{text-align:left}.score-table-head span:last-child{color:#f5c6d7}.score-table-row{padding:4px 3px;border-radius:5px;min-height:43px}.score-table-row+.score-table-row{border-top:1px solid #33405e}.score-table-row.winner{background:#173c34}.score-table-row.lose{opacity:.73}.score-name{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:2px}.score-table-row button{padding:7px 0;min-width:0;border-radius:5px;font-size:12px}.round-score{background:#24314e;border:1px solid #354769}.score-table-row.winner>.score{background:#279d6a}.score-table-row .score{width:38px}.score-table-row button:disabled{opacity:1;cursor:default}.score-table-row button:disabled.round-score{color:#bcc5d8}.score-table-row button:disabled.score{color:#eff4ff}@media(max-width:600px){.round{width:335px}.score-table-head,.score-table-row{grid-template-columns:minmax(83px,1fr) repeat(var(--set-count),30px) 36px;gap:3px}.score-table-row .score{width:36px}} .match-head{display:flex;justify-content:space-between;align-items:center;min-height:25px;gap:8px}.match-actions{display:flex;align-items:center;gap:6px}.match-actions button{padding:3px 8px;font-size:10px;border-radius:6px;min-height:26px}.live-indicator{font-size:10px;font-weight:800;letter-spacing:.08em;color:#77839c;background:#182239;border:1px solid #3b4966}.live-indicator.active{color:#fff;background:#d61e38;border-color:#ff6275;animation:livePulse 1.15s infinite}.live-indicator:disabled{opacity:1;cursor:default}.collapse-button{background:#26314c;color:#e1e9ff;font-size:17px!important;line-height:1;padding:1px 8px!important}.match.is-collapsed .match-body{display:none}@keyframes livePulse{0%,100%{box-shadow:0 0 0 0 #ef233c55;opacity:1}50%{box-shadow:0 0 0 4px #ef233c22;opacity:.65}}.player-identity{display:flex;align-items:center;min-width:0;gap:7px}.player-avatar{width:29px;height:29px;flex-shrink:0;border-radius:7px;object-fit:cover;border:1px solid #4a5d80;background:#263956}.avatar-empty{display:flex;align-items:center;justify-content:center;color:#8c9bb3}.player-identity .score-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}@media(max-width:600px){.player-avatar{height:24px;width:24px}.player-identity{gap:5px}.match-actions{gap:4px}} .compact-winner{display:flex;align-items:center;gap:9px;padding:6px 5px 3px;min-width:0}.compact-winner-name{font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}.compact-winner-score{font-size:13px;background:#237958;color:white;padding:4px 9px;border-radius:5px}.compact-pending{font-size:11px;color:#8291b0;padding:3px 0}.match.is-collapsed .match-head{border-bottom:1px solid #2c3853;padding-bottom:4px} .more-button{background:#243450;color:#d5e7ff;border:1px solid #496184;font-weight:700}.more-button.selected{background:#365477;border-color:#80a9e9}.match:not(.is-collapsed) .match-body{padding-top:2px}.score-table-head{letter-spacing:.02em}@media(max-width:600px){.match-actions .more-button{font-size:10px;padding:4px 7px}} .bracket-match{padding:6px 7px 7px;cursor:zoom-in}.bracket-match-head{display:flex;align-items:center;justify-content:space-between;min-height:23px;margin-bottom:3px}.bracket-live{font-size:9px;font-weight:800;background:#ca2039;color:#fff;border-radius:4px;padding:3px 6px;animation:livePulse 1.1s infinite}.bracket-player{display:grid;grid-template-columns:minmax(0,1fr) 34px;align-items:center;gap:5px;min-height:37px;border:1px solid #33415e;background:#171f35;padding:3px 3px 3px 5px}.bracket-player:first-of-type{border-radius:5px 5px 0 0}.bracket-player:last-child{border-radius:0 0 5px 5px}.bracket-player.winner{background:#1c3936}.bracket-player.lose{opacity:.75}.bracket-final{background:#5b6474;color:#fff;border:0;border-radius:3px;padding:6px 0;min-width:32px;font-weight:700;font-size:13px}.bracket-player.winner .bracket-final{background:#28a36f}.bracket-final:disabled{opacity:1;cursor:default}.bracket-match .player-avatar{width:25px;height:25px}.bracket-match .score-name{font-size:12px}.bracket-match .mid{margin:1px 4px}@media(max-width:600px){.bracket-match .player-avatar{width:23px;height:23px}.bracket-player{min-height:35px}} .tabs{position:sticky;top:67px;z-index:8;display:flex;gap:5px;overflow-x:auto;white-space:nowrap;background:#101831;border-bottom:1px solid #2e3a59;padding:8px 12px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab-button{flex:none;border:0;background:transparent;color:#9aaacb;border-bottom:3px solid transparent;border-radius:0;padding:11px 14px;font-weight:650}.tab-button.active{color:#fff;border-bottom-color:#ef4d78}.dashboard-panel{padding:18px 20px 35px;max-width:1000px;margin:auto}.dashboard-heading{font-size:21px}.dash-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.dash-card{padding:14px 10px;border:1px solid #364561;border-radius:10px;background:#151e34;display:flex;flex-direction:column;gap:8px}.dash-card strong{font-size:23px}.dash-card small{font-size:11px}.dash-list{display:grid;gap:9px;margin-top:12px}.dash-match{display:flex;flex-direction:column;gap:6px;text-align:left;width:100%;padding:14px;background:#151e34;border:1px solid #364561;border-radius:9px;margin:8px 0;font-size:13px}.dash-match small{color:#aab9d3}.dash-filter{width:100%;max-width:340px}.standings-scroll{overflow-x:auto}.dash-table{width:100%;border-collapse:collapse;min-width:330px;text-align:left}.dash-table td,.dash-table th{padding:12px 8px;border-bottom:1px solid #2b3c58}.dash-table th{font-size:12px;color:#9fb2d6}.panel-hint,.empty-state{color:#9caccb;font-size:13px}#bracketPanel[hidden],#otherPanel[hidden]{display:none!important}@media(max-width:600px){.tabs{top:77px}.dashboard-panel{padding:14px 12px}.dash-card strong{font-size:20px}.tab-button{padding:9px 11px}}  .selection-stats-list{display:grid;gap:10px;margin-top:15px}.selection-stat-row{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid #364561;border-radius:10px;background:#151e34}.selection-stat-rank{width:24px;flex:none;color:#92a4c9;font-size:12px}.selection-stat-image,.selection-stat-placeholder{width:53px;height:53px;flex:none;object-fit:contain;border-radius:8px;background:#263651;border:1px solid #44577a}.selection-stat-placeholder{display:grid;place-items:center;color:#9cb1d6}.selection-stat-info{display:flex;flex-direction:column;gap:5px;min-width:0;flex:1}.selection-stat-info strong{font-size:13px;overflow-wrap:anywhere}.selection-stat-info small{font-size:11px;color:#91a3c5}.selection-stat-total{font-size:21px;color:#f7faff;background:#263c60;padding:7px 12px;border-radius:8px;min-width:43px;text-align:center}@media(max-width:500px){.selection-stat-row{gap:8px;padding:8px}.selection-stat-image,.selection-stat-placeholder{width:42px;height:42px}.selection-stat-total{font-size:16px;padding:6px 8px;min-width:32px}} .character-search{width:100%;margin:10px 0 16px;padding:12px 14px;color:#eff4ff;background:#17233b;border:1px solid #405373;border-radius:9px}.character-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:9px}.character-tile{position:relative;padding:5px;border:1px solid #354765;background:linear-gradient(145deg,#253c57,#111d31);border-radius:9px;display:flex;align-items:center;flex-direction:column;gap:5px;min-width:0;overflow:hidden}.character-tile:hover,.character-tile.selected{border-color:#ed487a;background:#2b3c59}.character-tile-image,.character-gallery-placeholder{width:100%;height:94px;object-fit:contain;border-radius:6px;background:#1d344b}.character-gallery-placeholder{display:grid;place-items:center;color:#9cafcb;font-size:11px}.character-tile-name{font-size:11px;font-weight:700;line-height:1.25;text-align:center;min-height:27px}.character-tile-count{position:absolute;top:8px;right:8px;border-radius:5px;background:#cc2757;color:#fff;padding:3px 6px;font-size:10px;font-weight:800}.character-detail{margin-top:22px;padding:16px;border:1px solid #435778;background:#141f36;border-radius:13px}.character-detail[hidden]{display:none}.character-detail-heading{display:flex;align-items:center;justify-content:space-between}.character-detail-heading h3{margin:0 0 13px}.character-detail-close{font-size:22px;padding:2px 12px}.character-detail-hero{display:flex;align-items:center;gap:16px}.character-detail-image{width:125px;height:140px;object-fit:contain;background:#20314b;border-radius:9px}.character-detail-hero>.character-gallery-placeholder{width:125px;height:140px;flex:none}.character-detail-metrics{flex:1;min-width:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.character-detail-metrics .dash-card{padding:9px 6px}.character-detail-metrics .dash-card strong{font-size:20px}.character-match-row{display:grid;grid-template-columns:1fr auto;gap:5px;padding:12px 0;border-bottom:1px solid #2f405e}.character-match-row strong{font-size:12px}.character-match-row small{grid-column:1;color:#93a8cc}.character-match-row span{grid-column:2;grid-row:1/3;font-weight:700}@media(max-width:550px){.character-gallery{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.character-tile-image,.character-gallery-placeholder{height:70px}.character-tile-name{font-size:9px}.character-detail-hero{align-items:stretch;gap:8px}.character-detail-image,.character-detail-hero>.character-gallery-placeholder{width:85px;height:110px}.character-detail-metrics{grid-template-columns:1fr;gap:4px}.character-detail-metrics .dash-card{padding:5px 7px;gap:2px}.character-detail-metrics .dash-card strong{font-size:15px}.character-detail-metrics .dash-card small{font-size:9px}}.dummy-tournament-btn{background:#bf2454;border-color:#e24b7a;color:#fff;font-weight:700}.dummy-tournament-btn:hover{background:#da3065}#clearDummy:not([hidden]){background:#263451;border-color:#506283}#clearDummy[hidden]{display:none} </style></head><body><header><div><h1>TEKKEN 8 <span style="color:#ef4d78">/</span> BRACKET</h1><small>Double Elimination Tournament</small></div><div style="display:flex;align-items:center;gap:8px"><span class="pill" id="mode">PUBLIC VIEW</span><button id="auth">Admin Login</button></div></header><section class="controls admin-only"><label>Players <select id="count"><option>8</option><option selected>16</option><option>32</option></select></label><label>Default Format <select id="format"><option value="2">BO3</option><option value="3">BO5</option></select></label><button id="reset">Reset scores</button><button id="demo">Demo results</button><button id="dummyTournament" class="dummy-tournament-btn" type="button">Dummy Tournament</button><button id="clearDummy" type="button" hidden>Reset Dummy</button><span id="summary" class="muted"></span></section><details class="names"><summary>Edit nama peserta (satu nama setiap baris)</summary><textarea id="names"></textarea><p><button id="apply">Apply players</button></p></details><p class="notice admin-only">Admin: double-click tajuk setiap round untuk edit BO3 / BO5 serta tarikh dan masa. Klik skor akhir untuk pilih 0–3, atau skor R1/R2/R3 (dan R4/R5 bagi BO5) untuk pilih 0–3 bagi setiap pemain. Jumlah kemenangan round dikira automatik; pemenang mara selepas mencapai BO3 (2) atau BO5 (3). Skor yang berubah akan mengosongkan keputusan hiliran yang tidak lagi sepadan. Jika juara Losers menang Grand Final pertama, Grand Final Reset diaktifkan.</p><nav class="tabs" id="tabs" aria-label="Tournament sections"></nav><section id="tab-content"><main class="board" id="bracketPanel"><h2>UPPER BRACKET <small>· Winners</small></h2><div class="scroll"><div class="rounds" id="winners"></div></div><h2>LOWER BRACKET <small>· Losers</small></h2><div class="scroll"><div class="rounds" id="losers"></div></div><h2>GRAND FINAL</h2><div class="scroll"><div class="rounds" id="finals"></div></div></main><section class="dashboard-panel" id="otherPanel" hidden></section></section><footer>Tekken 8 · 8 / 16 / 32 players · Akaun admin pusat · Simpan keputusan ke server</footer><script>
+let dummyActive=false,dummyKeys=[];let activeTab='Brackets';let n=16,need=2,matches={},rounds={},scores={},names=[],roundSettings={},admin=false;let liveMatches={},collapsedMatches={},playerPhotos={},expandedMatches={};const $=id=>document.getElementById(id);
+function init(){n=+$('count').value;need=+$('format').value;names=Array.from({length:n},(_,i)=>names[i]||`Player ${i+1}`);$('names').value=names.join('\n');scores={};roundSettings={};build();render()}
+function make(id,sourceA,sourceB){matches[id]={id,sourceA,sourceB};return id}
+function ref(id,type='win'){return {id,type}}
+function build(){matches={};rounds={w:[],l:[],g:[]};let k=Math.log2(n);for(let r=0;r<k;r++){let arr=[];for(let j=0;j<n/2**(r+1);j++){let a=r===0?{seed:j*2}:{...ref(rounds.w[r-1][j*2])},b=r===0?{seed:j*2+1}:{...ref(rounds.w[r-1][j*2+1])};arr.push(make(`W${r+1}-${j+1}`,a,b))}rounds.w.push(arr)}
+// Losers bracket has 2(k-1) rounds: first from W1 losers, even rounds introduce new W losers.
+for(let t=1;t<=2*k-2;t++){let count=n/Math.pow(2,Math.floor((t+3)/2));let arr=[];for(let j=0;j<count;j++){let a,b;if(t===1){a=ref(rounds.w[0][2*j],'lose');b=ref(rounds.w[0][2*j+1],'lose')}else if(t%2===0){a=ref(rounds.l[t-2][j]);b=ref(rounds.w[t/2][count-1-j],'lose')}else{a=ref(rounds.l[t-2][2*j]);b=ref(rounds.l[t-2][2*j+1])}arr.push(make(`L${t}-${j+1}`,a,b))}rounds.l.push(arr)}rounds.g=[[make('GF-1',ref(rounds.w[k-1][0]),ref(rounds.l.at(-1)[0]))],[make('GF-RESET',ref('GF-1','fromA'),ref('GF-1','fromB'))]]}
+function roundKey(id){if(id.startsWith('GF-'))return id==='GF-1'?'g-0':'g-1';let m=id.match(/^([WL])(\d+)-/);return (m[1]==='W'?'w-':'l-')+(Number(m[2])-1)}
+function setting(key){return roundSettings[key]||(roundSettings[key]={need,datetime:''})}
+function formatDateTime(value){if(!value)return 'Tarikh & masa: belum ditetapkan';let date=new Date(value);return isNaN(date)?'Tarikh & masa: belum ditetapkan':new Intl.DateTimeFormat('ms-MY',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(date)}
+function recompute(){const resolved={};for(let key of [...rounds.w.flat(),...rounds.l.flat(),'GF-1','GF-RESET']){let m=matches[key];let get=s=>s.seed!==undefined?names[s.seed]:(s.type==='fromA'?resolved[s.id]?.a:s.type==='fromB'?resolved[s.id]?.b:s.type==='lose'?resolved[s.id]?.loser:resolved[s.id]?.winner);let a=get(m.sourceA),b=get(m.sourceB);if(key==='GF-RESET'&&resolved['GF-1']?.winner!==resolved['GF-1']?.b){a=null;b=null}let old=scores[key],valid=old&&old.aName===a&&old.bName===b&&a&&b;let s=valid?old:null;if(!valid)delete scores[key];if(s&&Array.isArray(s.sets)&&s.sets.some(r=>r.a!==null&&r.b!==null)){let av=0,bv=0;for(let r of s.sets.slice(0,setting(roundKey(key)).need*2-1)){if(r.a===null||r.b===null||r.a===r.b)continue;if(r.a>r.b)av++;else bv++}s.a=av;s.b=bv}let win=s&&(s.a>=setting(roundKey(key)).need&&s.a>s.b?a:s.b>=setting(roundKey(key)).need&&s.b>s.a?b:null);resolved[key]={a,b,winner:win,loser:win?(win===a?b:a):null,score:s}}return resolved}
+function editOnDouble(element,callback){element.classList.add('editable');element.title='Double-click / double-tap untuk edit';element.addEventListener('dblclick',e=>{if(!admin)return;e.stopPropagation();callback()});let lastTap=0;element.addEventListener('touchend',e=>{if(!admin)return;let now=Date.now();if(now-lastTap<350){e.preventDefault();callback()}lastTap=now},{passive:false})}
+function playerAvatar(name){let img=el('img','player-avatar');img.alt='Foto '+name;img.loading='lazy';let svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#263956"/><circle cx="32" cy="24" r="12" fill="#8ba6d4"/><path d="M9 64c1-19 10-28 23-28s22 9 23 28" fill="#8ba6d4"/></svg>';img.src=playerPhotos[name]||'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);img.onerror=()=>{img.onerror=null;img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)};if(admin){img.title='Double-click untuk ubah URL gambar pemain';editOnDouble(img,()=>{let url=prompt('URL gambar pemain '+name,playerPhotos[name]||'');if(url!==null){url=url.trim();if(url&&!/^https:\/\//i.test(url)){alert('Sila gunakan URL gambar https://');return}if(url)playerPhotos[name]=url;else delete playerPhotos[name];render()}})}return img}
+function changeName(oldName,newName){newName=newName.trim();if(!newName||newName===oldName)return;let idx=names.indexOf(oldName);if(idx>=0){names[idx]=newName;if(playerPhotos[oldName]){playerPhotos[newName]=playerPhotos[oldName];delete playerPhotos[oldName]}scores={};$('names').value=names.join('\n');render()}}
+function inlineName(element,oldName){let field=el('input','inline-editor');field.value=oldName;element.replaceWith(field);field.focus();field.select();const save=()=>changeName(oldName,field.value);field.addEventListener('blur',save,{once:true});field.addEventListener('keydown',e=>{if(e.key==='Enter')field.blur();if(e.key==='Escape')render()})}
+function toggleAdmin(on){admin=on;document.body.classList.toggle('admin',on);$('mode').textContent=on?'ADMIN · EDIT MODE':'PUBLIC VIEW';$('auth').textContent=on?'Log out':'Admin Login';render()}
+function el(tag,klass,text){let e=document.createElement(tag);if(klass)e.className=klass;if(text!==undefined)e.textContent=text;return e}
+function render(){let state=recompute();for(let [kind,target] of [['w','winners'],['l','losers'],['g','finals']]){let root=$(target);root.replaceChildren();rounds[kind].forEach((round,i)=>{let col=el('div','round'),h=el('div','rt',kind==='w'?(i===rounds.w.length-1?'Winners Final':`Winners Round ${i+1}`):kind==='l'?(i===rounds.l.length-1?'Losers Final':`Losers Round ${i+1}`):(i?'Grand Final Reset':'Grand Final'));col.append(h);
+let cfgKey=`${kind}-${i}`,cfg=setting(cfgKey),controls=el('div','round-settings');
+let lblFormat=el('label','','Format perlawanan'),select=el('select');
+for(let [val,text] of [[2,'BO3 · First to 2'],[3,'BO5 · First to 3']]){let opt=el('option','',text);opt.value=val;opt.selected=cfg.need===val;select.append(opt)}
+select.addEventListener('change',()=>{cfg.need=Number(select.value);round.forEach(id=>delete scores[id]);render()});lblFormat.append(select);controls.append(lblFormat);
+let lblDate=el('label','','Tarikh & masa'),dateInput=el('input');dateInput.type='datetime-local';dateInput.value=cfg.datetime||'';
+dateInput.addEventListener('change',()=>{cfg.datetime=dateInput.value;render()});lblDate.append(dateInput);controls.append(lblDate);col.append(controls);if(admin){let tip=el('div','edit-hint','Double-click tajuk untuk BO3/BO5 & tarikh/masa');col.append(tip);editOnDouble(h,()=>controls.classList.toggle('open'))}
+let stack=el('div','matches');round.forEach(id=>{let st=state[id],m=el('div','match bracket-match');
+m.title='Double-click / double-tap untuk detail perlawanan';
+let openDetail=()=>{let state=recompute()[id],config=setting(roundKey(id));let payload={id,players:[state.a||'TBD',state.b||'TBD'],score:state.score||null,format:config.need===2?'BO3':'BO5',datetime:config.datetime||'',live:!!liveMatches[id],photos:playerPhotos,selection:JSON.parse(localStorage.getItem('esports-tekken-selection-'+id)||'{}')};window.open('match-v3.html#'+encodeURIComponent(JSON.stringify(payload)),'_blank','noopener')};
+m.addEventListener('dblclick',e=>{if(e.target.closest('button,input,select'))return;openDetail()});
+let lastTap=0;m.addEventListener('touchend',e=>{if(e.target.closest('button,input,select'))return;let now=Date.now();if(now-lastTap<360){e.preventDefault();openDetail()}lastTap=now},{passive:false});
+let head=el('div','bracket-match-head');head.append(el('span','mid',id));if(liveMatches[id])head.append(el('span','bracket-live','LIVE'));m.append(head);
+['a','b'].forEach(side=>{let name=st[side],row=el('div','bracket-player'+(st.winner===name&&name?' winner':st.loser===name&&name?' lose':''));let identity=el('div','player-identity');if(name)identity.append(playerAvatar(name));else identity.append(el('span','player-avatar avatar-empty','?'));let label=el('span','score-name',name||'TBD');if(admin&&name)editOnDouble(label,()=>inlineName(label,name));identity.append(label);row.append(identity);let value=st.score?.[side];let score=el('button','bracket-final',value===null||value===undefined?'–':String(value));score.disabled=!admin||!st.a||!st.b;score.title=admin?'Klik untuk ubah keputusan akhir':'Keputusan akhir';score.addEventListener('click',()=>openScorePicker(id,side,'final'));row.append(score);m.append(row)});stack.append(m)});
+col.append(stack);root.append(col)})}$('summary').textContent=`${n} players • ${Object.values(state).filter(x=>x.winner).length} completed matches`;renderTabContent(state)}
+
+function renderTabContent(state){
+ const tabNames=['Overview','Brackets','Standings','Matches','Stats','Character','Map'];
+ const nav=$('tabs');nav.replaceChildren();
+ tabNames.forEach(name=>{const btn=el('button','tab-button'+(activeTab===name?' active':''),name);btn.type='button';btn.addEventListener('click',()=>{activeTab=name;renderTabContent(recompute())});nav.append(btn)});
+ $('bracketPanel').hidden=activeTab!=='Brackets';
+ const panel=$('otherPanel');panel.hidden=activeTab==='Brackets';panel.replaceChildren();
+ if(activeTab==='Brackets')return;
+ const all=Object.keys(state).map(id=>({id,...state[id]})).filter(m=>m.a||m.b);
+ const completed=all.filter(m=>m.winner),ongoing=all.filter(m=>m.a&&m.b&&!m.winner);
+ const heading=el('h2','dashboard-heading',activeTab);panel.append(heading);
+ const card=(title,value)=>{let b=el('div','dash-card');b.append(el('small','',title));b.append(el('strong','',String(value)));return b};
+ const summary=el('div','dash-summary');
+ const metrics={Overview:[['Players',n],['Completed',completed.length],['Pending',all.length-completed.length]],Stats:[['Completed',completed.length],['Active matchups',ongoing.length],['Participants',n]]};
+ if(metrics[activeTab]){metrics[activeTab].forEach(v=>summary.append(card(...v)));panel.append(summary)}
+ const more=(id)=>{let match=state[id],cfg=setting(roundKey(id));let payload={id,players:[match.a||'TBD',match.b||'TBD'],score:match.score||null,format:cfg.need===2?'BO3':'BO5',datetime:cfg.datetime||'',live:!!liveMatches[id],photos:playerPhotos,selection:JSON.parse(localStorage.getItem('esports-tekken-selection-'+id)||'{}')};window.open('match-v3.html#'+encodeURIComponent(JSON.stringify(payload)),'_blank','noopener')};
+ if(activeTab==='Character'||activeTab==='Map'){
+    renderSelectionStats(panel,state,activeTab);return;
+ }
+ if(activeTab==='Overview'){
+  let recent=completed.slice(-5).reverse();panel.append(el('h3','','Recent results'));
+  if(!recent.length)panel.append(el('p','empty-state','Belum ada keputusan perlawanan.'));
+  recent.forEach(m=>{let row=el('button','dash-match',m.winner+'  ·  '+m.id+'  ·  '+m.score.a+'–'+m.score.b);row.addEventListener('click',()=>more(m.id));panel.append(row)});
+  panel.append(el('p','panel-hint','Lihat carta penuh di tab Brackets.'));
+ }else if(activeTab==='Matches'){
+  let filter=el('select','dash-filter');['All Matches','Completed','Pending'].forEach(x=>{let opt=el('option','',x);opt.value=x;filter.append(opt)});panel.append(filter);let list=el('div','dash-list');panel.append(list);
+  const draw=()=>{list.replaceChildren();all.filter(m=>filter.value==='Completed'?!!m.winner:filter.value==='Pending'?!m.winner:true).forEach(m=>{let row=el('button','dash-match');row.append(el('small','',m.id+' · '+(m.winner?'FULL TIME':liveMatches[m.id]?'LIVE':'PREVIEW')));row.append(el('strong','', (m.a||'TBD')+'  '+(m.score?.a??'–')+' : '+(m.score?.b??'–')+'  '+(m.b||'TBD')));row.addEventListener('click',()=>more(m.id));list.append(row)});if(!list.children.length)list.append(el('p','empty-state','Tiada perlawanan untuk penapis ini.'))};filter.addEventListener('change',draw);draw();
+ }else{
+  const standings=names.map(name=>{let played=0,w=0,l=0,roundsWon=0,roundsLost=0;completed.forEach(m=>{if(m.a!==name&&m.b!==name)return;played++;if(m.winner===name)w++;else l++;const first=m.a===name;roundsWon+=first?m.score.a:m.score.b;roundsLost+=first?m.score.b:m.score.a});return{name,played,w,l,roundsWon,roundsLost}}).sort((a,b)=>b.w-a.w||a.l-b.l||b.roundsWon-a.roundsWon||a.name.localeCompare(b.name));
+  if(activeTab==='Standings')panel.append(el('p','panel-hint','Kedudukan sementara berdasarkan kemenangan dan kekalahan perlawanan.'));
+  else panel.append(el('p','panel-hint','Statistik pemain dikira daripada keputusan perlawanan yang telah lengkap.'));
+  let holder=el('div','standings-scroll'),table=el('table','dash-table'),thead=el('tr');(activeTab==='Standings'?['#','Player','P','W','L']:['Player','Matches','Wins','Losses','Sets W','Sets L']).forEach(t=>thead.append(el('th','',t)));table.append(thead);standings.forEach((p,i)=>{let tr=el('tr');let cols=activeTab==='Standings'?[i+1,p.name,p.played,p.w,p.l]:[p.name,p.played,p.w,p.l,p.roundsWon,p.roundsLost];cols.forEach(v=>tr.append(el('td','',String(v))));table.append(tr)});holder.append(table);panel.append(holder)
+ }
+}
+
+
+const tekkenRoster=["Alisa Bosconovitch","Anna Williams","Armor King","Asuka Kazama","Azucena Milagros Ortiz Castillo","Bob","Bryan Fury","Claudio Serafino","Clive Rosfield","Devil Jin","Eddy Gordo","Fahkumram","Feng Wei","Heihachi Mishima","Hwoarang","Jack-8","Jin Kazama","Jun Kazama","Kazuya Mishima","King","Kuma","Kunimitsu","Lars Alexandersson","Lee Chaolan","Leo","Leroy Smith","Lidia Sobieska","Lili","Ling Xiaoyu","Marshall Law","Miary Zo","Nina Williams","Panda","Paul Phoenix","Raven","Reina","Sergei Dragunov","Shaheen","Steve Fox","Victor Chevalier","Yoshimitsu","Zafina"];
+let tournamentCatalogs={Character:{},Map:{}};
+async function loadTournamentCatalogs(){
+  try {
+    const [c,m]=await Promise.all(['Character/catalog.json','Map/catalog.json'].map(url=>fetch(url,{cache:'no-cache'}).then(r=>r.ok?r.json():{}).catch(()=>({}))));
+    tournamentCatalogs={Character:c,Map:m};
+    if(activeTab==='Character'||activeTab==='Map')renderTabContent(recompute());
+  }catch(e){}
+}
+function readMatchSelection(id){
+  try {const value=JSON.parse(localStorage.getItem('esports-tekken-selection-'+id)||'{}');return value&&typeof value==='object'?value:{}}catch(e){return {}}
+}
+function renderSelectionStats(panel,state,tab){
+ const isChar=tab==='Character',catalog=tournamentCatalogs[tab]||{};
+ const matchIds=Object.keys(state).filter(id=>state[id]?.a||state[id]?.b);
+ const counts=new Map();
+ let matchesWithSelection=0,totalSlots=0;
+ for(const id of matchIds){
+   const selection=readMatchSelection(id),m=state[id];
+   const picks=[];
+   if(isChar){
+     for(let side=0;side<2;side++)for(let r=1;r<=3;r++){
+       const value=selection['char'+side+'_'+r]||(r===1?selection['char'+side]:'');
+       if(value)picks.push(value);
+     }
+   }else{
+     for(let r=1;r<=3;r++){
+       const value=selection['stage'+r]||(r===1?selection.stage:'');
+       if(value)picks.push(value);
+     }
+   }
+   if(picks.length)matchesWithSelection++;
+   totalSlots+=picks.length;
+   for(const value of picks){
+     const item=counts.get(value)||{name:value,picks:0,matches:new Set(),completed:0};
+     item.picks++;
+     item.matches.add(id);
+     if(m.winner)item.completed++;
+     counts.set(value,item);
+   }
+ }
+ if(isChar){
+  renderCharacterGallery(panel,state,counts,catalog);
+  return;
+ }
+ const metrics=el('div','dash-summary');
+ for(const [label,value] of [['Digunakan',counts.size],['Perlawanan direkod',matchesWithSelection],['Jumlah pilihan',totalSlots]]){let card=el('div','dash-card');card.append(el('small','',label));card.append(el('strong','',String(value)));metrics.append(card)}
+ panel.append(metrics);
+ panel.append(el('p','panel-hint',isChar?'Jumlah penggunaan Character 1–3 untuk kedua-dua pemain sepanjang kejohanan.':'Jumlah penggunaan Map/Stage 1–3 sepanjang kejohanan.'));
+ panel.append(el('p','panel-hint','Statistik berdasarkan pilihan yang direkodkan dalam pelayar ini. Tiada penyegerakan antara peranti; kemenangan watak/map tidak dikira tanpa keputusan khusus mengikut round.'));
+ const list=el('div','selection-stats-list');
+ const rows=[...counts.values()].sort((a,b)=>b.picks-a.picks||b.matches.size-a.matches.size||a.name.localeCompare(b.name));
+ if(!rows.length){
+   list.append(el('p','empty-state','Belum ada pilihan '+(isChar?'Character':'Map')+' direkodkan. Buka Match Detail, login Admin dan pilih sehingga 3 slot untuk setiap perlawanan.'));
+ }else rows.forEach((item,i)=>{
+   let row=el('div','selection-stat-row');
+   row.append(el('span','selection-stat-rank',String(i+1).padStart(2,'0')));
+   const imageURL=catalog[item.name]?.image;
+   if(imageURL){const img=el('img','selection-stat-image');img.src=imageURL;img.alt=item.name;img.loading='lazy';img.onerror=()=>{img.replaceWith(el('span','selection-stat-placeholder','?'))};row.append(img)}
+   else row.append(el('span','selection-stat-placeholder',isChar?'◉':'▧'));
+   let info=el('div','selection-stat-info');info.append(el('strong','',item.name));info.append(el('small','',item.matches.size+' perlawanan · '+item.completed+' pilihan dalam perlawanan selesai'));row.append(info);
+   let score=el('strong','selection-stat-total',String(item.picks));row.append(score);
+   list.append(row);
+ });
+ panel.append(list);
+}
+
+
+function renderCharacterGallery(panel,state,counts,catalog){
+ panel.append(el('p','panel-hint','Pilih gambar Character untuk melihat statistik pilihan dan perlawanan berkaitan.'));
+ panel.append(el('p','panel-hint','Data direkodkan dalam pelayar ini sahaja. Pilihan Character tidak semestinya menunjukkan watak yang digunakan dalam setiap round.'));
+ let search=el('input','character-search');search.type='search';search.placeholder='Cari Character...';search.setAttribute('aria-label','Cari Character');
+ panel.append(search);
+ let grid=el('div','character-gallery');panel.append(grid);
+ let detail=el('section','character-detail');detail.hidden=true;panel.append(detail);
+ const names=[...new Set([...tekkenRoster,...Object.keys(catalog),...counts.keys()])].sort((a,b)=>a.localeCompare(b));
+ let selected=null;
+ function openCharacter(name){
+  selected=name;detail.hidden=false;detail.replaceChildren();
+  const item=counts.get(name)||{picks:0,matches:new Set(),completed:0};
+  const title=el('div','character-detail-heading');
+  title.append(el('h3','',name));
+  let close=el('button','character-detail-close','×');close.title='Tutup statistik';close.setAttribute('aria-label','Tutup statistik');close.onclick=()=>{selected=null;detail.hidden=true;draw()};title.append(close);detail.append(title);
+  const hero=el('div','character-detail-hero');
+  const url=catalog[name]?.image;
+  if(url){let image=el('img','character-detail-image');image.src=url;image.alt=name;image.onerror=()=>image.replaceWith(el('div','character-gallery-placeholder','TIADA GAMBAR'));hero.append(image)}
+  else hero.append(el('div','character-gallery-placeholder','TIADA GAMBAR'));
+  const metrics=el('div','character-detail-metrics');
+  [['Jumlah pilihan',item.picks],['Perlawanan',item.matches.size],['Perlawanan selesai',item.completed]].forEach(([label,value])=>{const c=el('div','dash-card');c.append(el('small','',label));c.append(el('strong','',String(value)));metrics.append(c)});
+  hero.append(metrics);detail.append(hero);
+  detail.append(el('h3','','Senarai perlawanan'));
+  const ids=[...item.matches];
+  if(!ids.length) detail.append(el('p','empty-state','Belum ada rekod Character ini dalam perlawanan.'));
+  else ids.forEach(id=>{let st=state[id];let row=el('div','character-match-row');let names=[st?.a||'TBD',st?.b||'TBD'];let sideUsed=[];
+    const picks=readMatchSelection(id);
+    for(let side=0;side<2;side++)for(let n=1;n<=3;n++)if((picks['char'+side+'_'+n]||(n===1?picks['char'+side]:'') )===name){sideUsed.push(names[side]+' · Character '+n)}
+    row.append(el('strong','',id+'  ·  '+names.join(' vs ')));
+    row.append(el('small','',sideUsed.join(' | ')||'Direkodkan'));
+    let score=(st?.score?.a??'–')+' : '+(st?.score?.b??'–');row.append(el('span','',score));detail.append(row)});
+  draw();
+  detail.scrollIntoView({behavior:'smooth',block:'nearest'});
+ }
+ function draw(){
+  grid.replaceChildren();
+  let visible=names.filter(n=>n.toLowerCase().includes(search.value.trim().toLowerCase()));
+  if(!visible.length){grid.append(el('p','empty-state','Tiada Character ditemui.'));return}
+  visible.forEach(name=>{
+   const used=counts.get(name)?.picks||0;
+   let btn=el('button','character-tile'+(name===selected?' selected':''));btn.type='button';btn.title='Lihat statistik '+name;
+   const image=catalog[name]?.image;
+   if(image){let img=el('img','character-tile-image');img.src=image;img.loading='lazy';img.alt=name;img.onerror=()=>img.replaceWith(el('span','character-gallery-placeholder','?'));btn.append(img)}
+   else btn.append(el('span','character-gallery-placeholder','?'));
+   btn.append(el('span','character-tile-name',name));
+   btn.append(el('span','character-tile-count',String(used)));
+   btn.addEventListener('click',()=>openCharacter(name));
+   grid.append(btn);
+  });
+ }
+ search.addEventListener('input',draw);draw();
+}
+
+
+const demoCharacters=['King','Jun Kazama','Devil Jin','Yoshimitsu','Claudio Serafino','Miary Zo','Raven','Asuka Kazama','Clive Rosfield','Jack-8','Shaheen'];
+const demoStages=['Arena','Yakushima','Urban Square','Rebel Hangar','Coliseum of Fate','Sanctum','Elegant Palace','Ortiz Farm','Celebration on the Seine'];
+function clearDummyTournament(){
+  for(const id of dummyKeys){try{localStorage.removeItem('esports-tekken-selection-'+id)}catch(e){}}
+  dummyKeys=[];dummyActive=false;
+  $('clearDummy').hidden=true;
+  names=Array.from({length:n},(_,i)=>'Player '+(i+1));$('names').value=names.join('\n');
+  scores={};roundSettings={};liveMatches={};playerPhotos={};render();
+}
+function generateDummyTournament(){
+  if(!admin)return;
+  if(!confirm('Jana keputusan penuh dan statistik dummy? Data peserta serta skor semasa akan diganti dalam paparan ini.'))return;
+  for(const id of dummyKeys){try{localStorage.removeItem('esports-tekken-selection-'+id)}catch(e){}}
+  dummyKeys=[];
+  const roster=['MDE Squal','Sagat Q','MDE Puslifian','King Slayer','Jun Master','Tekken Ace','Devil Hunter','Phoenix','Iron Fist','Night Raven','Yoshi Pro','Claudio X','Miary Fighter','Asuka Star','Clive Hero','Jack Eight','Shaheen X','Mishima Pro','Hwoarang Ace','Reina Queen','Lars Legend','Feng Warrior','Armor King','Rage Drive','Nina Fury','Zafina X','Lee Chaolan','Kazuya Pro','Eddy Gordo','Steve Boxer','Paul Phoenix','Jin Storm'];
+  names=Array.from({length:n},(_,i)=>roster[i]||'Player '+(i+1));
+  $('names').value=names.join('\n');scores={};roundSettings={};
+  const ids=[...rounds.w.flat(),...rounds.l.flat(),'GF-1','GF-RESET'];
+  for(let i=0;i<ids.length;i++){
+    const id=ids[i],state=recompute()[id];if(!state?.a||!state?.b)continue;
+    const cfg=setting(roundKey(id));cfg.need=id.startsWith('GF')?3:(i%5===0?3:2);
+    const count=cfg.need*2-1;
+    const winSide=(i*7+Math.floor(i/4))%4===0?'b':'a';
+    const loseSide=winSide==='a'?'b':'a';
+    // Force GF-1 to be won by the lower bracket so that reset final is shown.
+    const winner=id==='GF-1'?'b':id==='GF-RESET'?'a':winSide;
+    let w=0,l=0,sets=[];
+    for(let r=0;r<count;r++){
+      const side=(r===1&&cfg.need===2)?(winner==='a'?'b':'a'):winner;
+      const need=Math.min(cfg.need,Math.max(0,cfg.need-w));
+      const currentWinner=side===winner;
+      const a=side==='a'?2+(r%2):1;
+      const b=side==='b'?2+(r%2):1;
+      sets.push({a,b});if(currentWinner)w++;else l++;
+      if(w>=cfg.need)break;
+    }
+    scores[id]={aName:state.a,bName:state.b,a:winner==='a'?w:l,b:winner==='b'?w:l,sets};
+    let selection={};
+    for(let side=0;side<2;side++)for(let r=1;r<=3;r++){
+      selection['char'+side+'_'+r]=demoCharacters[(i*3+side*5+r-1)%demoCharacters.length];
+    }
+    for(let r=1;r<=3;r++)selection['stage'+r]=demoStages[(i*2+r-1)%demoStages.length];
+    try{localStorage.setItem('esports-tekken-selection-'+id,JSON.stringify(selection));dummyKeys.push(id)}catch(e){}
+  }
+  dummyActive=true;$('clearDummy').hidden=false;activeTab='Overview';render();
+}
+
+function openScorePicker(id,side,type,roundIndex=0){if(!admin)return;let state=recompute()[id];if(!state.a||!state.b)return;let existing=scores[id]||{aName:state.a,bName:state.b,a:null,b:null,sets:[]};if(!Array.isArray(existing.sets))existing.sets=[];let overlay=el('div','score-popup');let panel=el('div','score-panel');let title=el('h3','',type==='final'?'KEPUTUSAN AKHIR · 0–3':`ROUND R${roundIndex+1} · 0–3`);title.style.margin='0 0 8px';panel.append(title);if(type==='final'){const caption=el('div','muted',side==='a'?state.a:state.b);panel.append(caption);let grid=el('div','number-grid');for(let v=0;v<=3;v++){let btn=el('button','',String(v));btn.addEventListener('click',()=>{existing[side]=v;existing.sets=[];scores[id]=existing;overlay.remove();render()});grid.append(btn)}panel.append(grid)}else{const caption=el('div','muted','Tetapkan skor round ini untuk setiap pemain.');panel.append(caption);while(existing.sets.length<=roundIndex)existing.sets.push({a:null,b:null});let wrap=el('div','dual-score');[['a',state.a],['b',state.b]].forEach(([sd,name])=>{let box=el('div','dual-player');box.append(el('h4','',name));let grid=el('div','dual-grid');for(let v=0;v<=3;v++){let btn=el('button','',String(v));if(existing.sets[roundIndex][sd]===v)btn.style.borderColor='#ee5d8b';btn.addEventListener('click',()=>{existing.sets[roundIndex][sd]=v;existing.a=null;existing.b=null;scores[id]=existing;overlay.remove();render()});grid.append(btn)}box.append(grid);wrap.append(box)});panel.append(wrap)}let reset=el('button','','Kosongkan skor');reset.addEventListener('click',()=>{if(type==='final'){existing.a=null;existing.b=null;existing.sets=[]}else{while(existing.sets.length<=roundIndex)existing.sets.push({a:null,b:null});existing.sets[roundIndex]={a:null,b:null};existing.a=null;existing.b=null}scores[id]=existing;overlay.remove();render()});panel.append(reset);let close=el('button','','Tutup');close.style.marginLeft='8px';close.addEventListener('click',()=>overlay.remove());panel.append(close);overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove()});overlay.append(panel);document.body.append(overlay)}
+$('auth').addEventListener('click',()=>window.tekkenAuth?.());$('count').addEventListener('change',init);$('format').addEventListener('change',()=>{need=+$('format').value;roundSettings={};scores={};render()});$('reset').addEventListener('click',()=>{scores={};render()});$('apply').addEventListener('click',()=>{let lines=$('names').value.split('\n').map(s=>s.trim());names=Array.from({length:n},(_,i)=>lines[i]||`Player ${i+1}`);scores={};render()});$('dummyTournament').addEventListener('click',generateDummyTournament);$('clearDummy').addEventListener('click',()=>{if(confirm('Padam data Dummy Tournament pada paparan ini?'))clearDummyTournament()});$('demo').addEventListener('click',()=>{scores={};for(let id of [...rounds.w.flat(),...rounds.l.flat(),'GF-1']){let st=recompute()[id];if(st.a&&st.b)scores[id]={aName:st.a,bName:st.b,a:setting(roundKey(id)).need,b:0}}render()});init();loadTournamentCatalogs();window.addEventListener('focus',()=>{if(activeTab==='Character'||activeTab==='Map')renderTabContent(recompute())});window.addEventListener('storage',e=>{if(e.key?.startsWith('esports-tekken-selection-')&&(activeTab==='Character'||activeTab==='Map'))renderTabContent(recompute())});
+</script><script src="./online.js"></script></body></html>

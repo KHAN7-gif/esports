@@ -1,1 +1,26 @@
-{"efll":{"name":"eFLL","redirect_uris":["https://efll-labuan.apengtakahashi.chatgpt.site/api/sso/callback"]},"bots":{"name":"BOTM","redirect_uris":["https://battle-states-efootball.apengtakahashi.chatgpt.site/api/sso/callback"]},"lel":{"name":"LEL","redirect_uris":["https://labuan-efootball-league.apengtakahashi.chatgpt.site/api/sso/callback"]}}
+{
+  "bots": {
+    "name": "BOST",
+    "redirect_uris": [
+      "https://battle-states-efootball.apengtakahashi.chatgpt.site/api/sso/callback"
+    ]
+  },
+  "lel": {
+    "name": "LEL",
+    "redirect_uris": [
+      "https://labuan-efootball-league.apengtakahashi.chatgpt.site/api/sso/callback"
+    ]
+  },
+  "efll": {
+    "name": "eFLL",
+    "redirect_uris": [
+      "https://efll-labuan.apengtakahashi.chatgpt.site/api/sso/callback"
+    ]
+  },
+  "tekken": {
+    "name": "Tekken",
+    "redirect_uris": [
+      "https://esports-login.apengtakahashi.chatgpt.site/portal-callback"
+    ]
+  }
+}

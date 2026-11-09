@@ -1,0 +1,49 @@
+import auth,{centralIdentity,centralLogout} from './index.js';
+import {handleTekken} from './tekken-api.mjs';
+import assets from './assets.generated.js';
+const FLOW='__Host-esports-portal-flow';
+const noStore={'Cache-Control':'no-store','Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff'};
+const cookie=(value,age=300)=>`${FLOW}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${age}`;
+const random=()=>btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const encode=value=>btoa(JSON.stringify(value)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+function redirect(location,cookies=[]){const headers=new Headers({...noStore,Location:location});for(const value of cookies)headers.append('Set-Cookie',value);return new Response(null,{status:303,headers})}
+const readCookie=(req,name)=>(req.headers.get('cookie')||'').split(';').map(s=>s.trim()).find(s=>s.startsWith(name+'='))?.slice(name.length+1)||'';
+async function configured(origin,env){const result=await auth.fetch(new Request(origin+'/health'),env);if(!result.ok)return false;return (await result.json()).configured===true}
+export default {async fetch(req,env,ctx){const url=new URL(req.url),path=url.pathname;try{
+ if(path==='/api/admin/session')return Response.json({admin:!!await centralIdentity(req,env)},{headers:noStore});
+ if(path==='/api/admin/logout'){
+  if(req.method!=='POST'||req.headers.get('Origin')!==url.origin)return new Response('Forbidden',{status:403,headers:noStore});
+  return Response.json({ok:true},{headers:{...noStore,'Set-Cookie':await centralLogout(req,env)}});
+ }
+ if(path.startsWith('/api/tekken/'))return handleTekken(req,env,async()=>!!await centralIdentity(req,env));
+ if(path==='/login'&&req.method==='GET'){
+  if(!await configured(url.origin,env))return redirect('/setup');
+  const target=url.searchParams.get('return_to')==='/tekken/'?'/tekken/':'/';
+  const state=random(),verifier=random(),bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(verifier));
+  const challenge=btoa(String.fromCharCode(...new Uint8Array(bytes))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  const dest=new URL('/authorize',url);dest.search=new URLSearchParams({client_id:'tekken',redirect_uri:url.origin+'/portal-callback',state,code_challenge:challenge,code_challenge_method:'S256'}).toString();
+  return redirect(dest.href,[cookie(encode({state,verifier,target,created:Date.now()}))]);
+ }
+ if(path==='/portal-callback'&&req.method==='GET'){
+  try{const raw=readCookie(req,FLOW);if(raw.length>2048)throw Error('Bad flow');const flow=JSON.parse(atob(raw.replace(/-/g,'+').replace(/_/g,'/')));
+   if(!/^[-_A-Za-z0-9]{43}$/.test(flow.state||'')||flow.state!==url.searchParams.get('state')||!/^[-_A-Za-z0-9]{43}$/.test(flow.verifier||'')||!Number.isFinite(flow.created)||Date.now()-flow.created>300000||flow.created>Date.now()||!['/','/tekken/'].includes(flow.target)||!/^[-_A-Za-z0-9]{43}$/.test(url.searchParams.get('code')||''))throw Error('Bad state');
+   const token=await auth.fetch(new Request(url.origin+'/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({client_id:'tekken',redirect_uri:url.origin+'/portal-callback',code:url.searchParams.get('code'),code_verifier:flow.verifier})}),env);
+   if(!token.ok||!await centralIdentity(req,env))throw Error('Login rejected');return redirect(flow.target,[cookie('',0)]);
+  }catch{return new Response('Sesi login tamat. Buka /login untuk cuba semula.',{status:400,headers:{...noStore,'Set-Cookie':cookie('',0)}})}
+ }
+ if(path==='/authorize'&&!await configured(url.origin,env))return redirect('/setup');
+ if(path==='/admin')return redirect('/login');
+ if(path==='/esports'||path==='/esports/')return redirect('/');
+ if(path==='/tekken')return redirect('/tekken/');
+ if(['/tekken/match.html','/tekken/match-v2.html'].includes(path))return redirect('/tekken/match-v3.html'+url.search);
+ if(path==='/'&&req.method==='GET'){
+  const ready=await configured(url.origin,env),notice=ready?'<p class="intro">Akaun pusat tersedia. Log masuk sekali untuk mengurus empat kejohanan.</p>':'<div class="notice">Persediaan sekali sahaja: <a href="/setup">tetapkan e-mel dan kata laluan pusat</a>. Akses persediaan terhad kepada pemilik portal.</div>';
+  return new Response(assets['portal.html'].replace('{{SETUP_NOTICE}}',notice),{headers:{...noStore,'Content-Type':'text/html;charset=utf-8','X-Frame-Options':'DENY'}});
+ }
+ const key=path==='/tekken/'?'tekken/index.html':path.slice(1);
+ if(req.method==='GET'&&Object.hasOwn(assets,key)){
+  const ext=key.split('.').pop(),type={html:'text/html;charset=utf-8',js:'text/javascript;charset=utf-8',json:'application/json',svg:'image/svg+xml'}[ext]||'text/plain';
+  return new Response(assets[key],{headers:{...noStore,'Content-Type':type,'X-Frame-Options':'DENY'}});
+ }
+ return auth.fetch(req,env,ctx);
+ }catch{return Response.json({error:'Portal tidak tersedia. Cuba semula.'},{status:503,headers:noStore})}},scheduled:(event,env,ctx)=>auth.scheduled?.(event,env,ctx)};

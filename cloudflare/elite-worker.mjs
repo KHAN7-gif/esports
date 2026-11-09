@@ -1,7 +1,3 @@
-import {handleTekken} from './tekken-api.mjs';
-import {handleEliteSso} from './elite-sso.mjs';
-import {externalLogout} from '../central-auth/worker/index.js';
-import {ssoEnabled,ssoUser,ssoRoute} from '../sso/client.mjs';
 const cookieName = '__Host-elite-admin';
 const encoder = new TextEncoder();
 const hex = bytes => Array.from(new Uint8Array(bytes), b => b.toString(16).padStart(2, '0')).join('');
@@ -10,16 +6,11 @@ async function sign(payload, secret) {
  const key=await crypto.subtle.importKey('raw',encoder.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign']);
  return hex(await crypto.subtle.sign('HMAC',key,encoder.encode(payload)));
 }
-export async function legacySession(req,env){
- if(!env.ADMIN_SESSION_SECRET)return null;
- const value=(req.headers.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(cookieName+'='))?.slice(cookieName.length+1)||'';
- const parts=value.split('.'),now=Math.floor(Date.now()/1000),exp=Number(parts[0]);
- if(parts.length!==3||!/^\d+$/.test(parts[0])||exp<=now||exp>now+28800||!equal(parts[2],await sign(parts.slice(0,2).join('.'),env.ADMIN_SESSION_SECRET)))return null;
- return {email:env.ADMIN_EMAIL,expires_at:exp};
-}
 async function authorized(req, env) {
- if(ssoEnabled(env))return !!await ssoUser(req,env);
- return !!await legacySession(req,env);
+ if (!env.ADMIN_SESSION_SECRET) return false;
+ const value=(req.headers.get('cookie')||'').split(';').map(x=>x.trim()).find(x=>x.startsWith(cookieName+'='))?.slice(cookieName.length+1)||'';
+ const parts=value.split('.'), now=Math.floor(Date.now()/1000);
+ return parts.length===3 && /^\d+$/.test(parts[0]) && Number(parts[0])>now && Number(parts[0])<=now+28800 && equal(parts[2],await sign(parts.slice(0,2).join('.'),env.ADMIN_SESSION_SECRET));
 }
 const json=(data,status=200,headers={})=>Response.json(data,{status,headers:{'Cache-Control':'no-store',...headers}});
 const sessionCookie=(value,age=28800)=>`${cookieName}=${value}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=${age}`;
@@ -36,29 +27,19 @@ function validate(row) {
 export default {
  async fetch(req, env) {
   const url=new URL(req.url), path=url.pathname;
-  if(path.startsWith('/api/tekken/'))return handleTekken(req,env,()=>authorized(req,env));
-  if(path.startsWith('/sso/'))return handleEliteSso(req,env,()=>legacySession(req,env));
-  if(path.startsWith('/api/sso/'))return await ssoRoute(req,env)??json({error:'Not found'},404);
-  if(ssoEnabled(env)&&['/admin','/admin/','/elite-admin.html'].includes(path)&&!await authorized(req,env))return Response.redirect(url.origin+'/api/sso/start',303);
   if(!path.startsWith('/api/')) {
    if(path==='/admin/')return Response.redirect(url.origin+'/admin'+url.search,308);
    if(path==='/')url.pathname='/the-elite.html';
-   if(path==='/esports'||path==='/esports/')url.pathname='/esports.html';
-   if(['/tekken/match.html','/tekken/match-v2.html'].includes(path))return Response.redirect(url.origin+'/tekken/match-v3.html'+url.search,308);
-   if(path==='/tekken')return Response.redirect(url.origin+'/tekken/',308);
-   if(path==='/tekken/')url.pathname='/tekken/index.html';
    if(path==='/admin'||path==='/admin/')url.pathname='/elite-admin.html';
    return env.ASSETS.fetch(new Request(url,req));
   }
   try {
    if(!env.DB)return json({error:'Pangkalan data belum tersedia.'},503);
    if(req.method!=='GET'&&req.headers.get('origin')!==url.origin)return json({error:'Origin tidak sah.'},403);
-   if(path==='/api/admin/logout'&&req.method==='POST'&&ssoEnabled(env))return json({ok:true,ssoLogoutUrl:'/api/sso/logout'});
-   if(path==='/api/admin/logout'&&req.method==='POST'){const response=json({ok:true},200,{'Set-Cookie':sessionCookie('',0)});if(env.SSO_PROVIDER_ENABLED==='true')response.headers.append('Set-Cookie',await externalLogout(req,env));return response;}
-   if(path==='/api/admin/config'&&req.method==='GET')return json({ssoLoginUrl:ssoEnabled(env)?'/api/sso/start':null,turnstileSiteKey:env.TURNSTILE_SITE_KEY||'',turnstileConfigured:!!(env.TURNSTILE_SITE_KEY&&env.TURNSTILE_SECRET_KEY)});
+   if(path==='/api/admin/logout'&&req.method==='POST')return json({ok:true},200,{'Set-Cookie':sessionCookie('',0)});
+   if(path==='/api/admin/config'&&req.method==='GET')return json({turnstileSiteKey:env.TURNSTILE_SITE_KEY||'',turnstileConfigured:!!(env.TURNSTILE_SITE_KEY&&env.TURNSTILE_SECRET_KEY)});
    if(path==='/api/admin/session'&&req.method==='GET')return json({admin:await authorized(req,env)});
    if(path==='/api/admin/login'&&req.method==='POST') {
-    if(ssoEnabled(env))return json({error:'Gunakan login pusat.',loginUrl:'/api/sso/start'},409);
     if(!env.ADMIN_EMAIL||!env.ADMIN_PASSWORD_HASH||!env.ADMIN_PASSWORD_SALT||!env.ADMIN_SESSION_SECRET)return json({error:'Admin belum dikonfigurasi.'},503);
     if(!env.TURNSTILE_SITE_KEY||!env.TURNSTILE_SECRET_KEY)return json({error:'Cloudflare Turnstile belum dikonfigurasi.'},503);
     const text=await req.text();if(text.length>8192)return json({error:'Permintaan terlalu besar.'},413);

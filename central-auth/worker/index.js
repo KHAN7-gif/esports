@@ -10,7 +10,7 @@ export const sha=async value=>b64(await crypto.subtle.digest('SHA-256',enc.encod
 const equal=(a,b)=>{if(typeof a!=='string'||typeof b!=='string')return false;let d=a.length^b.length;for(let i=0;i<Math.max(a.length,b.length);i++)d|=(a.charCodeAt(i)||0)^(b.charCodeAt(i)||0);return d===0};
 const readCookie=(req,key)=>(req.headers.get('cookie')||'').split(';').map(v=>v.trim()).find(v=>v.startsWith(key+'='))?.slice(key.length+1)||'';
 const cookie=(name,value,age=MAX_AGE)=>`${name}=${value}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${age}`;
-const headers={'Cache-Control':'no-store','Referrer-Policy':'no-referrer','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"};
+const headers={'Cache-Control':'no-store','Referrer-Policy':'same-origin','X-Content-Type-Options':'nosniff','Content-Security-Policy':"default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'"};
 const json=(value,status=200)=>Response.json(value,{status,headers});
 const redirect=(url,cookies=[])=>{const h=new Headers({...headers,Location:url});cookies.forEach(c=>h.append('Set-Cookie',c));return new Response(null,{status:303,headers:h})};
 const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -44,7 +44,7 @@ async function setupAccount(req,env){
  const hash=hex(await crypto.subtle.deriveBits({name:'PBKDF2',salt,iterations:100000,hash:'SHA-256'},key,256));
  const result=await env.DB.prepare("INSERT OR IGNORE INTO sso_account(id,email,password_hash,password_salt) VALUES('main',?,?,?)").bind(email,hash,hex(salt)).run();
  if(!result.meta.changes)return page('<h1>Akaun sudah disediakan</h1>',409);
- return page('<h1>Akaun pusat siap</h1><p>Akaun telah disimpan. Subweb boleh disambungkan selepas ujian login berjaya. Login lama belum ditukar.</p>',200,[cookie(CSRF_COOKIE,'',0)]);
+ return page('<h1>Akaun pusat siap</h1><p>Akaun telah disimpan. Login pusat kini tersedia untuk BOST, LEL, Tekken dan eFLL.</p><a href="/login">Log masuk dan buka portal</a>',200,[cookie(CSRF_COOKIE,'',0)]);
 }
 async function manageAccount(req,env){
  const active=await session(req,env);if(!active)return page('<h1>Log masuk diperlukan</h1><p>Buka admin subweb untuk log masuk sebelum mengubah akaun pusat.</p>',401);
@@ -70,7 +70,7 @@ export default {async fetch(req,env){
  env=await credentials(env);
  if(path==='/account'&&ready(env))return await manageAccount(req,env);
  if(path==='/health')return json({service:'esports-central-auth',configured:ready(env)});
- if(!ready(env))return page('<h1>Login pusat belum tersedia</h1><p>Pentadbir perlu melengkapkan konfigurasi akaun. Akses admin subweb belum ditukar.</p>',503);
+ if(!ready(env))return page('<h1>Login pusat belum tersedia</h1><p>Pemilik perlu menetapkan akaun pusat sekali sahaja.</p><a href="/setup">Sediakan akaun pusat</a>',503);
  if(req.method==='POST'&&['/login','/logout'].includes(path)&&req.headers.get('Origin')!==url.origin)return json({error:'Origin tidak sah.'},403);
  if(path==='/authorize'&&req.method==='GET'){const auth=authRequest(url,env);if(!auth)return json({error:'Permintaan login tidak sah.'},400);const existing=await session(req,env);return existing?grant(auth,existing.id,env):loginPage(auth,url)}
  if(path==='/login'&&req.method==='POST'){
@@ -107,7 +107,7 @@ export default {async fetch(req,env){
   const raw=await req.text();if(raw.length>4096)return json({error:'Permintaan terlalu besar.'},413);const body=new URLSearchParams(raw);if(!/^[-_A-Za-z0-9]{43}$/.test(body.get('csrf')||'')||!equal(body.get('csrf'),readCookie(req,CSRF_COOKIE)))return json({error:'Sesi borang tamat.'},403);
   const active=await session(req,env);if(active)await env.DB.prepare('DELETE FROM sso_sessions WHERE id=?').bind(active.id).run();return page('<h1>Anda telah log keluar</h1><p>Sesi pusat ditamatkan. Buka semula subweb untuk log masuk.</p>',200,[cookie(SESSION_COOKIE,'',0),cookie(CSRF_COOKIE,'',0)]);
  }
- if(path==='/'&&req.method==='GET')return page('<small>MAIDA ESPORTS</small><h1>Akaun Admin Pusat</h1><p>Buka halaman admin eFLL, BOTM, LEL atau The Elite untuk log masuk.</p><a href="/account">Urus e-mel dan kata laluan</a><p><a href="/logout">Log keluar semua subweb</a></p>');
+ if(path==='/'&&req.method==='GET')return page('<small>MAIDA ESPORTS</small><h1>Akaun Admin Pusat</h1><p>Buka halaman admin BOST, LEL, Tekken atau eFLL untuk log masuk.</p><a href="/account">Urus e-mel dan kata laluan</a><p><a href="/logout">Log keluar semua subweb</a></p>');
  return json({error:'Tidak ditemui.'},404);
  }catch{return json({error:'Perkhidmatan login tidak tersedia. Cuba semula.'},503)}
 },async scheduled(event,env){const time=now();await env.DB.batch(['sso_codes','sso_tokens','sso_sessions','sso_attempts'].map(table=>env.DB.prepare(`DELETE FROM ${table} WHERE expires_at<=?`).bind(time)))}};
@@ -124,3 +124,6 @@ export async function externalLogout(req,env){
  const active=await session(req,env);if(active)await env.DB.prepare('DELETE FROM sso_sessions WHERE id=?').bind(active.id).run();
  return cookie(SESSION_COOKIE,'',0);
 }
+
+export async function centralIdentity(req,env){const current=await credentials(env);if(!ready(current))return null;const active=await session(req,current);return active?{email:active.email,role:'superadmin',expires_at:active.expires_at}:null;}
+export async function centralLogout(req,env){const current=await credentials(env);return ready(current)?externalLogout(req,current):cookie(SESSION_COOKIE,'',0);}
