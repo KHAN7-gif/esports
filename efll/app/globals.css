@@ -404,3 +404,31 @@ html{color-scheme:light}.home-shortcuts{display:grid;grid-template-columns:repea
 .club-identity-hero .club-abbreviation{font-size:13px;letter-spacing:1.7px;color:#d4e3fa}
 .club-identity-hero .club-identity-members{grid-column:2;grid-row:3;margin:0}
 @media(max-width:600px){.team-hero>.club-identity-hero{grid-template-columns:64px minmax(0,1fr);column-gap:14px}.club-identity-hero .club-identity-logo .photo-frame{width:64px;height:64px;border-radius:12px}.club-identity-hero .club-identity-logo .photo-fallback{font-size:18px}.club-identity-hero .club-identity-name{font-size:23px}.club-identity-hero .club-state-flag{width:22px}.club-identity-hero .club-abbreviation{font-size:12px}}
+
+/* Reuse the club logo identity throughout every tournament tab. */
+.club-identity-compact{grid-template-columns:32px minmax(0,1fr);gap:4px 8px;width:100%;text-transform:none}
+.club-identity-compact .club-identity-logo .photo-frame{width:32px;height:32px;border-radius:7px}
+.club-identity-compact .club-identity-logo .photo-fallback{font-size:10px}
+.club-identity-compact .club-identity-name{font-size:12px;font-weight:700;line-height:1.35;white-space:normal;overflow-wrap:anywhere}
+.club-identity-compact .club-state-flag{width:14px}
+.club-identity-compact .club-abbreviation{font-size:9px;letter-spacing:.8px;line-height:1.3}
+.standing-team,.team-link{width:100%;min-width:0;text-align:left}
+.standing-team>.club-identity,.team-link>.club-identity{flex:1;min-width:0}
+.standing-team .club-identity-name{font-size:12px}
+.fixture-home>.club-identity,.fixture-away>.club-identity{width:100%;text-align:left}
+.matchday-team>.club-identity{width:100%;text-align:left}
+.matchday-team .club-identity-name{font-size:11px}
+.matchday-team .club-identity-logo .photo-frame img{width:100%;height:100%;object-fit:contain}
+.matchday-result{min-height:92px}
+.series-state-panel>.club-identity{color:inherit;max-width:200px;margin:auto}
+.series-state-panel .club-identity-name{font-size:14px;color:inherit;line-height:1.3;letter-spacing:0}
+.series-state-panel .club-abbreviation{color:inherit;opacity:.85;letter-spacing:.8px}
+.series-state-panel .club-state-flag img{width:100%;height:auto}
+.stat-identity .club-identity{margin-top:6px}
+.stat-club-identity .club-identity{margin-top:0}
+.ranking-affiliation>.club-identity,.roster-affiliation>.club-identity{flex:1;min-width:0}
+.ranking-affiliation .club-identity-name,.roster-affiliation .club-identity-name,.home-scorer-state .club-identity-name{font-size:11px}
+.home-scorer-state .club-identity{text-align:left}
+@media(max-width:600px){.fixture-home .club-identity,.fixture-away .club-identity,.matchday-team .club-identity{grid-template-columns:27px minmax(0,1fr);column-gap:5px}.fixture-home .club-identity-logo .photo-frame,.fixture-away .club-identity-logo .photo-frame,.matchday-team .club-identity-logo .photo-frame{width:27px;height:27px}.fixture-home .club-identity-name,.fixture-away .club-identity-name,.matchday-team .club-identity-name{font-size:10px}.series-state-panel .club-identity{grid-template-columns:28px minmax(0,1fr);column-gap:5px}.series-state-panel .club-identity-logo .photo-frame{width:28px;height:28px}.series-state-panel .club-identity-name{font-size:11px}}
+
+@media(max-width:600px){.series-scoreboard>.series-state-panel{padding-right:58px}.series-scoreboard>.series-state-panel.away{padding-left:58px;padding-right:8px}}

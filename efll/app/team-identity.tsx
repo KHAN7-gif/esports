@@ -2,10 +2,10 @@
 import DrivePhoto from './drive-photo';
 import {type Team,flagCode,codes,states} from '../lib/data';
 
-export default function TeamIdentity({team,hero=false}:{team:Team;hero?:boolean}){
+export default function TeamIdentity({team,hero=false,compact=false}:{team:Team;hero?:boolean;compact?:boolean}){
  const abbreviation=team.code.trim().toUpperCase().slice(0,3),state=flagCode(team),stateName=states[codes.indexOf(state)]||state;
  const Wrapper=hero?'div':'span',Text=hero?'div':'span',Name=hero?'h2':'span';
- return <Wrapper className={'club-identity'+(hero?' club-identity-hero':'')}>
+ return <Wrapper className={'club-identity'+(hero?' club-identity-hero':'')+(compact?' club-identity-compact':'')}>
   <DrivePhoto link={team.logo} alt={`Logo ${team.name}`} fallback={abbreviation} className="club-identity-logo"/>
   <Text className="club-identity-text">
    {hero&&<span className="eyebrow">KELAB LABUAN</span>}
