@@ -18,7 +18,7 @@ function page(content,status=200,cookies=[]){const h=new Headers({...headers,'Co
 function clients(env){try{const c=JSON.parse(env.SSO_CLIENTS||'{}');return c&&typeof c==='object'&&!Array.isArray(c)?c:{}}catch{return {}}}
 export function authRequest(url,env){const clientId=url.searchParams.get('client_id'),redirectUri=url.searchParams.get('redirect_uri'),state=url.searchParams.get('state'),challenge=url.searchParams.get('code_challenge');const client=clients(env)[clientId];if(!client||!Array.isArray(client.redirect_uris)||!client.redirect_uris.includes(redirectUri)||!state||!/^[-_A-Za-z0-9]{32,128}$/.test(state)||!/^[-_A-Za-z0-9]{43}$/.test(challenge||'')||url.searchParams.get('code_challenge_method')!=='S256')return null;try{if(new URL(redirectUri).protocol!=='https:')return null}catch{return null}return {clientId,redirectUri,state,challenge,name:client.name||clientId}}
 function ready(env){return !!env.DB&&typeof env.ADMIN_EMAIL==='string'&&/^[a-f0-9]{64}$/i.test(env.ADMIN_PASSWORD_HASH||'')&&/^[a-f0-9]{32}$/i.test(env.ADMIN_PASSWORD_SALT||'')}
-async function credentialVersion(env){return sha(env.ADMIN_EMAIL.toLowerCase()+'|'+env.ADMIN_PASSWORD_HASH+'|'+env.ADMIN_PASSWORD_SALT)}
+async function credentialVersion(env){return sha(env.ADMIN_EMAIL.toLowerCase()+'|'+env.ADMIN_PASSWORD_HASH+'|'+env.ADMIN_PASSWORD_SALT+'|'+(env.ADMIN_SESSION_SECRET||''))}
 async function session(req,env){const token=readCookie(req,SESSION_COOKIE);if(!/^[-_A-Za-z0-9]{43}$/.test(token))return null;return env.DB.prepare('SELECT * FROM sso_sessions WHERE id=? AND expires_at>? AND credential_version=?').bind(await sha(token),now(),await credentialVersion(env)).first()}
 async function grant(auth,sessionId,env,cookies=[]){const code=random();await env.DB.prepare('INSERT INTO sso_codes(id,session_id,client_id,redirect_uri,challenge,expires_at) VALUES(?,?,?,?,?,?)').bind(await sha(code),sessionId,auth.clientId,auth.redirectUri,auth.challenge,now()+60).run();const target=new URL(auth.redirectUri);target.searchParams.set('code',code);target.searchParams.set('state',auth.state);return redirect(target.href,cookies)}
 function loginPage(auth,url,error=''){const csrf=random();const action=new URL('/login',url);for(const [k,v] of new URL(url).searchParams)action.searchParams.set(k,v);return page(`<small>MAIDA ESPORTS · AKAUN PUSAT</small><h1>Superadmin</h1><p>Log masuk untuk membuka ${escape(auth.name)}. Akaun yang sama digunakan untuk semua subweb berdaftar.</p>${error?`<p class="error" role="alert">${escape(error)}</p>`:''}<form method="post" action="${escape(action.pathname+action.search)}"><input type="hidden" name="csrf" value="${csrf}"><label>E-mel<input type="email" name="email" autocomplete="username" required maxlength="254"></label><label>Kata laluan<input type="password" name="password" autocomplete="current-password" required maxlength="256"></label><button>Log masuk</button></form>`,error?401:200,[cookie(CSRF_COOKIE,csrf,600)])}
@@ -102,7 +102,7 @@ export default {async fetch(req,env){
   const token=req.headers.get('Authorization')?.match(/^Bearer ([-_A-Za-z0-9]{43})$/)?.[1];if(!token)return json({error:'Akses diperlukan.'},401);
   const identity=await env.DB.prepare('SELECT s.email,s.expires_at FROM sso_tokens t JOIN sso_sessions s ON s.id=t.session_id WHERE t.id=? AND t.client_id=? AND t.expires_at>? AND s.expires_at>? AND s.credential_version=?').bind(await sha(token),url.searchParams.get('client_id'),now(),now(),await credentialVersion(env)).first();return identity?json({email:identity.email,role:'superadmin',expires_at:identity.expires_at}):json({error:'Sesi tamat.'},401);
  }
- if(path==='/logout'&&req.method==='GET'){const csrf=random();return page(`<h1>Log keluar semua subweb?</h1><p>Sesi akaun pusat akan ditamatkan untuk semua subweb yang menggunakan login ini.</p><form method="post" action="/logout"><input type="hidden" name="csrf" value="${csrf}"><button>Log keluar semua</button></form>`,200,[cookie(CSRF_COOKIE,csrf,600)])}
+ if(path==='/logout'&&req.method==='GET'){const csrf=random();return page(`<h1>Log keluar semua subweb?</h1><p>Sesi akaun pusat akan ditamatkan untuk semua subweb yang menggunakan login ini.</p><form method="post" action="${escape(env.PUBLIC_PATH_PREFIX||'')}/logout"><input type="hidden" name="csrf" value="${csrf}"><button>Log keluar semua</button></form>`,200,[cookie(CSRF_COOKIE,csrf,600)])}
  if(path==='/logout'&&req.method==='POST'){
   const raw=await req.text();if(raw.length>4096)return json({error:'Permintaan terlalu besar.'},413);const body=new URLSearchParams(raw);if(!/^[-_A-Za-z0-9]{43}$/.test(body.get('csrf')||'')||!equal(body.get('csrf'),readCookie(req,CSRF_COOKIE)))return json({error:'Sesi borang tamat.'},403);
   const active=await session(req,env);if(active)await env.DB.prepare('DELETE FROM sso_sessions WHERE id=?').bind(active.id).run();return page('<h1>Anda telah log keluar</h1><p>Sesi pusat ditamatkan. Buka semula subweb untuk log masuk.</p>',200,[cookie(SESSION_COOKIE,'',0),cookie(CSRF_COOKIE,'',0)]);
@@ -111,3 +111,16 @@ export default {async fetch(req,env){
  return json({error:'Tidak ditemui.'},404);
  }catch{return json({error:'Perkhidmatan login tidak tersedia. Cuba semula.'},503)}
 },async scheduled(event,env){const time=now();await env.DB.batch(['sso_codes','sso_tokens','sso_sessions','sso_attempts'].map(table=>env.DB.prepare(`DELETE FROM ${table} WHERE expires_at<=?`).bind(time)))}};
+
+export async function externalAuthorize(req,env,identity){
+ const auth=authRequest(new URL(req.url),env);if(!auth)return json({error:'Permintaan login tidak sah.'},400);
+ const existing=await session(req,env);if(existing)return grant(auth,existing.id,env);
+ if(!identity||identity.email.toLowerCase()!==env.ADMIN_EMAIL.toLowerCase()||!Number.isInteger(identity.expires_at)||identity.expires_at<=now())return null;
+ const raw=random(),id=await sha(raw),expiry=Math.min(identity.expires_at,now()+MAX_AGE);
+ await env.DB.prepare('INSERT INTO sso_sessions(id,email,credential_version,expires_at) VALUES(?,?,?,?)').bind(id,env.ADMIN_EMAIL.trim().toLowerCase(),await credentialVersion(env),expiry).run();
+ return grant(auth,id,env,[cookie(SESSION_COOKIE,raw,expiry-now())]);
+}
+export async function externalLogout(req,env){
+ const active=await session(req,env);if(active)await env.DB.prepare('DELETE FROM sso_sessions WHERE id=?').bind(active.id).run();
+ return cookie(SESSION_COOKIE,'',0);
+}
