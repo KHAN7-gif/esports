@@ -1,51 +1,53 @@
-# Lawnball — Gelanggang Lawn Bowls
+# Lawnball — 64 pasukan
 
-Web app statik kejohanan lawn bowls triples: 6 pasukan, 2 kumpulan, top 2 ke separuh akhir, final dan tempat ketiga.
+Web app statik kejohanan lawn bowls triples dengan 64 pasukan dan 192 pemain demo.
 
-## Struktur
+## Format
 
-- `index.html`, `app.js`, `style.css`, `flags/`: paparan awam baca sahaja.
-- `admin/`: versi admin untuk mengemas kini keputusan, pasukan, pemain dan gambar.
+- 8 kumpulan A–H, masing-masing 8 pasukan.
+- Round robin penuh dalam kumpulan: setiap pasukan bertemu 7 lawan sekali, 28 perlawanan setiap kumpulan, 224 keseluruhan.
+- Top 4 setiap kumpulan layak ke Top 32: 16 perlawanan Top 32, 8 Top 16, 4 suku akhir, 2 separuh akhir, 1 akhir dan 1 tempat ke-3/4.
+- Jumlah 256 perlawanan, 8 rink, 13 Ends dan slot anggaran 90 minit.
+- Kumpulan membenarkan seri. Kalah mati seri selepas Ends 13 meneruskan Extra Ends 14; extra ends diteruskan sehingga ada pemenang.
+- Susunan kumpulan: mata (menang 2/seri 1/kalah 0), beza shot, jumlah shot diperoleh, kemudian kod pasukan jika masih sama.
+- Kelayakan dan keputusan pusingan susulan dikemas kini secara automatik apabila pasukan yang mara berubah.
 
-## Jalankan secara tempatan
+## Jadual demo: Khamis–Ahad, 19–22 November 2026
 
-Tiada pemasangan pakej atau proses build diperlukan. Dari root repositori:
+- Khamis dan Jumaat: sesi round robin bermula 09:00 dan tamat 06:30 pagi hari berikutnya, termasuk rehat 30 minit. Tarikh kalendar sebenar digunakan untuk perlawanan selepas tengah malam.
+- Sabtu: Top 32 pada 09:00 dan 10:30, tamat anggaran 12:00.
+- Ahad: Top 16 pada 09:00, suku akhir 10:30, separuh akhir 12:00, akhir dan tempat ke-3/4 pada 14:00; tamat anggaran 15:30.
+
+Sesi kumpulan semalaman diperlukan untuk mengekalkan round robin penuh, 8 rink dan 90 minit dalam empat hari. Jadual demo tidak mempunyai pertindihan pasukan atau rink pada slot 90 minit. Tambahan masa sebenar atau extra ends boleh menjejaskan slot berikutnya.
+
+## Jalankan dan semak
+
+Tiada pemasangan pakej atau build diperlukan. Dari root repositori:
 
 ```sh
 python3 -m http.server 8080
+node Lawnball/tests/validate.cjs
 ```
 
 - Awam: <http://localhost:8080/Lawnball/>
-- Senarai pasukan: <http://localhost:8080/Lawnball/#pasukan>
+- Pasukan: <http://localhost:8080/Lawnball/#pasukan>
 - Admin: <http://localhost:8080/Lawnball/admin/#pasukan>
 
-## Fungsi
+Semakan mengesahkan bilangan pasukan/perlawanan, round robin tanpa pasangan berulang, Top 32, kemaraan pemenang, extra ends, paparan utama dan pertindihan jadual.
 
-- Jadual dummy lengkap: 13 end setiap perlawanan, anggaran 90 minit, dua rink.
-- Pop-up keputusan end dan pengiraan kedudukan kumpulan automatik.
-- Padanan kalah mati dan pengosongan keputusan susulan apabila keputusan awal berubah.
-- Profil pasukan: logo, negeri, bendera dan tepat tiga pemain.
-- Satu tab Pasukan: ketiga-tiga gambar pemain, nama, posisi Lead/Second/Skip, nombor dan kapten dipaparkan dalam kad pasukan. Maklumat pemain diedit dalam profil pasukan yang sama.
-- Statistik Win/Lose/Draw pada peringkat pasukan sahaja, tanpa rekod atau tab pemain berasingan.
-- Gambar pemain melalui muat naik PNG/JPG/WebP (maksimum 2 MB) atau pautan Google Drive, pratonton dan pop-up gambar penuh.
-- Carian, penapis kumpulan/negeri, eksport CSV dan cetak.
-- Tema jingga kemerahan/putih dan susun atur responsif.
+## Paparan
 
-## Data dan akses admin
+Ringkasan, jadual dengan penapis semua kumpulan dan halaman, kedudukan Top 4, progresif kumpulan, serta kalah mati dengan All/Bracket dan navigasi Top 32 hingga akhir. Butang Remarks membuka keputusan besar, logo, bendera, maklumat perlawanan dan semua Ends. Hijau = menang/mendahului, kuning = seri, merah = kalah/ketinggalan.
 
-Versi ini menggunakan data contoh. Perubahan admin disimpan dalam `localStorage` pelayar admin (`gelanggang-v2`), bukan dalam GitHub atau pangkalan data. Perubahan dan gambar tersebut belum disegerakkan kepada paparan awam atau peranti lain. Folder ini tidak mengandungi gambar atau data yang hanya disimpan dalam pelayar pengguna.
+Tab Pasukan memaparkan tiga pemain bersama gambar, nama, posisi, nombor dan kapten dalam kad pasukan. Rekod Win/Lose/Draw berada pada peringkat pasukan sahaja. Admin boleh mengedit profil, logo, negeri, bendera dan gambar pemain melalui muat naik PNG/JPG/WebP (maksimum 2 MB) atau pautan fail Google Drive. Akses gambar Drive perlu ditetapkan kepada sesiapa sahaja yang mempunyai pautan.
 
-Paparan awam dan admin ialah dua aplikasi statik berasingan. `admin/` tidak menyediakan pengesahan pengguna sendiri. Jika disajikan pada hosting awam, laluan admin juga boleh diakses; gunakan kawalan akses hosting untuk menghadkan akses. Versi Sites admin di bawah dilindungi sebagai laman peribadi oleh platform Sites. Pengesahan dan pangkalan data bersama diperlukan sebelum menggunakan salinan statik ini sebagai sistem admin berbilang pengguna.
+## Data dan akses
 
-Untuk gambar Google Drive, tetapkan fail kepada **Sesiapa sahaja yang mempunyai pautan → Pelihat**, kemudian tampal pautan fail gambar ke profil pemain. Pautan folder tidak diterima.
+Data ini ialah demo. Admin menyimpan perubahan dalam localStorage pelayar (`gelanggang-64-v1`); belum ada pangkalan data atau penyegerakan ke awam/peranti lain. Data versi enam pasukan (`gelanggang-v2`) tidak dipadam. Profil enam pasukan asal, termasuk gambar tersimpan, disalin ke enam slot pertama apabila dataset baharu dimulakan.
 
-## Versi Sites
+`admin/` ialah versi statik berasingan tanpa pengesahan pengguna sendiri. Laluan ini memerlukan kawalan akses hosting jika diterbitkan. Versi Sites admin di bawah dilindungi secara peribadi oleh platform Sites. Fail tempatan tidak mengandungi token, konfigurasi projek Sites, arkib deployment atau data yang hanya disimpan dalam pelayar pengguna.
 
 - Awam: <https://gelanggang-lawn-bowls-awam.apengtakahashi.chatgpt.site>
 - Admin peribadi: <https://gelanggang-lawn-bowls-6team.apengtakahashi.chatgpt.site>
 
-Tiada konfigurasi hosting, identiti projek Sites, token, atau arkib deployment disalin ke folder ini.
-
-## Aset
-
-Bendera negeri/Wilayah dimuat turun daripada Wikimedia Commons (`Special:FilePath/Flag_of_….svg`). Logo pasukan dan inisial pemain ialah placeholder demo. Font DM Sans dan Manrope dimuatkan melalui Google Fonts; font sans-serif sistem digunakan jika tiada sambungan.
+Bendera negeri/Wilayah ialah aset Wikimedia Commons. Logo dan inisial ialah placeholder demo; font DM Sans/Manrope menggunakan Google Fonts dengan fallback sistem.
