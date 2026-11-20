@@ -14,15 +14,17 @@ Web app statik kejohanan lawn bowls triples dengan 64 pasukan dan 192 pemain dem
 
 ## Jadual: 28 Januari–1 Februari 2027
 
-Waktu permainan 10:00–22:30, 8 rink, slot anggaran 90 minit. Rehat 13:00–13:30 sekali sehari, bukan selepas setiap perlawanan.
+Waktu permainan 10:00–22:30, 8 rink, slot anggaran 90 minit. Rehat harian 13:00–13:30 sekali sehari, kecuali Jumaat 29 Januari yang menggunakan rehat khas 11:30–14:00.
 
-- 28–30 Januari: 64 perlawanan kumpulan sehari, lapan slot setiap hari (10:00, 11:30, 13:30, 15:00, 16:30, 18:00, 19:30, 21:00), tamat 22:30.
-- 31 Januari: baki 32 perlawanan kumpulan dalam empat slot sehingga 16:30; Top 32 dalam dua slot pada 16:30 dan 18:00, tamat 19:30. Jumlah 48 perlawanan.
+- 28 Januari: 64 perlawanan kumpulan, lapan slot, tamat 22:30.
+- 29 Januari (Jumaat): 48 perlawanan kumpulan. Slot bermula 10:00, 14:00, 15:30, 17:00, 18:30 dan 20:00. Semua rink kosong 11:30–14:00. Tamat 21:30.
+- 30 Januari: 64 perlawanan kumpulan, lapan slot, tamat 22:30.
+- 31 Januari: baki 48 perlawanan kumpulan dalam enam slot, tamat 19:30; Top 32 pada 19:30 dan 21:00, tamat 22:30. Jumlah 64 perlawanan.
 - 1 Februari: Top 16 pada 10:00, suku akhir 11:30, separuh akhir 13:30, akhir dan tempat ke-3/4 pada 15:00; tamat anggaran 16:30. Jumlah 16 perlawanan.
 
-Jumlah 256 perlawanan. Semakan mengesahkan tiada pertindihan pasukan/rink atau perlawanan semasa rehat, dan setiap slot tamat selewat-lewatnya 22:30. Waktu berdasarkan 90 minit; extra ends dan kelewatan sebenar boleh menjejaskan slot berikutnya.
+Slot biasa lapan sesi: 10:00, 11:30, 13:30, 15:00, 16:30, 18:00, 19:30, 21:00. Jumlah 256 perlawanan. Semakan mengesahkan tiada pertindihan pasukan/rink atau perlawanan ketika rehat, dan setiap slot tamat selewat-lewatnya 22:30. Extra ends dan kelewatan sebenar boleh menjejaskan slot berikutnya.
 
-Jadual lama dalam pelayar admin dipindahkan mengikut ID perlawanan sambil mengekalkan nama, profil, gambar dan skor. `calendarRevision: 3` mengelakkan pemindahan berulang. Tarikh dan hari menggunakan kalendar Malaysia.
+Jadual lama dalam pelayar admin dipindahkan mengikut ID perlawanan sambil mengekalkan nama, profil, gambar dan skor. `calendarRevision: 4` mengelakkan pemindahan berulang. Tarikh dan hari menggunakan kalendar Malaysia.
 
 ## Jalankan dan semak
 
