@@ -14,11 +14,15 @@ Web app statik kejohanan lawn bowls triples dengan 64 pasukan dan 192 pemain dem
 
 ## Jadual: 28 Januari–1 Februari 2027
 
-- 28–30 Januari (Khamis–Sabtu): round robin penuh. Sesi bermula 09:00; 28 Januari tamat 00:30 pada 29 Januari, sesi 29 dan 30 Januari tamat 23:00. Lapan rink digunakan; slot diagihkan 10/9/9 sesi harian, setiap sesi 90 minit dengan rehat 30 minit selepas tiga sesi pertama.
-- 31 Januari (Ahad): Top 32 pada 09:00 dan 10:30, tamat anggaran 12:00.
-- 1 Februari (Isnin): Top 16 pada 09:00, suku akhir 10:30, separuh akhir 12:00, akhir dan tempat ke-3/4 pada 14:00; tamat anggaran 15:30.
+Waktu permainan 10:00–22:30, 8 rink, slot anggaran 90 minit. Rehat 13:00–13:30 sekali sehari, bukan selepas setiap perlawanan.
 
-Semua tarikh ialah tarikh kalendar sebenar, menggunakan hari Malaysia. Jadual lama dalam pelayar admin dipindahkan kepada tarikh dan masa baharu mengikut ID perlawanan, sambil mengekalkan nama, profil, gambar dan skor yang tersimpan. `calendarRevision: 2` mengelakkan pemindahan ini berulang. Slot adalah anggaran; masa tambahan sebenar atau extra ends boleh menjejaskan slot seterusnya.
+- 28–30 Januari: 64 perlawanan kumpulan sehari, lapan slot setiap hari (10:00, 11:30, 13:30, 15:00, 16:30, 18:00, 19:30, 21:00), tamat 22:30.
+- 31 Januari: baki 32 perlawanan kumpulan dalam empat slot sehingga 16:30; Top 32 dalam dua slot pada 16:30 dan 18:00, tamat 19:30. Jumlah 48 perlawanan.
+- 1 Februari: Top 16 pada 10:00, suku akhir 11:30, separuh akhir 13:30, akhir dan tempat ke-3/4 pada 15:00; tamat anggaran 16:30. Jumlah 16 perlawanan.
+
+Jumlah 256 perlawanan. Semakan mengesahkan tiada pertindihan pasukan/rink atau perlawanan semasa rehat, dan setiap slot tamat selewat-lewatnya 22:30. Waktu berdasarkan 90 minit; extra ends dan kelewatan sebenar boleh menjejaskan slot berikutnya.
+
+Jadual lama dalam pelayar admin dipindahkan mengikut ID perlawanan sambil mengekalkan nama, profil, gambar dan skor. `calendarRevision: 3` mengelakkan pemindahan berulang. Tarikh dan hari menggunakan kalendar Malaysia.
 
 ## Jalankan dan semak
 
