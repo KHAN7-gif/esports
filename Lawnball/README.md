@@ -65,3 +65,9 @@ Profil pasukan mempunyai skop Kumpulan/Kalah Mati/Keseluruhan. Shot + ialah juml
 Rekod turut merangkumi kadar menang, purata Shot + setiap perlawanan selesai, lima keputusan terkini, status kelayakan Top 32 dan detail setiap perlawanan (lawan, skor, beza, mata liga, tarikh, rink dan Remarks). Pemain tidak mempunyai statistik individu berasingan.
 
 Jumlah Ends dikira menggunakan ends sebenar perlawanan selesai, termasuk extra ends. Profil menunjukkan pecahan ends biasa/extra serta jumlah keseluruhan pasukan. Ringkasan kejohanan mengira setiap perlawanan sekali; jumlah semua Ends pasukan ialah dua kali jumlah Ends kejohanan kerana setiap perlawanan melibatkan dua pasukan.
+
+## Kedudukan akhir dalam profil
+
+Kad pencapaian dipaparkan di atas statistik pasukan. Johan, Naib Johan dan tempat ke-3/4 ditentukan oleh perlawanan akhir serta penentuan ke-3/4. Pasukan kalah suku akhir dipaparkan dalam julat 5–8; kalah Top 16 dalam julat 9–16; kalah Top 32 dalam julat 17–32; dan tersingkir kumpulan dalam julat 33–64. Julat digunakan kerana tiada perlawanan untuk menentukan tempat tepat dalam julat tersebut. Keputusan belum selesai memaparkan status semasa, bukan kedudukan akhir. Paparan tidak bergantung pada skop statistik yang dipilih dan dikemas kini selepas Remarks ditutup.
+
+Kad pencapaian turut menyatakan pusingan: Akhir, Separuh Akhir/Ke-3/4, Suku Akhir, Top 16, Top 32 atau kumpulan.
