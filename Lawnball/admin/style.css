@@ -55,3 +55,12 @@
 .end-points.tone-draw{color:#795600;background:#fff0b8;border-color:#e2ca78}
 .ends-points-legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:.8125rem;line-height:1.5;color:#7a6257;margin:10px 0 0}
 .ends-points-legend .end-points{margin-left:0}
+
+/* Kolum +Mata berasingan di sebelah setiap skor */
+#editor .ends-table{table-layout:auto}
+#editor .ends-table th.ends-label{width:16%;text-align:left}
+#editor .ends-table th.ends-sub{width:28%}
+#editor .ends-table th.ends-sub-pts{width:14%}
+#editor .ends-table th.ends-sub{font-size:.75rem;font-weight:600;color:#8a7266;padding-top:6px;padding-bottom:6px}
+#editor .ends-table td.ends-pts-cell{text-align:center;vertical-align:middle;padding:2px 4px;background:#fff}
+#editor .ends-table td.ends-pts-cell .end-points{margin-left:0}
