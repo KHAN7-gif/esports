@@ -16,8 +16,8 @@ python3 -m http.server 8080
 ```
 
 - Awam: <http://localhost:8080/Lawnball/>
-- Senarai pemain: <http://localhost:8080/Lawnball/#pemain>
-- Admin: <http://localhost:8080/Lawnball/admin/#pemain>
+- Senarai pasukan: <http://localhost:8080/Lawnball/#pasukan>
+- Admin: <http://localhost:8080/Lawnball/admin/#pasukan>
 
 ## Fungsi
 
@@ -25,8 +25,8 @@ python3 -m http.server 8080
 - Pop-up keputusan end dan pengiraan kedudukan kumpulan automatik.
 - Padanan kalah mati dan pengosongan keputusan susulan apabila keputusan awal berubah.
 - Profil pasukan: logo, negeri, bendera dan tepat tiga pemain.
-- Profil individu: nama, nombor, posisi Lead/Second/Skip, kapten, gambar dan sejarah perlawanan.
-- Rekod Win/Lose/Draw pemain mengikut pasukan, dengan andaian semua tiga pemain beraksi dalam setiap perlawanan.
+- Satu tab Pasukan: ketiga-tiga gambar pemain, nama, posisi Lead/Second/Skip, nombor dan kapten dipaparkan dalam kad pasukan. Maklumat pemain diedit dalam profil pasukan yang sama.
+- Statistik Win/Lose/Draw pada peringkat pasukan sahaja, tanpa rekod atau tab pemain berasingan.
 - Gambar pemain melalui muat naik PNG/JPG/WebP (maksimum 2 MB) atau pautan Google Drive, pratonton dan pop-up gambar penuh.
 - Carian, penapis kumpulan/negeri, eksport CSV dan cetak.
 - Tema jingga kemerahan/putih dan susun atur responsif.
