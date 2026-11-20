@@ -97,3 +97,10 @@
  #extraEnd:hover{background:#ffe9dc;border-color:#e86924;box-shadow:0 4px 10px -6px rgba(232,105,36,.8)}
 }
 @media (prefers-reduced-motion:reduce){#editor *,#editor *::before,#editor *::after{transition:none!important;animation:none!important}}
+
+/* +Mata: tanpa kotak, nombor sahaja berwarna mengikut hasil */
+#editor .ends-table td.ends-pts-cell .end-points{background:none!important;background-image:none!important;border:0!important;box-shadow:none!important;padding:0!important;min-width:0!important;height:auto!important;border-radius:0;font-size:1rem;font-weight:800;line-height:1.2}
+#editor .ends-table td.ends-pts-cell .end-points.tone-win{color:#18623a}
+#editor .ends-table td.ends-pts-cell .end-points.tone-lose{color:#a52e24}
+#editor .ends-table td.ends-pts-cell .end-points.tone-draw{color:#795600}
+@media (hover:hover){#endsBody td.ends-pts-cell:hover .end-points{transform:scale(1.12);box-shadow:none!important}}
