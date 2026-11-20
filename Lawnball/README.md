@@ -12,13 +12,13 @@ Web app statik kejohanan lawn bowls triples dengan 64 pasukan dan 192 pemain dem
 - Susunan kumpulan: mata (menang 2/seri 1/kalah 0), beza shot, jumlah shot diperoleh, kemudian kod pasukan jika masih sama.
 - Kelayakan dan keputusan pusingan susulan dikemas kini secara automatik apabila pasukan yang mara berubah.
 
-## Jadual demo: Khamis–Ahad, 19–22 November 2026
+## Jadual: 28 Januari–1 Februari 2027
 
-- Khamis dan Jumaat: sesi round robin bermula 09:00 dan tamat 06:30 pagi hari berikutnya, termasuk rehat 30 minit. Tarikh kalendar sebenar digunakan untuk perlawanan selepas tengah malam.
-- Sabtu: Top 32 pada 09:00 dan 10:30, tamat anggaran 12:00.
-- Ahad: Top 16 pada 09:00, suku akhir 10:30, separuh akhir 12:00, akhir dan tempat ke-3/4 pada 14:00; tamat anggaran 15:30.
+- 28–30 Januari (Khamis–Sabtu): round robin penuh. Sesi bermula 09:00; 28 Januari tamat 00:30 pada 29 Januari, sesi 29 dan 30 Januari tamat 23:00. Lapan rink digunakan; slot diagihkan 10/9/9 sesi harian, setiap sesi 90 minit dengan rehat 30 minit selepas tiga sesi pertama.
+- 31 Januari (Ahad): Top 32 pada 09:00 dan 10:30, tamat anggaran 12:00.
+- 1 Februari (Isnin): Top 16 pada 09:00, suku akhir 10:30, separuh akhir 12:00, akhir dan tempat ke-3/4 pada 14:00; tamat anggaran 15:30.
 
-Sesi kumpulan semalaman diperlukan untuk mengekalkan round robin penuh, 8 rink dan 90 minit dalam empat hari. Jadual demo tidak mempunyai pertindihan pasukan atau rink pada slot 90 minit. Tambahan masa sebenar atau extra ends boleh menjejaskan slot berikutnya.
+Semua tarikh ialah tarikh kalendar sebenar, menggunakan hari Malaysia. Jadual lama dalam pelayar admin dipindahkan kepada tarikh dan masa baharu mengikut ID perlawanan, sambil mengekalkan nama, profil, gambar dan skor yang tersimpan. `calendarRevision: 2` mengelakkan pemindahan ini berulang. Slot adalah anggaran; masa tambahan sebenar atau extra ends boleh menjejaskan slot seterusnya.
 
 ## Jalankan dan semak
 
