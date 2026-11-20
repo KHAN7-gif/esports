@@ -57,3 +57,11 @@ Data ini ialah demo. Admin menyimpan perubahan dalam localStorage pelayar (`gela
 - Admin peribadi: <https://gelanggang-lawn-bowls-6team.apengtakahashi.chatgpt.site>
 
 Bendera negeri/Wilayah ialah aset Wikimedia Commons. Logo dan inisial ialah placeholder demo; font DM Sans/Manrope menggunakan Google Fonts dengan fallback sistem.
+
+## Statistik pasukan dan Ends
+
+Profil pasukan mempunyai skop Kumpulan/Kalah Mati/Keseluruhan. Shot + ialah jumlah shot diperoleh, Shot − ialah shot lawan, dan beza ialah jumlah Shot + ditolak Shot −. Nilai ini dijumlah daripada keputusan akhir setiap perlawanan, bukan daripada skor terkumpul semua ends. Mata liga dan kedudukan sentiasa merujuk kumpulan sahaja.
+
+Rekod turut merangkumi kadar menang, purata Shot + setiap perlawanan selesai, lima keputusan terkini, status kelayakan Top 32 dan detail setiap perlawanan (lawan, skor, beza, mata liga, tarikh, rink dan Remarks). Pemain tidak mempunyai statistik individu berasingan.
+
+Jumlah Ends dikira menggunakan ends sebenar perlawanan selesai, termasuk extra ends. Profil menunjukkan pecahan ends biasa/extra serta jumlah keseluruhan pasukan. Ringkasan kejohanan mengira setiap perlawanan sekali; jumlah semua Ends pasukan ialah dua kali jumlah Ends kejohanan kerana setiap perlawanan melibatkan dua pasukan.
