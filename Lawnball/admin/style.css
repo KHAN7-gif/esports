@@ -64,3 +64,36 @@
 #editor .ends-table th.ends-sub{font-size:.75rem;font-weight:600;color:#8a7266;padding-top:6px;padding-bottom:6px}
 #editor .ends-table td.ends-pts-cell{text-align:center;vertical-align:middle;padding:2px 4px;background:#fff}
 #editor .ends-table td.ends-pts-cell .end-points{margin-left:0}
+
+/* ===== Remarks: UI dikemas kini + kesan hover ===== */
+#editor{background:linear-gradient(180deg,#fffaf5 0%,#ffffff 42%)}
+#editor .eyebrow{background:linear-gradient(90deg,#ab442d 0%,#e86924 100%);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+#editor .ends-team{background:linear-gradient(160deg,var(--result-bg,#f7f4f1) 0%,#ffffff 120%);transition:transform .2s ease,box-shadow .2s ease}
+#editor .ends-big-score{text-shadow:0 1px 0 rgba(255,255,255,.7)}
+#editor .ends-table{border-collapse:separate;border-spacing:0}
+#editor .ends-table thead th{background:linear-gradient(180deg,#fcf4ec 0%,#f5e9de 100%)}
+#editor .ends-table thead th.ends-sub{background:#fbf6f1;color:#94604b}
+#editor .ends-table thead th .ends-column-brand{transition:transform .2s ease}
+#editor .ends-number{font-weight:800;color:#6d5245}
+#editor .ends-table tbody tr{transition:background-color .18s ease}
+#editor .ends-table td{transition:background-color .18s ease,box-shadow .18s ease}
+#editor .ends-value b{display:inline-block;transition:transform .18s cubic-bezier(.2,.8,.2,1)}
+#editor .end-points{background-image:linear-gradient(180deg,rgba(255,255,255,.6),rgba(255,255,255,0));transition:transform .18s ease,box-shadow .18s ease}
+#editor .ends-points-legend .end-points{cursor:default}
+#editor .ends-legend span{transition:transform .18s ease,box-shadow .18s ease}
+#cancel,#extraEnd{transition:background-color .18s ease,transform .12s ease,box-shadow .18s ease}
+#cancel:active,#extraEnd:active{transform:scale(.97)}
+@media (hover:hover){
+ #editor .ends-table tbody tr:hover td{background-image:linear-gradient(rgba(255,255,255,.35),rgba(255,255,255,.35))}
+ #endsBody tr:hover .ends-number{color:#ab442d}
+ #endsBody td.ends-value:hover b,#endsBody td.ends-value:hover input{transform:scale(1.08)}
+ #endsBody td.ends-value:hover{box-shadow:inset 0 0 0 2px rgba(62,44,37,.10)}
+ #endsBody td.ends-pts-cell:hover .end-points{transform:translateY(-2px) scale(1.06);box-shadow:0 6px 12px -6px rgba(62,44,37,.35)}
+ #editor .ends-table thead th:hover .ends-column-brand{transform:translateY(-2px) scale(1.05)}
+ #editor .ends-table thead th.ends-sub:hover{color:#ab442d}
+ #editor .ends-team:hover{transform:translateY(-3px);box-shadow:0 14px 26px -14px rgba(62,44,37,.4)}
+ #editor .ends-legend span:hover{transform:translateY(-2px);box-shadow:0 6px 12px -8px rgba(62,44,37,.45)}
+ #cancel:hover{background:#fbeee6;box-shadow:0 4px 10px -6px rgba(171,68,45,.5)}
+ #extraEnd:hover{background:#fff1e8;box-shadow:0 4px 10px -6px rgba(232,105,36,.6)}
+}
+@media (prefers-reduced-motion:reduce){#editor *,#editor *::before,#editor *::after{transition:none!important;animation:none!important}}
