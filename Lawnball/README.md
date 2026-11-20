@@ -43,7 +43,7 @@ Semakan mengesahkan bilangan pasukan/perlawanan, round robin tanpa pasangan beru
 
 ## Paparan
 
-Ringkasan, jadual dengan penapis semua kumpulan dan halaman, kedudukan Top 4, progresif kumpulan, serta kalah mati dengan All/Bracket dan navigasi Top 32 hingga akhir. Butang Remarks membuka keputusan besar, logo, bendera, maklumat perlawanan dan semua Ends. Hijau = menang/mendahului, kuning = seri, merah = kalah/ketinggalan.
+Ringkasan, jadual dengan penapis semua kumpulan dan halaman, kedudukan Top 4, progresif kumpulan, serta satu tab Jadual & Keputusan yang menggabungkan semua perlawanan dan kalah mati. Paparan Senarai/Bracket, kategori Semua/Kumpulan/Kalah Mati, penapis pusingan dan tarikh, serta navigasi bracket Top 32 hingga akhir tersedia. Pautan terus: `#jadual` dan `#bracket`. Butang Remarks membuka keputusan besar, logo, bendera, maklumat perlawanan dan semua Ends. Hijau = menang/mendahului, kuning = seri, merah = kalah/ketinggalan.
 
 Tab Pasukan memaparkan tiga pemain bersama gambar, nama, posisi, nombor dan kapten dalam kad pasukan. Rekod Win/Lose/Draw berada pada peringkat pasukan sahaja. Admin boleh mengedit profil, logo, negeri, bendera dan gambar pemain melalui muat naik PNG/JPG/WebP (maksimum 2 MB) atau pautan fail Google Drive. Akses gambar Drive perlu ditetapkan kepada sesiapa sahaja yang mempunyai pautan.
 
