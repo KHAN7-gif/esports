@@ -47,8 +47,11 @@
 
 .placement-round{display:inline-block;font-size:.75rem;font-weight:600;line-height:1.4;padding:4px 8px;margin:0 0 9px;border:1px solid var(--placement-line);border-radius:5px;color:var(--placement-ink);background:#ffffff8f}
 
-/* Mata per ends: +n = mendapat point, - = tiada point tambahan */
-.end-points{display:inline-block;margin-left:6px;font-size:.75rem;font-weight:700;color:var(--result-color,#725e51);white-space:nowrap;vertical-align:middle;opacity:.9}
+/* Mata per ends: cip hijau = dapat point, merah = tiada point tambahan, kuning = seri */
+.end-points{display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:20px;padding:0 7px;margin-left:6px;border-radius:999px;border:1px solid;font-size:.6875rem;font-weight:700;line-height:1;white-space:nowrap;vertical-align:middle;font-variant-numeric:tabular-nums}
 .end-points:empty{display:none}
-.ends-points-legend{font-size:.8125rem;line-height:1.5;color:#7a6257;margin:8px 0 0}
-.ends-points-legend b{color:#3e2c25}
+.end-points.tone-win{color:#18623a;background:#d9f0e0;border-color:#8fc9a0}
+.end-points.tone-lose{color:#a52e24;background:#fbdcd8;border-color:#e6a49b}
+.end-points.tone-draw{color:#795600;background:#fff0b8;border-color:#e2ca78}
+.ends-points-legend{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:.8125rem;line-height:1.5;color:#7a6257;margin:10px 0 0}
+.ends-points-legend .end-points{margin-left:0}
