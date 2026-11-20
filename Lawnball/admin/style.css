@@ -120,3 +120,7 @@
  .schedule-view>.tabs button:hover,.ko-mode button:hover,.unified-layout button:hover{transform:translateY(-1px)}
  .schedule-view>.tabs button,.ko-mode button,.unified-layout button,.ko-round-tabs button{transition:background-color .18s ease,color .18s ease,transform .15s ease,box-shadow .18s ease}
 }
+
+/* Gambar profil lalai: silhouette abu-abu untuk semua pemain tanpa foto */
+.photo-placeholder{background:#f4f1ef url("https://static.vecteezy.com/system/resources/previews/063/477/529/non_2x/neutral-gray-silhouette-of-male-avatar-defoult-photo-placeholder-with-short-hair-for-anonymous-profile-picture-with-minimalist-style-suitable-for-various-social-media-platforms-and-websites-vector.jpg") center / cover no-repeat!important;color:transparent!important}
+.photo-placeholder span,.photo-placeholder small{display:none!important}
