@@ -11,7 +11,7 @@ function toast(t){$('#toast').textContent=t;$('#toast').style.display='block';se
 function standings(g){let ids=g==='A'?[0,1,2]:[3,4,5];let rows=ids.map(id=>({id,played:0,w:0,d:0,l:0,for:0,against:0,pts:0}));state.matches.filter(m=>m.group===g&&m.score).forEach(m=>{[m.a,m.b].forEach((id,i)=>{let r=rows.find(r=>r.id===id),x=m.score[i],y=m.score[1-i];r.played++;r.for+=x;r.against+=y;r.w+=x>y;r.d+=x===y;r.l+=x<y;r.pts+=x>y?2:x===y?1:0})});return rows.sort((a,b)=>b.pts-a.pts||(b.for-b.against)-(a.for-a.against)||b.for-a.for||a.id-b.id)}
 function sync(){let ready=state.matches.slice(0,6).every(m=>m.score),a=standings('A'),b=standings('B');let set=(id,x,y)=>{let m=state.matches.find(m=>m.id===id);if(m.a!==x||m.b!==y){m.a=x;m.b=y;m.score=null;m.ends=null}};set('s1',ready?a[0].id:null,ready?b[1].id:null);set('s2',ready?b[0].id:null,ready?a[1].id:null);const s=state.matches.slice(6,8),win=m=>m.score?m.score[0]>m.score[1]?m.a:m.b:null,lose=m=>m.score?m.score[0]>m.score[1]?m.b:m.a:null;set('f',win(s[0]),win(s[1]));set('p',lose(s[0]),lose(s[1]))}
 const label=m=>({A:'Kumpulan A',B:'Kumpulan B',SF:'Separuh akhir',F:'Final',P:'Tempat ketiga'}[m.group]);
-function groupTable(g){return `<article class="panel"><div class="panel-head"><h3>Kumpulan ${g}</h3><span>3 team · Top 2 layak</span></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Pasukan</th><th>Main</th><th>M</th><th>S</th><th>K</th><th>Shot +/−</th><th>Beza</th><th>Mata</th></tr></thead><tbody>${standings(g).map((r,i)=>`<tr class="${i<2?'qual':''}"><td>${i+1}</td><td class="team-name">${view==='overview'?summaryTeam(r.id):tableTeam(r.id)}</td><td>${r.played}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.for}/${r.against}</td><td>${r.for-r.against>0?'+':''}${r.for-r.against}</td><td class="points">${r.pts}</td></tr>`).join('')}</tbody></table></div></article>`}
+function groupTable(g){return `<article class="panel"><div class="panel-head"><h3>Kumpulan ${g}</h3><span>3 team · Top 2 layak</span></div><div class="table-wrap"><table><thead><tr><th>#</th><th>Pasukan</th><th>Main</th><th>M</th><th>S</th><th>K</th><th>Shot +/−</th><th>Beza</th><th>Mata</th></tr></thead><tbody>${standings(g).map((r,i)=>`<tr class="${i<2?'qual':''}"><td>${i+1}</td><td class="team-name">${summaryTeam(r.id)}</td><td>${r.played}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.for}/${r.against}</td><td>${r.for-r.against>0?'+':''}${r.for-r.against}</td><td class="points">${r.pts}</td></tr>`).join('')}</tbody></table></div></article>`}
 const hiddenProgressiveGroups=new Set();
 function progressiveTable(group){
   const hidden=hiddenProgressiveGroups.has(group);
@@ -71,15 +71,7 @@ function logoSvg(i){const colors=['#112b68','#b5293d','#18397c','#9d2439','#2739
 function img(src,alt,cls){return `<img class="${cls}" src="${esc(src)}" alt="${esc(alt)}" loading="lazy">`}
 function teamLogo(i,p=state.profiles[i]){return img(p.logo||logoSvg(i),'Logo '+state.teams[i],'profile-logo')}
 function teamFlag(i,p=state.profiles[i]){return img(p.flag||flagPath(p.region),'Bendera '+p.region,'state-flag')}
-function tableTeam(id,code=''){
-  return `<div class="table-team">${teamLogo(id)}
-    <div class="table-team-label">
-      ${code?`<small>${code}</small>`:''}
-      <strong>${name(id)}</strong>
-    </div>
-    ${teamFlag(id)}
-  </div>`;
-}
+function tableTeam(id,code=''){return `<div class="table-team">${teamLogo(id)}${teamFlag(id)}<div class="table-team-label">${code?`<small>${code}</small>`:''}<strong>${name(id)}</strong></div></div>`}
 function record(i){let r={played:0,w:0,l:0,d:0,shotFor:0,shotAgainst:0};state.matches.filter(m=>m.score&&(m.a===i||m.b===i)).forEach(m=>{let j=m.a===i?0:1,x=m.score[j],y=m.score[1-j];r.played++;r.w+=x>y;r.l+=x<y;r.d+=x===y;r.shotFor+=x;r.shotAgainst+=y});return r}
 function recordHtml(i){let r=record(i);return `<div class="record"><span><b>${r.w}</b>Win</span><span><b>${r.l}</b>Lose</span><span><b>${r.d}</b>Draw</span><span><b>${r.played}</b>Main</span></div>`}
 let rosterMode='teams',rosterSearch='',rosterGroup='all',rosterRegion='all',profileDraft=null,profileId=null;
